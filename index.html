@@ -8,95 +8,124 @@
 <meta property="og:title" content="PizzaParty — 10° Anniversario — Iscrizioni">
 <meta property="og:description" content="Il modulo di iscrizione per l'edizione dei 10 anni del PizzaParty, 10 ottobre 2026.">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://pizza-party.net/">
-<meta property="og:image" content="https://pizza-party.net/og-image.png">
+<meta property="og:url" content="https://www.pizza-party.net/">
+<meta property="og:image" content="https://www.pizza-party.net/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="description" content="Il modulo di iscrizione per l'edizione dei 10 anni del PizzaParty, 10 ottobre 2026.">
-<meta name="theme-color" content="#14161f">
+<meta name="theme-color" content="#151217">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Kalam:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,600;1,9..144,700;1,9..144,900&family=Kalam:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --screen:#14161f;
-    --screen-2:#1c1f2c;
+    --bg:#151217;
+    --bg-2:#1d1922;
+    --card:#221d29;
+    --field:#100d14;
+    --line:rgba(245,201,52,.16);
+    --line-strong:rgba(245,201,52,.42);
     --gold:#f5c934;
+    --gold-bright:#ffd955;
     --gold-dark:#c99a1e;
-    --tomato:#c1432e;
-    --basil:#4f7942;
-    --parchment:#f2e8d5;
-    --ember:#ff7a3d;
+    --tomato:#d24a30;
+    --tomato-dark:#b23a22;
+    --basil:#5c8a4a;
+    --parchment:#f3e8d6;
+    --parchment-dim:#cabfa8;
+    --ember:#ff8a4d;
+    --ok:#7bbf5e;
+    --serif:"Fraunces",Georgia,"Times New Roman",serif;
+    --hand:"Kalam","Bradley Hand",cursive;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
   body{
-    background:var(--screen);
+    background:var(--bg);
     color:var(--parchment);
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-    line-height:1.5;
+    font-family:var(--sans);
+    line-height:1.55;
     min-height:100vh;
+    -webkit-font-smoothing:antialiased;
   }
-  .wrap{max-width:640px;margin:0 auto;padding:0 0 80px;}
+  /* film-grain overlay */
+  body::before{
+    content:"";
+    position:fixed;inset:0;
+    pointer-events:none;z-index:9999;
+    opacity:.04;mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .wrap{max-width:600px;margin:0 auto;padding:0 0 72px;position:relative;z-index:1;}
 
-  /* HERO */
+  /* ===== HERO ===== */
   .hero{
     position:relative;
-    padding:64px 24px 48px;
+    padding:56px 24px 46px;
     text-align:center;
     overflow:hidden;
-    background:radial-gradient(ellipse at 50% 120%, #2a1810 0%, var(--screen) 65%);
+    background:radial-gradient(120% 92% at 50% 122%, #3a1e12 0%, #241017 38%, var(--bg) 74%);
     border-bottom:2px solid var(--gold);
   }
+  .hero > *{position:relative;z-index:2;}
   .flame{
     position:absolute;
-    bottom:-20px;
-    left:50%;
-    width:280px;
-    height:280px;
+    left:50%;bottom:-64px;
+    width:180px;height:210px;
     transform:translateX(-50%);
-    opacity:0.55;
-    filter:blur(1px);
+    opacity:.22;
+    filter:blur(3px);
+    z-index:1;
     pointer-events:none;
   }
   .flame svg{width:100%;height:100%;}
-  .flame path{
-    animation:flicker 2.6s ease-in-out infinite;
-    transform-origin:50% 100%;
-  }
-  .flame path:nth-child(2){animation-delay:0.4s;animation-duration:3.1s;}
-  .flame path:nth-child(3){animation-delay:0.9s;animation-duration:2.3s;}
+  .flame path{animation:flicker 2.6s ease-in-out infinite;transform-origin:50% 100%;}
+  .flame path:nth-child(2){animation-delay:.4s;animation-duration:3.1s;}
+  .flame path:nth-child(3){animation-delay:.9s;animation-duration:2.3s;}
   @keyframes flicker{
     0%,100%{transform:scaleY(1) scaleX(1) rotate(0deg);}
-    30%{transform:scaleY(1.08) scaleX(0.96) rotate(-1deg);}
-    55%{transform:scaleY(0.94) scaleX(1.04) rotate(1.5deg);}
-    80%{transform:scaleY(1.05) scaleX(0.98) rotate(-0.5deg);}
+    30%{transform:scaleY(1.08) scaleX(.96) rotate(-1deg);}
+    55%{transform:scaleY(.94) scaleX(1.04) rotate(1.5deg);}
+    80%{transform:scaleY(1.05) scaleX(.98) rotate(-.5deg);}
+  }
+  .hero::after{
+    content:"";
+    position:absolute;inset:0;z-index:1;pointer-events:none;
+    background:linear-gradient(to top, var(--bg) 4%, rgba(21,18,23,.35) 42%, transparent 68%);
   }
   .eyebrow{
-    position:relative;
-    font-size:13px;
-    letter-spacing:0.12em;
-    color:var(--ember);
-    margin:0 0 6px;
-    font-weight:600;
+    font-size:12px;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    color:var(--parchment-dim);
+    font-weight:700;
+    margin:0 0 14px;
   }
   .title{
-    position:relative;
-    font-family:Georgia,'Times New Roman',serif;
+    font-family:var(--serif);
+    font-weight:900;
+    font-style:italic;
+    font-size:clamp(46px,13vw,78px);
+    line-height:.92;
+    color:var(--gold);
+    letter-spacing:-.02em;
+    text-shadow:0 2px 0 #7a3f18, 0 10px 26px rgba(0,0,0,.55);
+    margin:0;
+  }
+  .title-sub{
+    font-family:var(--serif);
     font-weight:700;
     font-style:italic;
-    font-size:clamp(38px,9vw,58px);
-    line-height:0.98;
-    color:var(--gold);
-    text-shadow:0 2px 0 #6b3d1a, 0 6px 18px rgba(0,0,0,0.5);
-    margin:0 0 10px;
-    letter-spacing:-0.01em;
+    font-size:clamp(18px,5vw,27px);
+    color:var(--parchment);
+    margin:12px 0 0;
   }
+  .title-sub::before,.title-sub::after{content:"—";color:var(--gold-dark);margin:0 .45em;}
   .subtitle{
-    position:relative;
     display:inline-block;
-    font-family:'Kalam',cursive;
+    font-family:var(--hand);
     font-weight:700;
     font-style:italic;
     font-size:16px;
@@ -105,369 +134,385 @@
     padding:8px 20px;
     border-radius:3px;
     transform:rotate(-1.5deg);
-    box-shadow:0 4px 10px rgba(0,0,0,0.35);
-    margin:0;
+    box-shadow:0 4px 12px rgba(0,0,0,.4);
+    margin:20px 0 0;
   }
-  .date-badge{
-    position:relative;
-    display:inline-block;
-    margin-top:20px;
-    padding:8px 20px;
-    border:1.5px solid var(--gold);
-    border-radius:2px;
+  .ticket-stub{
+    display:inline-flex;
+    align-items:center;
+    gap:12px;
+    margin-top:22px;
+    padding:9px 20px;
+    border:1.5px dashed var(--gold);
+    border-radius:4px;
+    font-family:var(--serif);
+    font-weight:700;
     font-size:14px;
-    letter-spacing:0.08em;
+    letter-spacing:.12em;
     color:var(--gold);
+    background:rgba(245,201,52,.05);
   }
+  .ticket-stub .dot{width:7px;height:7px;border-radius:50%;background:var(--gold-dark);flex-shrink:0;}
 
-  /* FILMSTRIP PROGRESS */
-  .filmstrip{
+  /* ===== FILM REEL PROGRESS ===== */
+  .reel{
     display:flex;
     justify-content:center;
-    gap:6px;
-    padding:20px 24px 0;
+    flex-wrap:wrap;
+    gap:5px;
+    padding:22px 20px 6px;
   }
-  .frame-dot{
-    width:28px;height:6px;
-    background:#3a3d4c;
-    border-radius:1px;
-    transition:background 0.4s ease;
+  .frame{
+    position:relative;
+    width:34px;height:22px;
+    border-radius:2px;
+    background:#2b2733;
+    border:1px solid var(--line);
+    transition:background .35s ease,border-color .35s ease;
   }
-  .frame-dot.active{background:var(--gold);}
+  .frame::before,.frame::after{
+    content:"";
+    position:absolute;left:3px;right:3px;height:3px;
+    background-image:radial-gradient(circle, rgba(0,0,0,.55) 45%, transparent 46%);
+    background-size:7px 3px;
+    background-repeat:repeat-x;
+  }
+  .frame::before{top:2px;}
+  .frame::after{bottom:2px;}
+  .frame.on{background:var(--gold);border-color:var(--gold-dark);}
+  .reel-label{
+    text-align:center;
+    font-family:var(--serif);
+    font-style:italic;
+    font-size:13px;
+    color:var(--parchment-dim);
+    margin:0 0 4px;
+    padding:0 20px;
+  }
 
-  /* SCENE CARDS */
+  /* ===== SCENE CARDS ===== */
   .scene{
     display:none;
-    margin:28px 20px 0;
-    background:var(--screen-2);
-    border:1px solid #2e3244;
-    border-radius:4px;
-    padding:24px 22px;
+    margin:26px 16px 0;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:26px 22px;
+    box-shadow:0 16px 34px -14px rgba(0,0,0,.65), inset 0 1px 0 rgba(255,255,255,.03);
   }
   .scene.step-active{display:block;}
-  @keyframes stepExitLeft{ to{opacity:0; transform:translateX(-36px);} }
-  @keyframes stepExitRight{ to{opacity:0; transform:translateX(36px);} }
-  @keyframes stepEnterLeft{ from{opacity:0; transform:translateX(-36px);} to{opacity:1; transform:translateX(0);} }
-  @keyframes stepEnterRight{ from{opacity:0; transform:translateX(36px);} to{opacity:1; transform:translateX(0);} }
-  .scene.step-exit-left{animation:stepExitLeft 0.28s ease forwards;}
-  .scene.step-exit-right{animation:stepExitRight 0.28s ease forwards;}
-  .scene.step-enter-left{animation:stepEnterLeft 0.32s ease forwards;}
-  .scene.step-enter-right{animation:stepEnterRight 0.32s ease forwards;}
-  .step-nav{
-    display:flex;
-    gap:12px;
-    margin:20px 20px 0;
-  }
-  .nav-btn{
-    flex:1;
-    padding:14px;
-    border-radius:4px;
-    font-size:15px;
-    font-weight:700;
-    font-family:Georgia,serif;
-    cursor:pointer;
-  }
-  .nav-back{
-    background:transparent;
-    border:1.5px solid var(--gold);
-    color:var(--gold);
-  }
-  .nav-back:hover{background:rgba(232,179,74,0.08);}
-  .nav-back:disabled{opacity:0.3;cursor:not-allowed;}
-  .nav-next{
-    border:none;
-    background:var(--tomato);
-    color:var(--parchment);
-  }
-  .nav-next:hover{background:#a8371f;}
-  .scene-num{
-    display:inline-block;
-    font-family:Georgia,serif;
+  @keyframes stepExitLeft{ to{opacity:0; transform:translateX(-34px);} }
+  @keyframes stepExitRight{ to{opacity:0; transform:translateX(34px);} }
+  @keyframes stepEnterLeft{ from{opacity:0; transform:translateX(-34px);} to{opacity:1; transform:translateX(0);} }
+  @keyframes stepEnterRight{ from{opacity:0; transform:translateX(34px);} to{opacity:1; transform:translateX(0);} }
+  .scene.step-exit-left{animation:stepExitLeft .26s ease forwards;}
+  .scene.step-exit-right{animation:stepExitRight .26s ease forwards;}
+  .scene.step-enter-left{animation:stepEnterLeft .3s ease forwards;}
+  .scene.step-enter-right{animation:stepEnterRight .3s ease forwards;}
+
+  .slate{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    font-family:var(--serif);
     font-style:italic;
     font-weight:700;
+    font-size:12px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
     color:var(--tomato);
-    font-size:13px;
-    letter-spacing:0.1em;
-    margin-bottom:10px;
+    margin-bottom:12px;
+  }
+  .slate::before{
+    content:"";
+    width:18px;height:12px;
+    border-radius:2px;
+    background:repeating-linear-gradient(-45deg, var(--tomato) 0 3px, #2b2733 3px 6px);
   }
   .scene h2{
-    font-family:Georgia,serif;
+    font-family:var(--serif);
     font-weight:700;
-    font-size:21px;
-    margin:0 0 16px;
+    font-size:22px;
+    line-height:1.22;
+    margin:0 0 18px;
     color:var(--parchment);
+    outline:none;
   }
-  label{
+  .scene h2:focus-visible{outline:2px solid var(--gold);outline-offset:4px;border-radius:3px;}
+  .scene p.note{font-size:14px;color:var(--parchment-dim);margin:0 0 12px;}
+
+  fieldset{border:0;margin:0 0 22px;padding:0;min-width:0;}
+  fieldset:last-of-type{margin-bottom:0;}
+  legend,.lbl{
     display:block;
-    font-size:14px;
-    color:var(--parchment);
-    opacity:0.9;
-    margin:0 0 6px;
+    font-size:13.5px;
+    color:var(--parchment-dim);
+    font-weight:600;
+    margin:0 0 8px;
+    padding:0;
   }
+  .hint{
+    display:block;
+    font-size:12.5px;
+    color:var(--parchment-dim);
+    line-height:1.45;
+    margin:-2px 0 8px;
+  }
+
   input[type=text], input[type=tel], input[type=email], textarea{
     width:100%;
-    background:#0f1119;
-    border:1px solid #3a3d4c;
-    border-radius:3px;
+    background:var(--field);
+    border:1px solid rgba(243,232,214,.16);
+    border-radius:7px;
     color:var(--parchment);
-    padding:11px 12px;
-    font-size:15px;
+    padding:13px;
+    font-size:16px;
     font-family:inherit;
-    margin-bottom:16px;
+    min-height:46px;
+    margin-bottom:4px;
+    transition:border-color .15s ease, box-shadow .15s ease;
   }
-  input[type=text]:focus, input[type=email]:focus, textarea:focus{
-    outline:2px solid var(--gold);
-    outline-offset:1px;
+  input:focus, textarea:focus{
+    outline:none;
     border-color:var(--gold);
+    box-shadow:0 0 0 3px rgba(245,201,52,.22);
   }
-  textarea{resize:vertical;min-height:64px;}
+  input[aria-invalid="true"], textarea[aria-invalid="true"]{
+    border-color:var(--ember);
+    box-shadow:0 0 0 3px rgba(255,138,77,.18);
+  }
+  textarea{resize:vertical;min-height:70px;}
 
-  .radio-row, .check-row{
-    display:flex;
-    flex-direction:column;
-    gap:10px;
-    margin-bottom:16px;
-  }
-  .radio-opt, .check-opt{
+  .opt-list{display:flex;flex-direction:column;gap:9px;}
+  .opt{
     display:flex;
     align-items:center;
-    gap:10px;
-    padding:11px 14px;
-    background:#0f1119;
-    border:1px solid #3a3d4c;
-    border-radius:3px;
+    gap:11px;
+    padding:12px 14px;
+    background:var(--field);
+    border:1px solid rgba(243,232,214,.14);
+    border-radius:8px;
     cursor:pointer;
-    transition:border-color 0.2s ease, background 0.2s ease;
+    min-height:46px;
+    transition:border-color .15s ease, background .15s ease;
   }
-  .radio-opt:has(input:checked), .check-opt:has(input:checked){
-    border-color:var(--gold);
-    background:rgba(232,179,74,0.08);
-  }
-  .radio-opt input, .check-opt input{
-    accent-color:var(--gold);
-    width:17px;height:17px;
-    flex-shrink:0;
-  }
-  .radio-opt span, .check-opt span{font-size:15px;}
+  .opt:hover{border-color:var(--line-strong);}
+  .opt:focus-within{border-color:var(--gold);box-shadow:0 0 0 3px rgba(245,201,52,.2);}
+  .opt:has(input:checked){border-color:var(--gold);background:rgba(245,201,52,.1);}
+  .opt input{accent-color:var(--gold);width:18px;height:18px;flex-shrink:0;}
+  .opt span{font-size:15px;color:var(--parchment);}
 
-  .conditional{
-    max-height:0;
-    overflow:hidden;
-    transition:max-height 0.35s ease;
-  }
-  .conditional.open{max-height:200px;}
+  .conditional{max-height:0;overflow:hidden;transition:max-height .35s ease;}
+  .conditional.open{max-height:220px;}
+  .conditional .lbl{margin-top:14px;}
 
   .quota-line{
     display:flex;
     justify-content:space-between;
     align-items:baseline;
-    padding:14px 16px;
-    background:rgba(193,67,46,0.12);
+    padding:16px;
+    background:rgba(210,74,48,.12);
     border:1px solid var(--tomato);
-    border-radius:3px;
-    margin-bottom:16px;
+    border-radius:8px;
+    margin-bottom:14px;
   }
-  .quota-line .amount{
-    font-family:Georgia,serif;
-    font-weight:700;
-    font-size:24px;
-    color:var(--gold);
-  }
-  .pay-buttons{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
+  .quota-line .amount{font-family:var(--serif);font-weight:900;font-size:26px;color:var(--gold);}
+  .pay-buttons{display:flex;gap:10px;margin:6px 0 16px;flex-wrap:wrap;}
   .pay-btn{
-    flex:1;
-    min-width:140px;
-    text-align:center;
-    padding:11px 14px;
-    border-radius:3px;
-    text-decoration:none;
-    font-size:14px;
-    font-weight:600;
-    border:1px solid var(--gold);
-    color:var(--gold);
-    transition:background 0.2s ease, color 0.2s ease;
+    flex:1;min-width:150px;text-align:center;
+    padding:12px 14px;border-radius:8px;
+    text-decoration:none;font-size:14px;font-weight:700;font-family:var(--serif);
+    border:1px solid var(--gold);color:var(--gold);
+    transition:background .15s ease, color .15s ease;
   }
-  .pay-btn:hover{background:var(--gold);color:var(--screen);}
+  .pay-btn:hover{background:var(--gold);color:var(--bg);}
+
+  /* ===== NAV / BUTTONS ===== */
+  .step-nav{display:flex;gap:12px;margin:22px 16px 0;}
+  .btn{
+    flex:1;
+    padding:15px;
+    border-radius:9px;
+    font-size:15px;
+    font-weight:700;
+    font-family:var(--serif);
+    font-style:italic;
+    cursor:pointer;
+    border:1.5px solid transparent;
+    transition:background .15s ease, border-color .15s ease, transform .08s ease;
+  }
+  .btn:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+  .btn:active{transform:translateY(1px);}
+  .btn-ghost{background:transparent;border-color:var(--parchment-dim);color:var(--parchment);}
+  .btn-ghost:hover{border-color:var(--parchment);background:rgba(243,232,214,.06);}
+  .btn-ghost:disabled{opacity:.3;cursor:not-allowed;}
+  .btn-primary{background:var(--gold);color:var(--bg);}
+  .btn-primary:hover{background:var(--gold-bright);}
+  .btn-primary:disabled{opacity:.6;cursor:not-allowed;}
 
   .submit-btn{
-    width:calc(100% - 40px);
-    margin:32px 20px 0;
     display:block;
-    padding:16px;
-    background:var(--tomato);
-    color:var(--parchment);
+    width:calc(100% - 32px);
+    margin:26px 16px 0;
+    padding:17px;
+    background:var(--gold);
+    color:var(--bg);
     border:none;
-    border-radius:4px;
+    border-radius:10px;
     font-size:17px;
-    font-weight:700;
-    font-family:Georgia,serif;
+    font-weight:900;
+    font-family:var(--serif);
     font-style:italic;
-    letter-spacing:0.02em;
+    letter-spacing:.01em;
     cursor:pointer;
-    transition:background 0.2s ease, transform 0.1s ease;
+    transition:background .15s ease, transform .08s ease;
   }
-  .submit-btn:hover{background:#a8371f;}
-  .submit-btn:active{transform:scale(0.98);}
-  .submit-btn:disabled{opacity:0.6;cursor:not-allowed;}
+  .submit-btn:hover{background:var(--gold-bright);}
+  .submit-btn:active{transform:scale(.99);}
+  .submit-btn:disabled{opacity:.6;cursor:not-allowed;}
 
-  .error-msg{
-    color:var(--ember);
-    font-size:13px;
-    margin-top:-10px;
-    margin-bottom:14px;
+  .error-msg{color:var(--ember);font-size:13px;margin:6px 0 10px;display:none;}
+  .error-msg.show{display:block;}
+  .form-error{
+    margin:16px 16px 0;
+    padding:12px 14px;
+    border:1px solid var(--ember);
+    border-radius:8px;
+    background:rgba(255,138,77,.1);
+    color:var(--parchment);
+    font-size:14px;
+    line-height:1.55;
     display:none;
   }
-  .error-msg.show{display:block;}
+  .form-error.show{display:block;}
 
-  /* PIZZA BAKING / DEVOUR ANIMATION */
+  /* honeypot */
+  .hp{position:absolute !important;left:-9999px !important;top:auto !important;width:1px !important;height:1px !important;overflow:hidden !important;}
+
+  /* ===== BAKE ANIMATION ===== */
   .bake-screen{
     display:none;
-    text-align:center;
-    padding:70px 24px 40px;
-  }
-  .bake-screen.show{display:block;}
-  .pizza-stage{
-    position:relative;
-    width:230px;
-    height:230px;
-    margin:0 auto;
-  }
-  .crust-ring{
-    position:absolute;
-    inset:-10px;
-    border-radius:50%;
-    background:#c9942b;
-    box-shadow:inset 0 0 0 6px #a8781f;
-  }
-  .pizza-wheel{
-    position:absolute;
-    inset:0;
-    border-radius:50%;
-    overflow:visible;
-  }
-  .slice-slot{
-    position:absolute;
-    inset:0;
-    transform-origin:50% 50%;
-  }
-  .slice-content{
-    position:absolute;
-    inset:0;
-    clip-path:polygon(50% 50%, 50% 0%, 85.36% 14.64%);
-    background:linear-gradient(165deg, #e6a53a 0%, #e6a53a 18%, var(--tomato) 19%, #d1462d 60%, #a8331f 100%);
-    opacity:0;
-    transform:scale(0);
-    transform-origin:50% 50%;
-  }
-  .pizza-wheel.appear .slice-content{
-    animation:sliceAppear 0.45s ease-out forwards;
-  }
-  .pizza-wheel.devour .slice-content{
-    animation:sliceFly 0.55s ease-in forwards;
-  }
-  @keyframes sliceAppear{
-    from{opacity:0;transform:scale(0);}
-    to{opacity:1;transform:scale(1);}
-  }
-  @keyframes sliceFly{
-    0%{opacity:1;transform:scale(1) translateY(0) rotate(0deg);}
-    100%{opacity:0;transform:scale(0.75) translateY(-260px) rotate(35deg);}
-  }
-  .topping{position:absolute;}
-  .topping-a{
-    width:19px;height:15px;
-    border-radius:55% 45% 60% 40%;
-    background:#f7f0dc;
-    box-shadow:0 0 0 1.5px rgba(120,90,30,0.25);
-    top:26%;left:54%;
-  }
-  .topping-b{
-    width:14px;height:14px;
-    border-radius:50%;
-    background:#e2503a;
-    box-shadow:inset 0 0 0 2.5px #8f2a18;
-    top:46%;left:68%;
-  }
-  .topping-c{
-    width:13px;height:7px;
-    border-radius:60% 40% 60% 40%;
-    background:var(--basil);
-    top:57%;left:50%;
-    transform:rotate(25deg);
-  }
-  .crumb-field{
-    position:absolute;
-    inset:0;
-    pointer-events:none;
-  }
-  .crumb{
-    position:absolute;
-    border-radius:40% 60% 50% 50%;
-    background:#a8781f;
-    opacity:0;
-    transform:scale(0);
-  }
-  #pizzaWheel.devour ~ .crumb-field .crumb{
-    animation:crumbPop 0.4s cubic-bezier(0.34,1.56,0.64,1) forwards;
-  }
-  @keyframes crumbPop{
-    0%{opacity:0;transform:scale(0) translateY(-6px);}
-    60%{opacity:1;transform:scale(1.15) translateY(0);}
-    100%{opacity:0.9;transform:scale(1) translateY(0);}
-  }
-  .bake-caption{
-    margin-top:28px;
-    font-family:Georgia,serif;
-    font-style:italic;
-    font-weight:700;
-    font-size:17px;
-    color:var(--gold);
-  }
-
-  /* SUCCESS STAMP */
-  .success-screen{
-    display:none;
-    position:fixed;
-    inset:0;
-    z-index:100;
-    background:var(--screen);
+    position:fixed;inset:0;z-index:100;
+    background:var(--bg);
     text-align:center;
     flex-direction:column;
     align-items:center;
     justify-content:center;
-    padding:24px;
+    padding:32px 24px;
+  }
+  .bake-screen.show{display:flex;}
+  .pizza-stage{position:relative;width:250px;height:250px;margin:0 auto;}
+  .pizza-stage svg{width:100%;height:100%;overflow:visible;}
+  .board{fill:#6b4a1e;}
+  .board-ring{fill:none;stroke:#5a3d18;stroke-width:3;}
+
+  /* ogni fetta: assemblata sul tagliere, poi presa via una alla volta */
+  #pizzaWheel .slice{
+    transform-box:view-box;
+    transform-origin:100px 100px;
+    opacity:0;
+  }
+  #pizzaWheel.appear .slice{
+    animation:sliceIn .5s cubic-bezier(.34,1.4,.64,1) both;
+    animation-delay:calc(var(--i) * 120ms);
+  }
+  #pizzaWheel.devour .slice{
+    animation:sliceOut .45s ease-in both;
+    animation-delay:calc(var(--i) * 150ms);
+  }
+  @keyframes sliceIn{
+    0%{opacity:0;transform:translate(calc(var(--fx,0px) * .5), -66px) scale(.25) rotate(calc(var(--fr,0deg) * -1));}
+    60%{opacity:1;}
+    100%{opacity:1;transform:translate(0,0) scale(1) rotate(0deg);}
+  }
+  @keyframes sliceOut{
+    0%{opacity:1;transform:translate(0,0) scale(1) rotate(0deg);}
+    100%{opacity:0;transform:translate(var(--fx,0px), -92px) scale(.4) rotate(var(--fr,16deg));}
+  }
+
+  .crumb-field{position:absolute;inset:0;pointer-events:none;}
+  .crumb{position:absolute;border-radius:40% 60% 50% 50%;background:#a8781f;opacity:0;transform:scale(0);}
+  #pizzaWheel.devour ~ .crumb-field .crumb{animation:crumbPop .4s cubic-bezier(.34,1.56,.64,1) forwards;}
+  @keyframes crumbPop{
+    0%{opacity:0;transform:scale(0) translateY(-6px);}
+    60%{opacity:1;transform:scale(1.15) translateY(0);}
+    100%{opacity:.9;transform:scale(1) translateY(0);}
+  }
+  .bake-caption{margin-top:30px;font-family:var(--serif);font-style:italic;font-weight:700;font-size:17px;color:var(--gold);}
+
+  /* ===== SUCCESS ===== */
+  .success-screen{
+    display:none;
+    position:fixed;inset:0;z-index:100;
+    background:var(--bg);
+    text-align:center;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding:32px 24px;
   }
   .success-screen.show{display:flex;}
   .stamp{
-    display:inline-block;
     border:4px solid var(--basil);
     color:var(--basil);
     border-radius:50%;
-    width:140px;height:140px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-family:Georgia,serif;
-    font-weight:700;
+    width:150px;height:150px;
+    display:flex;align-items:center;justify-content:center;
+    font-family:var(--serif);
+    font-weight:900;
     font-style:italic;
-    font-size:20px;
-    line-height:1.15;
+    font-size:21px;
+    line-height:1.1;
+    text-align:center;
     transform:rotate(-8deg) scale(0);
-    animation:stampIn 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards;
+    animation:stampIn .5s cubic-bezier(.34,1.56,.64,1) forwards;
   }
-  @keyframes stampIn{
-    to{transform:rotate(-8deg) scale(1);}
+  @keyframes stampIn{to{transform:rotate(-8deg) scale(1);}}
+  .success-title{font-family:var(--serif);font-style:italic;font-weight:900;font-size:24px;color:var(--gold);margin:22px 0 0;}
+  .success-body{max-width:38ch;margin:14px auto 0;}
+  .success-body > *{margin:0;}
+  .success-body > * + *{margin-top:12px;}
+  .success-text{color:var(--parchment);font-size:15px;line-height:1.6;}
+  .success-pay{color:var(--parchment-dim);font-size:13.5px;line-height:1.55;}
+  .success-note{
+    color:var(--parchment-dim);
+    font-size:12.5px;
+    line-height:1.5;
+    margin-top:16px !important;
+    padding-top:12px;
+    border-top:1px solid var(--line);
   }
-  .success-screen p{margin-top:24px;color:var(--parchment);opacity:0.85;}
+  .cal-link{
+    display:inline-block;
+    margin-top:26px;
+    padding:12px 20px;
+    border:1.5px solid var(--gold);
+    border-radius:8px;
+    color:var(--gold);
+    text-decoration:none;
+    font-family:var(--serif);
+    font-weight:700;
+    font-size:14px;
+  }
+  .cal-link:hover{background:var(--gold);color:var(--bg);}
 
   .hidden{display:none !important;}
+
+  @media (prefers-reduced-motion: reduce){
+    *,*::before,*::after{
+      animation-duration:.001ms !important;
+      animation-iteration-count:1 !important;
+      transition-duration:.001ms !important;
+    }
+    .flame{display:none;}
+  }
 </style>
 </head>
 <body>
 <div class="wrap">
 
   <div class="hero">
-    <div class="flame">
+    <div class="flame" aria-hidden="true">
       <svg viewBox="0 0 100 120">
         <path d="M50 120 C20 100 15 70 30 45 C33 60 40 62 40 50 C40 30 30 20 32 5 C55 20 70 40 65 60 C75 55 78 45 76 35 C90 55 88 85 65 105 C70 90 60 90 55 100 C58 90 50 88 50 120 Z" fill="var(--ember)"/>
         <path d="M50 120 C35 105 32 85 40 68 C42 78 46 79 46 70 C46 55 40 48 41 38 C56 48 65 62 62 76 C68 73 70 66 69 59 C77 72 76 92 62 106 Z" fill="#ffb15c" opacity="0.85"/>
@@ -475,201 +520,224 @@
       </svg>
     </div>
     <p class="eyebrow">L'evento più atteso di questo rocambolesco 2026</p>
-    <h1 class="title">PizzaParty —<br>10° Anniversario</h1>
+    <h1 class="title">PizzaParty</h1>
+    <p class="title-sub">10° Anniversario</p>
     <p class="subtitle">Dieci anni di pizze più o meno riuscite</p>
-    <div class="date-badge">10 · 10 · 2026</div>
+    <div><span class="ticket-stub"><span class="dot"></span>10 · 10 · 2026<span class="dot"></span></span></div>
   </div>
 
-  <div class="filmstrip" id="filmstrip">
-    <div class="frame-dot active" data-frame="0"></div>
-    <div class="frame-dot" data-frame="1"></div>
-    <div class="frame-dot" data-frame="2"></div>
-    <div class="frame-dot" data-frame="3"></div>
-    <div class="frame-dot" data-frame="4"></div>
-    <div class="frame-dot" data-frame="5"></div>
-  </div>
+  <div class="reel" id="reel" aria-hidden="true"></div>
+  <p class="reel-label" id="reelLabel" aria-live="polite"></p>
 
-  <form id="pizzaForm">
+  <form id="pizzaForm" novalidate>
+
+    <!-- honeypot: invisibile agli umani, riempito dai bot -->
+    <div class="hp" aria-hidden="true">
+      <label>Se sei umano lascia vuoto questo campo
+        <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+      </label>
+    </div>
 
     <div class="scene step-active">
-      <span class="scene-num">PizzaID</span>
-      <h2>Chi partecipa</h2>
-      <label for="email">Email</label>
-      <input type="email" id="email" name="email" required placeholder="Ci servirà per mandarti la galleria fotografica dopo l'evento">
-      <div class="error-msg" id="err-email">Serve un'email valida.</div>
-      <div class="error-msg" id="err-email-dup">Questa email risulta già iscritta. Se pensi sia un errore, scrivi ad Arturo.</div>
+      <span class="slate">PizzaID</span>
+      <h2 tabindex="-1">Chi partecipa</h2>
 
-      <label for="nome">Nome e cognome</label>
-      <input type="text" id="nome" name="nome" required placeholder="Il tuo nome">
-      <div class="error-msg" id="err-nome">Serve il tuo nome per la lista alla porta.</div>
+      <label class="lbl" for="email">Email</label>
+      <span class="hint" id="hint-email">Ci servirà per mandarti la galleria fotografica dopo l'evento.</span>
+      <input type="email" id="email" name="email" required placeholder="nome@esempio.it" autocomplete="email"
+             aria-describedby="hint-email err-email err-email-dup">
+      <div class="error-msg" id="err-email" role="alert">Serve un'email valida.</div>
+      <div class="error-msg" id="err-email-dup" role="alert">Questa email risulta già iscritta. Se pensi sia un errore, scrivi ad Arturo.</div>
 
-      <label>Parteciperai alla festa?</label>
-      <div class="radio-row">
-        <label class="radio-opt">
-          <input type="radio" name="conferma" value="si" checked>
-          <span>Sì</span>
-        </label>
-        <label class="radio-opt">
-          <input type="radio" name="conferma" value="no">
-          <span>No</span>
-        </label>
-        <label class="radio-opt">
-          <input type="radio" name="conferma" value="forse">
-          <span>Forse (tendente al sì)</span>
-        </label>
-        <label class="radio-opt">
-          <input type="radio" name="conferma" value="zonzo">
-          <span>Sarò a zonzo per il mondo</span>
-        </label>
-      </div>
+      <label class="lbl" for="nome">Nome e cognome</label>
+      <span class="hint" id="hint-nome">Come vuoi comparire nella lista alla porta.</span>
+      <input type="text" id="nome" name="nome" required placeholder="Mario Rossi" autocomplete="name"
+             aria-describedby="hint-nome err-nome">
+      <div class="error-msg" id="err-nome" role="alert">Serve il tuo nome per la lista alla porta.</div>
 
-      <label>Partecipazione</label>
-      <div class="radio-row">
-        <label class="radio-opt">
-          <input type="radio" name="partecipazione" value="solo" checked>
-          <span>Vengo da solo/a</span>
-        </label>
-        <label class="radio-opt">
-          <input type="radio" name="partecipazione" value="plus1">
-          <span>Vengo con un +1</span>
-        </label>
-      </div>
-      <div class="conditional" id="plus1-wrap">
-        <label for="plus1nome">Nome del tuo +1</label>
-        <input type="text" id="plus1nome" name="plus1nome" placeholder="Nome dell'accompagnatore">
-      </div>
+      <fieldset>
+        <legend>Parteciperai alla festa?</legend>
+        <div class="opt-list">
+          <label class="opt"><input type="radio" name="conferma" value="si" checked><span>Sì</span></label>
+          <label class="opt"><input type="radio" name="conferma" value="no"><span>No</span></label>
+          <label class="opt"><input type="radio" name="conferma" value="forse"><span>Forse (tendente al sì)</span></label>
+          <label class="opt"><input type="radio" name="conferma" value="zonzo"><span>Sarò a zonzo per il mondo</span></label>
+        </div>
+      </fieldset>
 
-      <label>Hai già partecipato ad una delle edizioni precedenti?</label>
-      <div class="radio-row">
-        <label class="radio-opt">
-          <input type="radio" name="veterano" value="no" checked>
-          <span>No, sarà la mia prima volta</span>
-        </label>
-        <label class="radio-opt">
-          <input type="radio" name="veterano" value="si">
-          <span>Sì, ho già partecipato</span>
-        </label>
-      </div>
+      <fieldset>
+        <legend>Partecipazione</legend>
+        <div class="opt-list">
+          <label class="opt"><input type="radio" name="partecipazione" value="solo" checked><span>Vengo da solo/a</span></label>
+          <label class="opt"><input type="radio" name="partecipazione" value="plus1"><span>Vengo con un +1</span></label>
+        </div>
+        <div class="conditional" id="plus1-wrap">
+          <label class="lbl" for="plus1nome">Nome del tuo +1</label>
+          <input type="text" id="plus1nome" name="plus1nome" placeholder="Nome dell'accompagnatore">
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Hai già partecipato ad una delle edizioni precedenti?</legend>
+        <div class="opt-list">
+          <label class="opt"><input type="radio" name="veterano" value="no" checked><span>No, sarà la mia prima volta</span></label>
+          <label class="opt"><input type="radio" name="veterano" value="si"><span>Sì, ho già partecipato</span></label>
+        </div>
+      </fieldset>
     </div>
 
     <div class="scene" id="intolleranze-scene">
-      <span class="scene-num">HACCP</span>
-      <h2>Intolleranze e allergie</h2>
-      <label for="intolleranze">Qualcosa da segnalarci? (facoltativo)</label>
+      <span class="slate">HACCP</span>
+      <h2 tabindex="-1">Intolleranze e allergie</h2>
+      <label class="lbl" for="intolleranze">Qualcosa da segnalarci? (facoltativo)</label>
       <textarea id="intolleranze" name="intolleranze" placeholder="Es. intolleranza al lattosio, allergia alle noci..."></textarea>
     </div>
 
     <div class="scene">
-      <span class="scene-num">Per non perdersi</span>
-      <h2>Come arrivare</h2>
-      <label>Sai già come arrivare a destinazione o hai bisogno di indicazioni?</label>
-      <div class="radio-row">
-        <label class="radio-opt">
-          <input type="radio" name="indicazioni" value="memoria" checked>
-          <span>No, conosco la strada a memoria</span>
-        </label>
-        <label class="radio-opt">
-          <input type="radio" name="indicazioni" value="ping">
-          <span>Sì, manda il ping su Google Maps</span>
-        </label>
-        <label class="radio-opt">
-          <input type="radio" name="indicazioni" value="accompagnato">
-          <span>Non conosco la strada, ma mi faccio portare da qualcun altro</span>
-        </label>
-      </div>
+      <span class="slate">Per non perdersi</span>
+      <h2 tabindex="-1">Come arrivare</h2>
+      <fieldset>
+        <legend>Sai già come arrivare a destinazione o hai bisogno di indicazioni?</legend>
+        <div class="opt-list">
+          <label class="opt"><input type="radio" name="indicazioni" value="memoria" checked><span>No, conosco la strada a memoria</span></label>
+          <label class="opt"><input type="radio" name="indicazioni" value="ping"><span>Sì, manda il ping su Google Maps</span></label>
+          <label class="opt"><input type="radio" name="indicazioni" value="accompagnato"><span>Non conosco la strada, ma mi faccio portare da qualcun altro</span></label>
+        </div>
+      </fieldset>
     </div>
 
     <div class="scene">
-      <span class="scene-num">In aggiunta per cena...</span>
-      <h2>Il tuo contributo</h2>
-      <label>Cosa porti?</label>
-      <div class="check-row">
-        <label class="check-opt"><input type="checkbox" name="contributo" value="Bevande"><span>Bevande</span></label>
-        <label class="check-opt"><input type="checkbox" name="contributo" value="Antipasto"><span>Antipasto</span></label>
-        <label class="check-opt"><input type="checkbox" name="contributo" value="Dolce"><span>Dolce</span></label>
-        <label class="check-opt"><input type="checkbox" name="contributo" value="Nessuno"><span>Non porto nulla</span></label>
-      </div>
-      <label for="dettaglio">Dettagli (facoltativo)</label>
+      <span class="slate">In aggiunta per cena...</span>
+      <h2 tabindex="-1">Il tuo contributo</h2>
+      <fieldset>
+        <legend>Cosa porti?</legend>
+        <div class="opt-list">
+          <label class="opt"><input type="checkbox" name="contributo" value="Bevande"><span>Bevande</span></label>
+          <label class="opt"><input type="checkbox" name="contributo" value="Antipasto"><span>Antipasto</span></label>
+          <label class="opt"><input type="checkbox" name="contributo" value="Dolce"><span>Dolce</span></label>
+          <label class="opt"><input type="checkbox" name="contributo" value="Nessuno"><span>Non porto nulla</span></label>
+        </div>
+      </fieldset>
+      <label class="lbl" for="dettaglio">Dettagli (facoltativo)</label>
       <input type="text" id="dettaglio" name="dettaglio" placeholder="Es. 2 bottiglie di vino rosso, una torta al cioccolato...">
     </div>
 
     <div class="scene">
-      <span class="scene-num">Per chi ha a cuore l'ambiente</span>
-      <h2>Iniziativa "Adotta un sacchetto"</h2>
-      <p style="font-size:14px;opacity:0.85;">
+      <span class="slate">Per chi ha a cuore l'ambiente</span>
+      <h2 tabindex="-1">Iniziativa "Adotta un sacchetto"</h2>
+      <p class="note">
         Lo smaltimento dei rifiuti non è cosa da poco e noi della PizzaParty SPA ci teniamo a fare le cose per bene.
         Gli avventori di vecchia data conosceranno già il programma o lo avranno almeno sentito nominare.
       </p>
-      <p style="font-size:14px;opacity:0.85;">
+      <p class="note">
         Alla fine della serata, verrà richiesta la cooperazione dei partecipanti per il ritiro di un sacchetto di spazzatura a scelta (tra carta, vetro e plastica) tra quelli riempiti durante la cena.
       </p>
-      <p style="font-size:14px;opacity:0.85;">
+      <p class="note">
         Potranno partecipare solo le persone che arrivano da Mantova e che devono sottostare alle regole della raccolta porta a porta della Tea, mentre sono da considerarsi esclusi tutti gli avventori provenienti da fuori regione.
         Se avete a disposizione un buono ottenuto durante la precedente edizione, questa sarà la serata buona per riscattarlo.
         Se invece non avete mai preso parte all'iniziativa, avrete diritto ad un coupon dedicato che potrete riscattare al PizzaParty successivo.
       </p>
-      <p style="font-size:14px;opacity:0.85;">
+      <p class="note">
         Se pensate di rispettare i requisiti, potete aderire alla campagna con la spunta qui sotto. La vostra collaborazione verrà apprezzata.
       </p>
-      <label class="check-opt" style="margin-bottom:0;">
+      <label class="opt">
         <input type="checkbox" id="sacchetto" name="sacchetto">
         <span>Adotterò un sacchetto</span>
       </label>
     </div>
 
     <div class="scene">
-      <span class="scene-num">Spese per gli impasti</span>
-      <h2>La quota</h2>
+      <span class="slate">Spese per gli impasti</span>
+      <h2 tabindex="-1">La quota</h2>
       <div class="quota-line">
         <span>Quota di partecipazione</span>
         <span class="amount" id="quota-amount">5€</span>
       </div>
-      <p style="font-size:14px;opacity:0.8;margin-top:-6px;">La quota copre i costi della serata. Puoi versarla con uno dei link qui sotto.</p>
-      <label>Come vuoi pagare?</label>
-      <div class="radio-row">
-        <label class="radio-opt">
-          <input type="radio" name="metodo_pagamento" value="online" checked>
-          <span>Pago online</span>
-        </label>
-        <label class="radio-opt">
-          <input type="radio" name="metodo_pagamento" value="contanti">
-          <span>Pago la sera dell'evento</span>
-        </label>
-      </div>
+      <p class="note">La quota copre i costi della serata. Puoi versarla con uno dei link qui sotto.</p>
+      <fieldset>
+        <legend>Come vuoi pagare?</legend>
+        <div class="opt-list">
+          <label class="opt"><input type="radio" name="metodo_pagamento" value="online" checked><span>Pago online</span></label>
+          <label class="opt"><input type="radio" name="metodo_pagamento" value="contanti"><span>Pago la sera dell'evento</span></label>
+        </div>
+      </fieldset>
       <div class="conditional open" id="online-wrap">
         <div class="pay-buttons">
           <a class="pay-btn" href="https://www.paypal.me/ArturoScalori" target="_blank" rel="noopener">Paga con PayPal</a>
           <a class="pay-btn" href="https://web.satispay.com/download/qrcode/S6Y-CON--C128DABC-9807-4413-AE7B-C13BFABB9F34?locale=it" target="_blank" rel="noopener">Paga con Satispay</a>
         </div>
       </div>
-      <label class="check-opt" style="margin-bottom:0;">
+      <label class="opt">
         <input type="checkbox" id="accetto" name="accetto" required>
         <span>Confermo la mia partecipazione e accetto di versare la quota di partecipazione</span>
       </label>
-      <div class="error-msg" id="err-accetto">Devi confermare l'accettazione della quota per iscriverti.</div>
+      <div class="error-msg" id="err-accetto" role="alert">Devi confermare l'accettazione della quota per iscriverti.</div>
     </div>
 
     <div class="step-nav" id="stepNav">
-      <button type="button" class="nav-btn nav-back" id="btnBack">← Indietro</button>
-      <button type="button" class="nav-btn nav-next" id="btnNext">Avanti →</button>
+      <button type="button" class="btn btn-ghost" id="btnBack">← Indietro</button>
+      <button type="button" class="btn btn-primary" id="btnNext">Avanti →</button>
     </div>
+
+    <div class="form-error" id="formError" role="alert"></div>
 
     <button type="submit" class="submit-btn" id="submitBtn">Prenota il tuo posto</button>
   </form>
 
-  <div class="bake-screen" id="bakeScreen">
+  <div class="bake-screen" id="bakeScreen" role="status">
     <div class="pizza-stage">
-      <div class="crust-ring"></div>
-      <div class="pizza-wheel" id="pizzaWheel">
-        <div class="slice-slot" style="transform:rotate(0deg)"><div class="slice-content" style="animation-delay:0ms"><span class="topping topping-a"></span><span class="topping topping-b"></span><span class="topping topping-c"></span></div></div>
-        <div class="slice-slot" style="transform:rotate(45deg)"><div class="slice-content" style="animation-delay:100ms"><span class="topping topping-a"></span><span class="topping topping-b"></span><span class="topping topping-c"></span></div></div>
-        <div class="slice-slot" style="transform:rotate(90deg)"><div class="slice-content" style="animation-delay:200ms"><span class="topping topping-a"></span><span class="topping topping-b"></span><span class="topping topping-c"></span></div></div>
-        <div class="slice-slot" style="transform:rotate(135deg)"><div class="slice-content" style="animation-delay:300ms"><span class="topping topping-a"></span><span class="topping topping-b"></span><span class="topping topping-c"></span></div></div>
-        <div class="slice-slot" style="transform:rotate(180deg)"><div class="slice-content" style="animation-delay:400ms"><span class="topping topping-a"></span><span class="topping topping-b"></span><span class="topping topping-c"></span></div></div>
-        <div class="slice-slot" style="transform:rotate(225deg)"><div class="slice-content" style="animation-delay:500ms"><span class="topping topping-a"></span><span class="topping topping-b"></span><span class="topping topping-c"></span></div></div>
-        <div class="slice-slot" style="transform:rotate(270deg)"><div class="slice-content" style="animation-delay:600ms"><span class="topping topping-a"></span><span class="topping topping-b"></span><span class="topping topping-c"></span></div></div>
-        <div class="slice-slot" style="transform:rotate(315deg)"><div class="slice-content" style="animation-delay:700ms"><span class="topping topping-a"></span><span class="topping topping-b"></span><span class="topping topping-c"></span></div></div>
-      </div>
+      <svg viewBox="0 0 200 200" id="pizzaWheel" aria-hidden="true">
+        <defs>
+          <g id="pizzaArt">
+            <circle cx="100" cy="100" r="92" fill="#e6b45a"/>
+            <circle cx="100" cy="100" r="92" fill="none" stroke="#b9832c" stroke-width="4"/>
+            <circle cx="100" cy="100" r="80" fill="#cf4529"/>
+            <circle cx="100" cy="100" r="80" fill="#d24a30" opacity="0.5"/>
+            <!-- mozzarella -->
+            <ellipse cx="72" cy="74" rx="14" ry="10" fill="#f4e3b0" opacity="0.9"/>
+            <ellipse cx="128" cy="70" rx="13" ry="10" fill="#f4e3b0" opacity="0.9"/>
+            <ellipse cx="132" cy="120" rx="14" ry="11" fill="#f4e3b0" opacity="0.9"/>
+            <ellipse cx="70" cy="126" rx="13" ry="10" fill="#f4e3b0" opacity="0.9"/>
+            <ellipse cx="100" cy="56" rx="11" ry="8" fill="#f4e3b0" opacity="0.9"/>
+            <ellipse cx="56" cy="102" rx="10" ry="9" fill="#f4e3b0" opacity="0.9"/>
+            <ellipse cx="144" cy="100" rx="10" ry="9" fill="#f4e3b0" opacity="0.9"/>
+            <ellipse cx="100" cy="144" rx="12" ry="9" fill="#f4e3b0" opacity="0.9"/>
+            <!-- pepperoni -->
+            <circle cx="88" cy="68" r="9" fill="#c0392b" stroke="#8f2a18" stroke-width="2"/>
+            <circle cx="120" cy="84" r="9" fill="#c0392b" stroke="#8f2a18" stroke-width="2"/>
+            <circle cx="130" cy="116" r="9" fill="#c0392b" stroke="#8f2a18" stroke-width="2"/>
+            <circle cx="96" cy="132" r="9" fill="#c0392b" stroke="#8f2a18" stroke-width="2"/>
+            <circle cx="66" cy="96" r="8" fill="#c0392b" stroke="#8f2a18" stroke-width="2"/>
+            <circle cx="112" cy="108" r="8" fill="#c0392b" stroke="#8f2a18" stroke-width="2"/>
+            <circle cx="78" cy="120" r="7" fill="#c0392b" stroke="#8f2a18" stroke-width="2"/>
+            <circle cx="122" cy="62" r="7" fill="#c0392b" stroke="#8f2a18" stroke-width="2"/>
+            <!-- basilico -->
+            <ellipse cx="104" cy="100" rx="8" ry="4" fill="#5c8a4a" transform="rotate(20 104 100)"/>
+            <ellipse cx="84" cy="110" rx="7" ry="4" fill="#5c8a4a" transform="rotate(-25 84 110)"/>
+            <ellipse cx="118" cy="90" rx="7" ry="4" fill="#5c8a4a" transform="rotate(15 118 90)"/>
+          </g>
+          <clipPath id="w0"><path d="M100,100 L100,8 A92,92 0 0,1 165.05,34.95 Z"/></clipPath>
+          <clipPath id="w1"><path d="M100,100 L165.05,34.95 A92,92 0 0,1 192,100 Z"/></clipPath>
+          <clipPath id="w2"><path d="M100,100 L192,100 A92,92 0 0,1 165.05,165.05 Z"/></clipPath>
+          <clipPath id="w3"><path d="M100,100 L165.05,165.05 A92,92 0 0,1 100,192 Z"/></clipPath>
+          <clipPath id="w4"><path d="M100,100 L100,192 A92,92 0 0,1 34.95,165.05 Z"/></clipPath>
+          <clipPath id="w5"><path d="M100,100 L34.95,165.05 A92,92 0 0,1 8,100 Z"/></clipPath>
+          <clipPath id="w6"><path d="M100,100 L8,100 A92,92 0 0,1 34.95,34.95 Z"/></clipPath>
+          <clipPath id="w7"><path d="M100,100 L34.95,34.95 A92,92 0 0,1 100,8 Z"/></clipPath>
+        </defs>
+
+        <circle class="board" cx="100" cy="100" r="99"/>
+        <circle class="board-ring" cx="100" cy="100" r="99"/>
+
+        <g class="slice" style="--i:0; --fx:10px; --fr:-20deg"><g clip-path="url(#w0)"><use href="#pizzaArt"/></g><path d="M100,100 L100,8 A92,92 0 0,1 165.05,34.95 Z" fill="none" stroke="rgba(0,0,0,.26)" stroke-width="1.5"/></g>
+        <g class="slice" style="--i:3; --fx:38px; --fr:14deg"><g clip-path="url(#w1)"><use href="#pizzaArt"/></g><path d="M100,100 L165.05,34.95 A92,92 0 0,1 192,100 Z" fill="none" stroke="rgba(0,0,0,.26)" stroke-width="1.5"/></g>
+        <g class="slice" style="--i:6; --fx:44px; --fr:24deg"><g clip-path="url(#w2)"><use href="#pizzaArt"/></g><path d="M100,100 L192,100 A92,92 0 0,1 165.05,165.05 Z" fill="none" stroke="rgba(0,0,0,.26)" stroke-width="1.5"/></g>
+        <g class="slice" style="--i:1; --fx:22px; --fr:10deg"><g clip-path="url(#w3)"><use href="#pizzaArt"/></g><path d="M100,100 L165.05,165.05 A92,92 0 0,1 100,192 Z" fill="none" stroke="rgba(0,0,0,.26)" stroke-width="1.5"/></g>
+        <g class="slice" style="--i:4; --fx:-22px; --fr:-10deg"><g clip-path="url(#w4)"><use href="#pizzaArt"/></g><path d="M100,100 L100,192 A92,92 0 0,1 34.95,165.05 Z" fill="none" stroke="rgba(0,0,0,.26)" stroke-width="1.5"/></g>
+        <g class="slice" style="--i:7; --fx:-44px; --fr:-24deg"><g clip-path="url(#w5)"><use href="#pizzaArt"/></g><path d="M100,100 L34.95,165.05 A92,92 0 0,1 8,100 Z" fill="none" stroke="rgba(0,0,0,.26)" stroke-width="1.5"/></g>
+        <g class="slice" style="--i:2; --fx:-38px; --fr:-14deg"><g clip-path="url(#w6)"><use href="#pizzaArt"/></g><path d="M100,100 L8,100 A92,92 0 0,1 34.95,34.95 Z" fill="none" stroke="rgba(0,0,0,.26)" stroke-width="1.5"/></g>
+        <g class="slice" style="--i:5; --fx:-10px; --fr:20deg"><g clip-path="url(#w7)"><use href="#pizzaArt"/></g><path d="M100,100 L34.95,34.95 A92,92 0 0,1 100,8 Z" fill="none" stroke="rgba(0,0,0,.26)" stroke-width="1.5"/></g>
+      </svg>
       <div class="crumb-field" id="crumbField">
         <span class="crumb" style="left:32%; top:88%; width:7px; height:6px; animation-delay:550ms;"></span>
         <span class="crumb" style="left:44%; top:94%; width:5px; height:5px; animation-delay:680ms;"></span>
@@ -684,23 +752,51 @@
     <p class="bake-caption" id="bakeCaption">Sfornata al momento...</p>
   </div>
 
-  <div class="success-screen" id="successScreen">
-    <div class="stamp">ISCRITTO</div>
-    <p>Ci vediamo il 10 ottobre!</p>
+  <div class="success-screen" id="successScreen" role="status">
+    <div class="stamp" id="successStamp">ISCRITTO</div>
+    <h2 class="success-title" id="successTitle">Ci vediamo il 10 ottobre!</h2>
+    <div class="success-body">
+      <p class="success-text" id="successText"></p>
+      <p class="success-pay" id="successPay" hidden></p>
+      <p class="success-note" id="successNote" hidden></p>
+    </div>
+    <a class="cal-link" id="calLink" href="#" target="_blank" rel="noopener">Aggiungi al calendario</a>
   </div>
 
 </div>
 
 <script>
 // ====== CONFIGURAZIONE ======
-// Sostituisci con l'URL del tuo Web App Google Apps Script dopo il deploy
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwY3R9Y1ysBhbNQPerN4x2LgclbJDk0RP8SVSGY6yLd4Jdu3LePjfi7g7D-zvIu_Brj0g/exec";
+const CONFIG = {
+  // URL del Web App di Google Apps Script (dopo il deploy come "Chiunque")
+  SCRIPT_URL: "https://script.google.com/macros/s/AKfycbwY3R9Y1ysBhbNQPerN4x2LgclbJDk0RP8SVSGY6yLd4Jdu3LePjfi7g7D-zvIu_Brj0g/exec",
+  // Dati evento per il link "Aggiungi al calendario".
+  // EVENT_START/END: "AAAA-MM-GG" (giornata intera) oppure "AAAA-MM-GGTHH:mm" (con orario).
+  EVENT_TITLE: "PizzaParty — 10° Anniversario",
+  EVENT_START: "2026-10-10",
+  EVENT_END: "",
+  EVENT_LOCATION: ""
+};
+const SCRIPT_URL = CONFIG.SCRIPT_URL;
+const SCRIPT_READY = SCRIPT_URL && SCRIPT_URL.indexOf("INCOLLA_QUI") === -1;
+const REDUCED_MOTION = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 // ============================
+
+const form = document.getElementById('pizzaForm');
+const submitBtn = document.getElementById('submitBtn');
+const formError = document.getElementById('formError');
+const formLoadedAt = Date.now();
 
 const plus1Radio = document.querySelector('input[value="plus1"]');
 const soloRadio = document.querySelector('input[value="solo"]');
 const plus1Wrap = document.getElementById('plus1-wrap');
 const quotaAmount = document.getElementById('quota-amount');
+const accettoCheck = document.getElementById('accetto');
+
+function isAttending(){
+  const v = form.querySelector('input[name="conferma"]:checked');
+  return v && (v.value === 'si' || v.value === 'forse');
+}
 
 function updatePlus1(){
   const isPlus1 = plus1Radio.checked;
@@ -717,181 +813,131 @@ document.querySelectorAll('input[name="metodo_pagamento"]').forEach(r => {
   });
 });
 
-const form = document.getElementById('pizzaForm');
-const submitBtn = document.getElementById('submitBtn');
-
-form.addEventListener('submit', function(e){
-  e.preventDefault();
-
-  document.getElementById('err-nome').classList.remove('show');
-  document.getElementById('err-email').classList.remove('show');
-  document.getElementById('err-accetto').classList.remove('show');
-
-  const email = document.getElementById('email').value.trim();
-  const nome = document.getElementById('nome').value.trim();
-  const accetto = document.getElementById('accetto').checked;
-  let valid = true;
-
-  const emailValida = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  if(!emailValida){
-    document.getElementById('err-email').classList.add('show');
-    valid = false;
-  }
-  if(!nome){
-    document.getElementById('err-nome').classList.add('show');
-    valid = false;
-  }
-  if(!accetto){
-    document.getElementById('err-accetto').classList.add('show');
-    valid = false;
-  }
-  if(!valid) return;
-
-  const contributi = Array.from(form.querySelectorAll('input[name="contributo"]:checked')).map(c => c.value);
-
-  const confermaMap = {si:"Sì", no:"No", forse:"Forse (tendente al sì)", zonzo:"Sarò a zonzo per il mondo"};
-
-  const payload = {
-    email: email,
-    nome: nome,
-    conferma: confermaMap[form.querySelector('input[name="conferma"]:checked').value],
-    partecipazione: form.querySelector('input[name="partecipazione"]:checked').value,
-    plus1nome: document.getElementById('plus1nome').value.trim(),
-    veterano: form.querySelector('input[name="veterano"]:checked').value === "si" ? "Sì" : "No",
-    indicazioni: form.querySelector('input[name="indicazioni"]:checked').value,
-    intolleranze: document.getElementById('intolleranze').value.trim(),
-    contributo: contributi.join(", "),
-    dettaglio: document.getElementById('dettaglio').value.trim(),
-    sacchetto: document.getElementById('sacchetto').checked ? "Sì" : "No",
-    quota: quotaAmount.textContent,
-    metodoPagamento: form.querySelector('input[name="metodo_pagamento"]:checked').value === "contanti" ? "Contanti alla serata" : "Online (PayPal/Satispay)",
-    timestamp: new Date().toISOString()
-  };
-
-  submitBtn.disabled = true;
-  submitBtn.textContent = "Invio in corso...";
-
-  function playSequence(){
-    document.getElementById('filmstrip').classList.add('hidden');
-    form.classList.add('hidden');
-
-    const bakeScreen = document.getElementById('bakeScreen');
-    const pizzaWheel = document.getElementById('pizzaWheel');
-    const bakeCaption = document.getElementById('bakeCaption');
-
-    bakeScreen.classList.add('show');
-    pizzaWheel.classList.add('appear');
-
-    setTimeout(() => {
-      bakeCaption.textContent = "...ma finita in un lampo.";
-      pizzaWheel.classList.add('devour');
-    }, 1500);
-
-    setTimeout(() => {
-      bakeScreen.classList.remove('show');
-      document.getElementById('successScreen').classList.add('show');
-    }, 1500 + 1900);
-  }
-
-  // Finché non è stato incollato l'URL reale dell'Apps Script,
-  // salta l'invio effettivo e mostra comunque l'animazione (solo per test).
-  if(SCRIPT_URL.indexOf("INCOLLA_QUI") !== -1){
-    playSequence();
-    return;
-  }
-
-  fetch(SCRIPT_URL, {
-    method: "POST",
-    mode: "no-cors",
-    headers: {"Content-Type": "text/plain"},
-    body: JSON.stringify(payload)
-  }).then(playSequence).catch(() => {
-    submitBtn.disabled = false;
-    submitBtn.textContent = "Prenota il tuo posto";
-    alert("Qualcosa è andato storto. Riprova o scrivi ad Arturo.");
+// ---- Verifica email lato server (JSONP), stato a tre valori: 'yes' | 'no' | 'unknown'
+function confirmSignup(email){
+  return new Promise((resolve) => {
+    if(!SCRIPT_READY){ resolve('unknown'); return; }
+    const cbName = 'pizzaEmailCheck_' + Date.now() + '_' + Math.floor(Math.random()*1e5);
+    let settled = false;
+    const script = document.createElement('script');
+    function cleanup(){
+      delete window[cbName];
+      if(script.parentNode) script.parentNode.removeChild(script);
+    }
+    function done(val){ if(settled) return; settled = true; cleanup(); resolve(val); }
+    window[cbName] = function(data){ done(data && data.exists ? 'yes' : 'no'); };
+    script.src = SCRIPT_URL + '?action=checkEmail&email=' + encodeURIComponent(email) + '&callback=' + cbName;
+    script.onerror = function(){ done('unknown'); };
+    document.body.appendChild(script);
+    setTimeout(() => done('unknown'), 4000);
   });
-});
+}
 
-// Stepper: una scena alla volta, con Avanti/Indietro e transizione a scorrimento
+// ---- Stepper -------------------------------------------------------------
 const scenes = Array.from(document.querySelectorAll('.scene'));
-const dots = document.querySelectorAll('.frame-dot');
+const reel = document.getElementById('reel');
+const reelLabel = document.getElementById('reelLabel');
 const stepNav = document.getElementById('stepNav');
 const btnBack = document.getElementById('btnBack');
 const btnNext = document.getElementById('btnNext');
 let currentIndex = 0;
 
 function isSkipped(scene){
+  if(scene === scenes[0]) return false;
+  if(!isAttending()) return true;               // chi non viene compila solo la prima scena
   if(scene.id === 'intolleranze-scene'){
     const v = document.querySelector('input[name="veterano"]:checked');
     return v && v.value === 'si';
   }
   return false;
 }
+function visibleScenes(){ return scenes.filter(s => !isSkipped(s)); }
 
 function findStep(fromIndex, direction){
   let i = fromIndex + direction;
-  while(scenes[i] && isSkipped(scenes[i])){
-    i += direction;
-  }
+  while(scenes[i] && isSkipped(scenes[i])) i += direction;
   return i;
 }
 
-function updateDots(){
-  dots.forEach((d,i) => d.classList.toggle('active', i === currentIndex));
+function renderReel(){
+  const vis = visibleScenes();
+  const cur = vis.indexOf(scenes[currentIndex]);
+  reel.innerHTML = vis.map((s,i) => '<span class="frame' + (i === cur ? ' on' : '') + '"></span>').join('');
+  const heading = scenes[currentIndex].querySelector('h2').textContent.trim();
+  reelLabel.textContent = 'Scena ' + (cur + 1) + ' / ' + vis.length + ' — ' + heading;
+}
+
+function refreshFlow(){
+  accettoCheck.required = isAttending();
+  renderReel();
+  updateNav();
 }
 
 function updateNav(){
-  btnBack.disabled = findStep(currentIndex, -1) < 0;
-  const isLast = findStep(currentIndex, 1) >= scenes.length;
+  const vis = visibleScenes();
+  const pos = vis.indexOf(scenes[currentIndex]);
+  btnBack.disabled = pos <= 0;
+  const isLast = pos === vis.length - 1;
   stepNav.style.display = isLast ? 'none' : 'flex';
   submitBtn.style.display = isLast ? 'block' : 'none';
 }
 
+function setInvalid(el, on){
+  el.setAttribute('aria-invalid', on ? 'true' : 'false');
+}
+
 function validateStep(index){
-  if(scenes[index].id !== undefined && scenes[index].querySelector('#email')){
-    const emailValida = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(document.getElementById('email').value.trim());
-    const nomeOk = document.getElementById('nome').value.trim().length > 0;
-    document.getElementById('err-email').classList.toggle('show', !emailValida);
+  const scene = scenes[index];
+  if(scene.querySelector('#email')){
+    const emailEl = document.getElementById('email');
+    const nomeEl = document.getElementById('nome');
+    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailEl.value.trim());
+    const nomeOk = nomeEl.value.trim().length > 0;
+    document.getElementById('err-email').classList.toggle('show', !emailOk);
     document.getElementById('err-nome').classList.toggle('show', !nomeOk);
-    return emailValida && nomeOk;
+    setInvalid(emailEl, !emailOk);
+    setInvalid(nomeEl, !nomeOk);
+    return emailOk && nomeOk;
   }
   return true;
 }
 
-function checkEmailExists(email){
-  return new Promise((resolve) => {
-    if(SCRIPT_URL.indexOf("INCOLLA_QUI") !== -1){
-      resolve(false); // in modalità di test (senza backend) non blocchiamo
-      return;
+['email','nome'].forEach(id => {
+  document.getElementById(id).addEventListener('input', e => {
+    if(e.target.getAttribute('aria-invalid') === 'true'){
+      setInvalid(e.target, false);
+      const err = document.getElementById(id === 'email' ? 'err-email' : 'err-nome');
+      err.classList.remove('show');
     }
-    const cbName = 'pizzaEmailCheck_' + Date.now();
-    let settled = false;
-    function cleanup(){
-      delete window[cbName];
-      if(script.parentNode) script.parentNode.removeChild(script);
-    }
-    window[cbName] = function(data){
-      if(settled) return;
-      settled = true;
-      cleanup();
-      resolve(!!(data && data.exists));
-    };
-    const script = document.createElement('script');
-    script.src = SCRIPT_URL + '?action=checkEmail&email=' + encodeURIComponent(email) + '&callback=' + cbName;
-    script.onerror = function(){
-      if(settled) return;
-      settled = true;
-      cleanup();
-      resolve(false); // se la verifica fallisce, non blocchiamo l'iscrizione
-    };
-    document.body.appendChild(script);
-    setTimeout(() => {
-      if(settled) return;
-      settled = true;
-      cleanup();
-      resolve(false);
-    }, 4000);
   });
+});
+
+function goTo(newIndex, direction){
+  const oldScene = scenes[currentIndex];
+  const newScene = scenes[newIndex];
+
+  function activate(){
+    newScene.classList.add('step-active');
+    currentIndex = newIndex;
+    refreshFlow();
+    const h = newScene.querySelector('h2');
+    if(h) h.focus();
+  }
+
+  if(REDUCED_MOTION){
+    oldScene.classList.remove('step-active');
+    activate();
+    return;
+  }
+
+  oldScene.classList.remove('step-active');
+  oldScene.classList.add(direction > 0 ? 'step-exit-left' : 'step-exit-right');
+  setTimeout(() => {
+    oldScene.classList.remove('step-exit-left','step-exit-right');
+    newScene.classList.add(direction > 0 ? 'step-enter-right' : 'step-enter-left');
+    activate();
+    setTimeout(() => newScene.classList.remove('step-enter-left','step-enter-right'), 320);
+  }, 260);
 }
 
 btnNext.addEventListener('click', async () => {
@@ -900,14 +946,15 @@ btnNext.addEventListener('click', async () => {
   if(currentIndex === 0){
     document.getElementById('err-email-dup').classList.remove('show');
     const email = document.getElementById('email').value.trim();
-    const originalLabel = btnNext.textContent;
+    const original = btnNext.textContent;
     btnNext.disabled = true;
     btnNext.textContent = "Verifica in corso...";
-    const exists = await checkEmailExists(email);
+    const state = await confirmSignup(email);
     btnNext.disabled = false;
-    btnNext.textContent = originalLabel;
-    if(exists){
+    btnNext.textContent = original;
+    if(state === 'yes'){
       document.getElementById('err-email-dup').classList.add('show');
+      setInvalid(document.getElementById('email'), true);
       return;
     }
   }
@@ -916,29 +963,205 @@ btnNext.addEventListener('click', async () => {
   if(idx < scenes.length) goTo(idx, 1);
 });
 
-function goTo(newIndex, direction){
-  const oldScene = scenes[currentIndex];
-  const newScene = scenes[newIndex];
-  oldScene.classList.remove('step-active');
-  oldScene.classList.add(direction > 0 ? 'step-exit-left' : 'step-exit-right');
-  setTimeout(() => {
-    oldScene.classList.remove('step-exit-left','step-exit-right');
-    newScene.classList.add('step-active', direction > 0 ? 'step-enter-right' : 'step-enter-left');
-    setTimeout(() => {
-      newScene.classList.remove('step-enter-left','step-enter-right');
-    }, 340);
-  }, 280);
-  currentIndex = newIndex;
-  updateDots();
-  updateNav();
-}
-
 btnBack.addEventListener('click', () => {
   const idx = findStep(currentIndex, -1);
   if(idx >= 0) goTo(idx, -1);
 });
 
-updateNav();
+form.querySelectorAll('input[name="conferma"], input[name="veterano"]').forEach(r => {
+  r.addEventListener('change', refreshFlow);
+});
+
+// ---- Invio ------------------------------------------------------------------
+function buildPayload(){
+  const attending = isAttending();
+  const contributi = Array.from(form.querySelectorAll('input[name="contributo"]:checked')).map(c => c.value);
+  const confermaMap = {si:"Sì", no:"No", forse:"Forse (tendente al sì)", zonzo:"Sarò a zonzo per il mondo"};
+  return {
+    email: document.getElementById('email').value.trim(),
+    nome: document.getElementById('nome').value.trim(),
+    conferma: confermaMap[form.querySelector('input[name="conferma"]:checked').value],
+    partecipazione: form.querySelector('input[name="partecipazione"]:checked').value,
+    plus1nome: document.getElementById('plus1nome').value.trim(),
+    veterano: form.querySelector('input[name="veterano"]:checked').value === "si" ? "Sì" : "No",
+    indicazioni: attending ? form.querySelector('input[name="indicazioni"]:checked').value : "",
+    intolleranze: attending ? document.getElementById('intolleranze').value.trim() : "",
+    contributo: attending ? contributi.join(", ") : "",
+    dettaglio: attending ? document.getElementById('dettaglio').value.trim() : "",
+    sacchetto: attending && document.getElementById('sacchetto').checked ? "Sì" : "No",
+    quota: attending ? quotaAmount.textContent : "—",
+    metodoPagamento: !attending ? "—"
+      : (form.querySelector('input[name="metodo_pagamento"]:checked').value === "contanti"
+          ? "Contanti alla serata" : "Online (PayPal/Satispay)"),
+    timestamp: new Date().toISOString()
+  };
+}
+
+function gcalLink(){
+  const clean = s => (s || "").replace(/[-:]/g, "");
+  const start = clean(CONFIG.EVENT_START);
+  let dates = "";
+  if(start.length === 8){
+    const d = new Date(CONFIG.EVENT_START + "T12:00:00Z");
+    d.setUTCDate(d.getUTCDate() + 1);
+    dates = start + "/" + d.toISOString().slice(0,10).replace(/-/g, "");
+  } else if(start.length >= 13){
+    const end = clean(CONFIG.EVENT_END) || start;
+    dates = start.slice(0,15) + "/" + end.slice(0,15);
+  } else {
+    return "";
+  }
+  const p = new URLSearchParams({action:"TEMPLATE", text:CONFIG.EVENT_TITLE, dates:dates});
+  if(CONFIG.EVENT_LOCATION) p.set("location", CONFIG.EVENT_LOCATION);
+  return "https://calendar.google.com/calendar/render?" + p.toString();
+}
+
+function showResult(payload, opts){
+  opts = opts || {};
+  const attending = isAttending();
+  document.getElementById('reel').classList.add('hidden');
+  reelLabel.classList.add('hidden');
+  form.classList.add('hidden');
+
+  const bakeScreen = document.getElementById('bakeScreen');
+  const pizzaWheel = document.getElementById('pizzaWheel');
+  const bakeCaption = document.getElementById('bakeCaption');
+  const successScreen = document.getElementById('successScreen');
+  const stamp = document.getElementById('successStamp');
+  const sTitle = document.getElementById('successTitle');
+  const sText = document.getElementById('successText');
+  const sPay = document.getElementById('successPay');
+  const sNote = document.getElementById('successNote');
+  const calLink = document.getElementById('calLink');
+
+  // Testi schermata finale
+  const href = gcalLink();
+  if(href){ calLink.href = href; calLink.hidden = false; } else { calLink.hidden = true; }
+  sPay.hidden = true;
+  sNote.hidden = true;
+
+  if(!attending){
+    stamp.textContent = "REGISTRATO";
+    stamp.style.borderColor = "var(--parchment-dim)";
+    stamp.style.color = "var(--parchment-dim)";
+    sTitle.textContent = "Ci mancherai!";
+    sText.textContent = "Grazie per avercelo fatto sapere. Se cambi idea, riscrivici: alla prossima edizione!";
+    calLink.hidden = true;
+  } else {
+    stamp.textContent = "ISCRITTO";
+    stamp.style.borderColor = "var(--basil)";
+    stamp.style.color = "var(--basil)";
+    sTitle.textContent = "Ci vediamo il 10 ottobre!";
+    sText.textContent = "Dopo la serata ti manderemo la galleria fotografica via mail.";
+    if(payload.metodoPagamento.indexOf("Online") === 0){
+      sPay.textContent = "Puoi versare la quota di " + payload.quota + " con PayPal o Satispay quando ti fa comodo.";
+      sPay.hidden = false;
+    }
+    if(opts.caveat){
+      sNote.textContent = "Non siamo riusciti a confermare la ricezione dell'iscrizione. "
+        + "Se non ricevi risposta da Arturo entro qualche giorno, riscrivi pure.";
+      sNote.hidden = false;
+    }
+  }
+
+  if(REDUCED_MOTION){
+    successScreen.classList.add('show');
+    return;
+  }
+
+  bakeScreen.classList.add('show');
+  pizzaWheel.classList.add('appear');
+  setTimeout(() => {
+    bakeCaption.textContent = attending ? "...ma finita in un lampo, fetta dopo fetta." : "...ma stavolta senza di te.";
+    pizzaWheel.classList.add('devour');
+  }, 1800);
+  setTimeout(() => {
+    bakeScreen.classList.remove('show');
+    successScreen.classList.add('show');
+  }, 1800 + 1900);
+}
+
+async function submitPayload(payload){
+  let networkError = false;
+  if(SCRIPT_READY){
+    try{
+      const ctrl = new AbortController();
+      const t = setTimeout(() => ctrl.abort(), 12000);
+      await fetch(SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: {"Content-Type": "text/plain"},
+        body: JSON.stringify(payload),
+        signal: ctrl.signal
+      });
+      clearTimeout(t);
+    }catch(err){
+      networkError = true;
+    }
+  }
+
+  // Conferma best-effort: l'endpoint POST è "no-cors" e non leggibile,
+  // quindi verifichiamo l'esito interrogando il backend.
+  let state = SCRIPT_READY ? await confirmSignup(payload.email) : 'unknown';
+  if(state === 'no'){
+    await new Promise(r => setTimeout(r, 1400));
+    state = await confirmSignup(payload.email);
+  }
+
+  if(state === 'yes'){
+    showResult(payload, {});
+    return;
+  }
+  if(state === 'no'){
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Prenota il tuo posto";
+    formError.textContent = networkError
+      ? "Sembra esserci un problema di connessione. Controlla la rete e riprova, oppure scrivi ad Arturo."
+      : "Non siamo riusciti a registrare l'iscrizione. Riprova tra poco, oppure scrivi ad Arturo.";
+    formError.classList.add('show');
+    return;
+  }
+  // state === 'unknown' : mostriamo comunque l'esito, con avviso
+  showResult(payload, {caveat: SCRIPT_READY});
+}
+
+form.addEventListener('submit', function(e){
+  e.preventDefault();
+  formError.classList.remove('show');
+
+  // validazione finale
+  let valid = validateStep(0);
+  const attending = isAttending();
+  if(attending && !accettoCheck.checked){
+    document.getElementById('err-accetto').classList.add('show');
+    valid = false;
+  } else {
+    document.getElementById('err-accetto').classList.remove('show');
+  }
+  if(!valid){
+    // riporta l'utente alla prima scena se il problema è lì
+    if(!validateStep(0) && currentIndex !== 0) goTo(0, -1);
+    return;
+  }
+
+  const payload = buildPayload();
+
+  // anti-spam: honeypot + invio troppo rapido
+  const trap = document.getElementById('website').value.trim();
+  const tooFast = (Date.now() - formLoadedAt) < 3000;
+  if(trap || tooFast){
+    showResult(payload, {});   // finto successo, nessun invio
+    return;
+  }
+
+  submitBtn.disabled = true;
+  submitBtn.textContent = "Invio in corso...";
+  submitPayload(payload);
+});
+
+// init
+updatePlus1();
+refreshFlow();
 </script>
 </body>
 </html>
