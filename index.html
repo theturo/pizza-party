@@ -486,6 +486,7 @@
     display:inline-block;
     margin-top:26px;
     padding:12px 20px;
+    background:transparent;
     border:1.5px solid var(--gold);
     border-radius:8px;
     color:var(--gold);
@@ -493,8 +494,48 @@
     font-family:var(--serif);
     font-weight:700;
     font-size:14px;
+    cursor:pointer;
   }
   .cal-link:hover{background:var(--gold);color:var(--bg);}
+  .cal-link + .cal-link{margin-top:12px;}
+  .cal-link:disabled{opacity:.6;cursor:not-allowed;}
+  .cal-link:disabled:hover{background:transparent;color:var(--gold);}
+
+  /* ===== PROMEMORIA (rendering nascosto per il download PDF) ===== */
+  .reminder-offscreen{position:fixed;left:-99999px;top:0;pointer-events:none;}
+  .reminder-card{
+    position:relative;
+    width:559px;height:794px;
+    overflow:hidden;
+    background:#17141a;
+    font-family:var(--sans);
+    color:var(--parchment);
+  }
+  .reminder-card .strip{height:26px;background:repeating-linear-gradient(90deg,#2b2733 0 20px,#17141a 20px 33px);border-bottom:2px solid var(--gold);}
+  .reminder-card .stamp-mini{
+    position:absolute;top:44px;right:30px;width:70px;height:70px;
+    border:3px solid var(--basil);border-radius:50%;
+    display:flex;align-items:center;justify-content:center;text-align:center;
+    transform:rotate(-9deg);
+    font-family:var(--serif);font-weight:900;font-style:italic;font-size:12px;color:var(--basil);line-height:1.1;
+  }
+  .reminder-card .body{padding:38px 44px 0;}
+  .reminder-card .eyebrow{margin:0 0 8px;font-size:12px;letter-spacing:.16em;text-transform:uppercase;font-weight:700;color:var(--parchment-dim);}
+  .reminder-card h1{margin:0;font-family:var(--serif);font-weight:900;font-style:italic;font-size:60px;line-height:.9;color:var(--gold);max-width:400px;}
+  .reminder-card .sub{margin:8px 0 0;font-family:var(--serif);font-weight:700;font-style:italic;font-size:22px;color:var(--parchment);}
+  .reminder-card .sticker{display:inline-block;margin:20px 0 0;font-family:var(--hand);font-weight:700;font-style:italic;font-size:16px;color:#0c2a4a;background:var(--parchment);padding:7px 18px;border-radius:3px;transform:rotate(-1.5deg);}
+  .reminder-card .rule{margin:26px 0;height:1px;background:rgba(245,201,52,.3);}
+  .reminder-card .grid{margin:0;display:grid;grid-template-columns:92px 1fr;gap:15px 18px;font-size:15px;line-height:1.5;}
+  .reminder-card .grid dt{margin:0;font-family:var(--serif);font-style:italic;font-weight:700;color:var(--tomato);}
+  .reminder-card .grid dd{margin:0;}
+  .reminder-card .pay-title{margin:22px 0 16px;font-family:var(--serif);font-style:italic;font-weight:700;font-size:19px;color:var(--parchment);}
+  .reminder-card .pay-row{display:flex;gap:24px;}
+  .reminder-card .pay-col{flex:1;text-align:center;}
+  .reminder-card .pay-col img{width:128px;height:128px;border:2px solid var(--gold);border-radius:6px;}
+  .reminder-card .pay-col .lbl{margin:10px 0 0;font-size:14px;font-weight:700;color:var(--gold);}
+  .reminder-card .pay-col .id{margin:2px 0 0;font-size:11px;color:var(--parchment-dim);word-break:break-word;}
+  .reminder-card .cash-note{margin:26px 0 0;font-size:13px;color:var(--parchment-dim);line-height:1.5;}
+  .reminder-card .flame-corner{position:absolute;right:-34px;bottom:-44px;width:210px;height:252px;opacity:.22;}
 
   .hidden{display:none !important;}
 
@@ -761,6 +802,48 @@
       <p class="success-note" id="successNote" hidden></p>
     </div>
     <a class="cal-link" id="calLink" href="#" target="_blank" rel="noopener">Aggiungi al calendario</a>
+    <button type="button" class="cal-link" id="downloadReminderBtn" hidden>Scarica il promemoria</button>
+  </div>
+
+  <div class="reminder-offscreen" aria-hidden="true">
+    <div class="reminder-card" id="reminderCard">
+      <div class="strip"></div>
+      <div class="stamp-mini">ISCRITTO</div>
+      <div class="body">
+        <p class="eyebrow">Promemoria di <span id="rem-nome">—</span></p>
+        <h1>PizzaParty</h1>
+        <p class="sub">10° Anniversario</p>
+        <div class="sticker">Ci vediamo il 10 ottobre!</div>
+        <div class="rule"></div>
+        <dl class="grid">
+          <dt>Quando</dt><dd id="rem-quando">—</dd>
+          <dt>Dove</dt><dd id="rem-dove">—</dd>
+          <dt>Quota</dt><dd id="rem-quota">—</dd>
+          <dt>Porti</dt><dd id="rem-porti">—</dd>
+        </dl>
+        <div id="rem-pay-section">
+          <div class="rule"></div>
+          <p class="pay-title">Paga la quota comodamente da qui</p>
+          <div class="pay-row">
+            <div class="pay-col">
+              <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPgAAAD4CAIAAABOs7xcAAAEKUlEQVR42u3dsW1bQRBF0UdDlTh0F65cXTB0zJwNuAErILHzZ0Y+J7VBUdTFYjFc7L89H/fAd/fDR4DQQeggdBA6CB2EDu/5+Ooffv76veIX+HP/PPL+X32dr/7/q7re56n/v6UHKzq2LiB0EDoIHYQOQoccnqPnxTlltS1z3Gnz8uq/45YerOjYuoDQQeggdBA6CB1y0Rw9xXPu6vlu9Ty++vW7zqNv78GKjq0LCB2EDkIHoYPQIc1z9Cw//z3tnPep91k9L7eig9BB6CB0EDoIHaFDzNFXqj5XPW1u3fW9gRUdhA5CB6GD0EHoCB1ijp7J92Rnyb001XPrac8HndaDFR1bFxA6CB2EDkIHoUMumqNved5n9T0tXfeLV9+P/l17sKJj6wJCB6GD0EHoIHR40+35uMf96Gk7//3q3N1951Z0EDpCB6GD0EHoIHTIiPPo1eebq89JV58Lz7B5/5b5fVdXVnRsXUDoIHQQOggdhA656Dx61znvac8BnXavS/V8fcv3G+bo2LqA0EHoIHQQOggd0nw/etc572nz8uq5b9e9MV3z9erfy4qOrQsIHYQOQgehg9Ahh8+jd82ts/ze9GrOozuPDrYuCB2EDkIHoYPQIaPn6Gma727/uV3vZ9r3G13n6a3o2LqA0EHoIHQQOggd0nw/+qk5btdzKNM0D+46H991rr3r+wQrOrYuIHQQOggdhA5Ch1w0R8+w+1i2zKe7nku6Zc5tjg62LiB0EDpCB6GD0CHf/F6XNM2Vu+4t6Zpbbz9H3vU5WNGxdQGhg9BB6CB0EDq86SNN94Sk+Dx69et3/dzq8+KnPoevXqfrew8rOrYuIHQQOggdhA5Chxyeo29/juarr9N130iW34N+6r6d6nt4rOjYuoDQQeggdBA6CB1yeI7e9bzP/+35nWn6XiJLvg859Xla0bF1AaGD0EHoIHQQOmToefQt8/Ku55hWfz5Z8v2AFR2EDkIHoSN0EDoIHbLsOaNZcp/3tPlu1zx+y3n9rr+vFR1bFxA6CB2EDkIHoUMumqNvUX2ee9p59Gn3qEy7V8eKjq0LCB2EDkIHoYPQIRfdj57l55W3n5vven5n9dy9et5vRcfWBYQOQgehg9BB6JDDc/QMu0eleq4/7T7yDLvXxf3oIHQQOggdhA5CB6ETc/RMmHNvOd88bU6/5T6WrvvarejYuoDQQeggdBA6CB3SPEfP8vvRpz03dNq9Oqfuw6l+Tq370bF1AaGD0EHoIHQQOsQcPRPOqU871179e1Xfm179eVrRsXUBoYPQQeggdBA6pHmOPu3+7Glz4mnPVe067971fYUVHVsXEDoIHYQOQgehQy6ao0+7b6TrvvZp98F3vZ8tzx+1omPrAkIHoYPQQeggdHjT7fm4+xSwooPQQeggdBA6CB2EDv/2FzC7JSBdU310AAAAAElFTkSuQmCC" alt="QR PayPal">
+              <p class="lbl">PayPal</p>
+              <p class="id">paypal.me/ArturoScalori</p>
+            </div>
+            <div class="pay-col">
+              <img src="data:image/png;base64,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" alt="QR Satispay">
+              <p class="lbl">Satispay</p>
+              <p class="id">@arturoscalori</p>
+            </div>
+          </div>
+        </div>
+        <p class="cash-note" id="rem-cash-note" hidden>Hai scelto di pagare in contanti la sera dell'evento: non serve nessun QR, ci vediamo il 10 ottobre.</p>
+      </div>
+      <svg class="flame-corner" viewBox="0 0 100 120">
+        <path d="M50 120 C20 100 15 70 30 45 C33 60 40 62 40 50 C40 30 30 20 32 5 C55 20 70 40 65 60 C75 55 78 45 76 35 C90 55 88 85 65 105 C70 90 60 90 55 100 C58 90 50 88 50 120 Z" fill="#ff8a4d"/>
+        <path d="M50 120 C35 105 32 85 40 68 C42 78 46 79 46 70 C46 55 40 48 41 38 C56 48 65 62 62 76 C68 73 70 66 69 59 C77 72 76 92 62 106 Z" fill="#ffb15c" opacity="0.85"/>
+      </svg>
+    </div>
   </div>
 
 </div>
@@ -1033,12 +1116,16 @@ function showResult(payload, opts){
   const sPay = document.getElementById('successPay');
   const sNote = document.getElementById('successNote');
   const calLink = document.getElementById('calLink');
+  const downloadBtn = document.getElementById('downloadReminderBtn');
+
+  window.__lastPayload = payload;
 
   // Testi schermata finale
   const href = gcalLink();
   if(href){ calLink.href = href; calLink.hidden = false; } else { calLink.hidden = true; }
   sPay.hidden = true;
   sNote.hidden = true;
+  downloadBtn.hidden = !attending;
 
   if(!attending){
     stamp.textContent = "REGISTRATO";
@@ -1080,6 +1167,90 @@ function showResult(payload, opts){
     successScreen.classList.add('show');
   }, 1800 + 1900);
 }
+
+// ---- Promemoria scaricabile (PDF) -------------------------------------------
+function loadScript(src){
+  return new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = src;
+    s.onload = () => resolve();
+    s.onerror = () => reject(new Error('Impossibile caricare ' + src));
+    document.head.appendChild(s);
+  });
+}
+
+let libsPromise = null;
+function ensureReminderLibs(){
+  if(!libsPromise){
+    libsPromise = Promise.all([
+      loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js'),
+      loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js')
+    ]);
+  }
+  return libsPromise;
+}
+
+function formatEventWhen(){
+  if(!CONFIG.EVENT_START) return '';
+  const d = new Date(CONFIG.EVENT_START);
+  if(isNaN(d.getTime())) return CONFIG.EVENT_START;
+  const dateStr = d.toLocaleDateString('it-IT', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
+  const cap = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
+  if(CONFIG.EVENT_START.indexOf('T') === -1) return cap;
+  const timeStr = d.toLocaleTimeString('it-IT', {hour:'2-digit', minute:'2-digit'});
+  return cap + ', dalle ' + timeStr;
+}
+
+function formatPorti(payload){
+  const list = (payload.contributo || '').split(',').map(s => s.trim()).filter(Boolean);
+  const meaningful = list.filter(x => x && x !== 'Nessuno');
+  if(meaningful.length){
+    let txt = meaningful.join(', ');
+    if(payload.dettaglio) txt += ' — ' + payload.dettaglio;
+    return txt;
+  }
+  return 'Qualcosa da condividere (ma è una scelta facoltativa)';
+}
+
+function fillReminderCard(payload){
+  document.getElementById('rem-nome').textContent = payload.nome || 'un ospite';
+  document.getElementById('rem-quando').textContent = formatEventWhen();
+  document.getElementById('rem-dove').textContent = CONFIG.EVENT_LOCATION || '[luogo da definire]';
+  document.getElementById('rem-quota').textContent = payload.quota;
+  document.getElementById('rem-porti').textContent = formatPorti(payload);
+
+  const online = payload.metodoPagamento.indexOf('Online') === 0;
+  document.getElementById('rem-pay-section').hidden = !online;
+  document.getElementById('rem-cash-note').hidden = online;
+}
+
+const downloadReminderBtn = document.getElementById('downloadReminderBtn');
+downloadReminderBtn.addEventListener('click', async () => {
+  const payload = window.__lastPayload;
+  if(!payload) return;
+  const original = downloadReminderBtn.textContent;
+  downloadReminderBtn.disabled = true;
+  downloadReminderBtn.textContent = 'Preparazione…';
+  try{
+    await ensureReminderLibs();
+    fillReminderCard(payload);
+    await new Promise(r => setTimeout(r, 60)); // lascia assestare il layout
+    const card = document.getElementById('reminderCard');
+    const canvas = await html2canvas(card, {scale:2, backgroundColor:'#17141a'});
+    const imgData = canvas.toDataURL('image/png');
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({unit:'pt', format:'a5'});
+    const pageW = doc.internal.pageSize.getWidth();
+    const pageH = doc.internal.pageSize.getHeight();
+    doc.addImage(imgData, 'PNG', 0, 0, pageW, pageH);
+    doc.save('PizzaParty-promemoria.pdf');
+  }catch(err){
+    alert("Non sono riuscito a generare il promemoria. Riprova, oppure usa \"Stampa\" > \"Salva come PDF\" dal browser su questa pagina.");
+  }finally{
+    downloadReminderBtn.disabled = false;
+    downloadReminderBtn.textContent = original;
+  }
+});
 
 async function submitPayload(payload){
   let networkError = false;
