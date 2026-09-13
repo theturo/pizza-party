@@ -391,6 +391,18 @@
     display:none;
   }
   .form-error.show{display:block;}
+  .restore-note{
+    margin:16px 16px 0;
+    padding:10px 14px;
+    border:1px solid var(--line);
+    border-radius:8px;
+    background:rgba(245,201,52,.06);
+    color:var(--parchment-dim);
+    font-size:13px;
+    line-height:1.5;
+    display:none;
+  }
+  .restore-note.show{display:block;}
 
   /* honeypot */
   .hp{position:absolute !important;left:-9999px !important;top:auto !important;width:1px !important;height:1px !important;overflow:hidden !important;}
@@ -584,6 +596,8 @@
         <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
       </label>
     </div>
+
+    <div class="restore-note" id="restoreNote" role="status">Abbiamo ritrovato la tua iscrizione da dove l'avevi lasciata.</div>
 
     <div class="scene step-active">
       <span class="slate">PizzaID</span>
@@ -924,6 +938,91 @@ function confirmSignup(email){
   });
 }
 
+// ---- Salvataggio locale della compilazione ---------------------------------
+// Protegge da un caso reale: su mobile, aprire un link di pagamento in un'altra
+// scheda può far scaricare/ricaricare la scheda del modulo per motivi di memoria;
+// al ritorno la pagina si ricarica da zero e perderebbe tutto senza questo.
+// sessionStorage sopravvive a quel tipo di ricarica (non a una chiusura vera
+// della scheda) ed è privato a questa scheda, quindi non crea conflitti tra
+// più iscrizioni aperte in schede diverse.
+const PROGRESS_KEY = 'pizzaPartyProgress';
+
+function setRadioValue(name, value){
+  if(!value) return;
+  const el = form.querySelector('input[name="' + name + '"][value="' + CSS.escape(value) + '"]');
+  if(el) el.checked = true;
+}
+
+function saveProgress(){
+  try{
+    sessionStorage.setItem(PROGRESS_KEY, JSON.stringify({
+      v: 1,
+      email: document.getElementById('email').value,
+      nome: document.getElementById('nome').value,
+      conferma: (form.querySelector('input[name="conferma"]:checked') || {}).value,
+      partecipazione: (form.querySelector('input[name="partecipazione"]:checked') || {}).value,
+      plus1nome: document.getElementById('plus1nome').value,
+      veterano: (form.querySelector('input[name="veterano"]:checked') || {}).value,
+      intolleranze: document.getElementById('intolleranze').value,
+      indicazioni: (form.querySelector('input[name="indicazioni"]:checked') || {}).value,
+      contributo: Array.from(form.querySelectorAll('input[name="contributo"]:checked')).map(c => c.value),
+      dettaglio: document.getElementById('dettaglio').value,
+      sacchetto: document.getElementById('sacchetto').checked,
+      metodo_pagamento: (form.querySelector('input[name="metodo_pagamento"]:checked') || {}).value,
+      accetto: document.getElementById('accetto').checked,
+      currentIndex: currentIndex
+    }));
+  }catch(e){ /* storage non disponibile: non è grave, si compila di nuovo */ }
+}
+
+function clearProgress(){
+  try{ sessionStorage.removeItem(PROGRESS_KEY); }catch(e){}
+}
+
+function restoreProgress(){
+  let data;
+  try{ data = JSON.parse(sessionStorage.getItem(PROGRESS_KEY) || 'null'); }catch(e){ data = null; }
+  if(!data) return;
+  try{
+    document.getElementById('email').value = data.email || '';
+    document.getElementById('nome').value = data.nome || '';
+    setRadioValue('conferma', data.conferma);
+    setRadioValue('partecipazione', data.partecipazione);
+    document.getElementById('plus1nome').value = data.plus1nome || '';
+    setRadioValue('veterano', data.veterano);
+    document.getElementById('intolleranze').value = data.intolleranze || '';
+    setRadioValue('indicazioni', data.indicazioni);
+    (data.contributo || []).forEach(v => {
+      const el = form.querySelector('input[name="contributo"][value="' + CSS.escape(v) + '"]');
+      if(el) el.checked = true;
+    });
+    document.getElementById('dettaglio').value = data.dettaglio || '';
+    document.getElementById('sacchetto').checked = !!data.sacchetto;
+    setRadioValue('metodo_pagamento', data.metodo_pagamento);
+    document.getElementById('accetto').checked = !!data.accetto;
+
+    updatePlus1();
+    onlineWrap.classList.toggle('open', (form.querySelector('input[name="metodo_pagamento"]:checked') || {}).value === 'online');
+
+    const target = Math.max(0, Math.min(data.currentIndex || 0, scenes.length - 1));
+    if(target > 0 && !isSkipped(scenes[target])){
+      scenes[currentIndex].classList.remove('step-active');
+      currentIndex = target;
+      scenes[currentIndex].classList.add('step-active');
+    }
+    refreshFlow();
+
+    if(currentIndex > 0 || data.email || data.nome){
+      const note = document.getElementById('restoreNote');
+      note.classList.add('show');
+      setTimeout(() => note.classList.remove('show'), 8000);
+    }
+  }catch(e){ /* ripristino parziale va bene comunque */ }
+}
+
+form.addEventListener('input', saveProgress);
+form.addEventListener('change', saveProgress);
+
 // ---- Stepper -------------------------------------------------------------
 const scenes = Array.from(document.querySelectorAll('.scene'));
 const reel = document.getElementById('reel');
@@ -1011,6 +1110,7 @@ function goTo(newIndex, direction){
     newScene.classList.add('step-active');
     currentIndex = newIndex;
     refreshFlow();
+    saveProgress();
     const h = newScene.querySelector('h2');
     if(h) h.focus();
   }
@@ -1109,6 +1209,7 @@ function gcalLink(){
 
 function showResult(payload, opts){
   opts = opts || {};
+  clearProgress();
   const attending = isAttending();
   document.getElementById('reel').classList.add('hidden');
   reelLabel.classList.add('hidden');
@@ -1341,6 +1442,7 @@ form.addEventListener('submit', function(e){
 // init
 updatePlus1();
 refreshFlow();
+restoreProgress();
 </script>
 </body>
 </html>
