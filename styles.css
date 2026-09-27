@@ -488,41 +488,6 @@ textarea{resize:vertical;min-height:70px;}
 .cal-link:disabled{opacity:.6;cursor:not-allowed;}
 .cal-link:disabled:hover{background:transparent;color:var(--gold);}
 
-/* ===== PROMEMORIA (rendering nascosto per il download PDF) ===== */
-.reminder-offscreen{position:fixed;left:-99999px;top:0;pointer-events:none;}
-.reminder-card{
-  position:relative;
-  width:559px;height:794px;
-  overflow:hidden;
-  background:#17141a;
-  font-family:var(--sans);
-  color:var(--parchment);
-}
-.reminder-card .strip{height:26px;background:repeating-linear-gradient(90deg,#2b2733 0 20px,#17141a 20px 33px);border-bottom:2px solid var(--gold);}
-.reminder-card .stamp-mini{
-  position:absolute;top:44px;right:30px;width:70px;height:70px;
-  border:3px solid var(--basil);border-radius:50%;
-  display:flex;align-items:center;justify-content:center;text-align:center;
-  transform:rotate(-9deg);
-  font-family:var(--serif);font-weight:900;font-style:italic;font-size:12px;color:var(--basil);line-height:1.1;
-}
-.reminder-card .body{padding:38px 44px 0;}
-.reminder-card .eyebrow{margin:0 0 8px;font-size:12px;letter-spacing:.16em;text-transform:uppercase;font-weight:700;color:var(--parchment-dim);}
-.reminder-card h1{margin:0;font-family:var(--serif);font-weight:900;font-style:italic;font-size:60px;line-height:.9;color:var(--gold);max-width:400px;}
-.reminder-card .sub{margin:8px 0 0;font-family:var(--serif);font-weight:700;font-style:italic;font-size:22px;color:var(--parchment);}
-.reminder-card .sticker{display:inline-block;margin:20px 0 0;font-family:var(--hand);font-weight:700;font-style:italic;font-size:16px;color:#0c2a4a;background:var(--parchment);padding:7px 18px;border-radius:3px;transform:rotate(-1.5deg);}
-.reminder-card .rule{margin:26px 0;height:1px;background:rgba(245,201,52,.3);}
-.reminder-card .grid{margin:0;display:grid;grid-template-columns:92px 1fr;gap:15px 18px;font-size:15px;line-height:1.5;}
-.reminder-card .grid dt{margin:0;font-family:var(--serif);font-style:italic;font-weight:700;color:var(--tomato);}
-.reminder-card .grid dd{margin:0;}
-.reminder-card .pay-title{margin:22px 0 16px;font-family:var(--serif);font-style:italic;font-weight:700;font-size:19px;color:var(--parchment);}
-.reminder-card .pay-row{display:flex;gap:24px;}
-.reminder-card .pay-col{flex:1;text-align:center;}
-.reminder-card .pay-col img{width:128px;height:128px;border:2px solid var(--gold);border-radius:6px;}
-.reminder-card .pay-col .lbl{margin:10px 0 0;font-size:14px;font-weight:700;color:var(--gold);}
-.reminder-card .pay-col .id{margin:2px 0 0;font-size:11px;color:var(--parchment-dim);word-break:break-word;}
-.reminder-card .cash-note{margin:26px 0 0;font-size:13px;color:var(--parchment-dim);line-height:1.5;}
-.reminder-card .flame-corner{position:absolute;right:-34px;bottom:-44px;width:210px;height:252px;opacity:.22;}
 
 .hidden{display:none !important;}
 

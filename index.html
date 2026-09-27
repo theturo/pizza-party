@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://cdnjs.cloudflare.com; style-src 'self' 'sha256-UP0QZg7irvSMvOBz9mH2PIIE28+57UiavRfeVea0l3g='; font-src 'self'; img-src 'self' data: blob:; connect-src https://script.google.com https://script.googleusercontent.com; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://cdnjs.cloudflare.com; style-src 'self'; font-src 'self'; img-src 'self' data: blob:; connect-src https://script.google.com https://script.googleusercontent.com; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PizzaParty — 10 anni — Iscrizioni</title>
@@ -18,7 +18,7 @@
 <meta name="description" content="Il modulo di iscrizione per l'edizione dei 10 anni del PizzaParty, 10 ottobre 2026.">
 <meta name="theme-color" content="#151217">
 <link rel="preload" href="fonts/fraunces-italic-latin.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="styles.css?v=4">
+<link rel="stylesheet" href="styles.css?v=5">
 </head>
 <body>
 <div class="wrap">
@@ -275,50 +275,11 @@
     <button type="button" class="cal-link" id="downloadReminderBtn" hidden>Scarica il promemoria</button>
   </div>
 
-  <div class="reminder-offscreen" aria-hidden="true">
-    <div class="reminder-card" id="reminderCard">
-      <div class="strip"></div>
-      <div class="stamp-mini">ISCRITTO</div>
-      <div class="body">
-        <p class="eyebrow">Promemoria di <span id="rem-nome">—</span></p>
-        <h1>PizzaParty</h1>
-        <p class="sub">10° Anniversario</p>
-        <div class="sticker">Ci vediamo il <span data-cfg="dayMonth">10 ottobre</span>!</div>
-        <div class="rule"></div>
-        <dl class="grid">
-          <dt>Quando</dt><dd id="rem-quando">—</dd>
-          <dt>Dove</dt><dd id="rem-dove">—</dd>
-          <dt>Quota</dt><dd id="rem-quota">—</dd>
-          <dt>Porti</dt><dd id="rem-porti">—</dd>
-        </dl>
-        <div id="rem-pay-section">
-          <div class="rule"></div>
-          <p class="pay-title">Paga la quota comodamente da qui</p>
-          <div class="pay-row">
-            <div class="pay-col">
-              <img src="assets/qr-paypal.png" alt="QR PayPal" width="128" height="128">
-              <p class="lbl">PayPal</p>
-              <p class="id">paypal.me/ArturoScalori</p>
-            </div>
-            <div class="pay-col">
-              <img src="assets/qr-satispay.png" alt="QR Satispay" width="128" height="128">
-              <p class="lbl">Satispay</p>
-              <p class="id">@arturoscalori</p>
-            </div>
-          </div>
-        </div>
-        <p class="cash-note" id="rem-cash-note" hidden>Hai scelto di pagare in contanti la sera dell'evento: non serve nessun QR, ci vediamo il <span data-cfg="dayMonth">10 ottobre</span>.</p>
-      </div>
-      <svg class="flame-corner" viewBox="0 0 100 120">
-        <path d="M50 120 C20 100 15 70 30 45 C33 60 40 62 40 50 C40 30 30 20 32 5 C55 20 70 40 65 60 C75 55 78 45 76 35 C90 55 88 85 65 105 C70 90 60 90 55 100 C58 90 50 88 50 120 Z" fill="#ff8a4d"/>
-        <path d="M50 120 C35 105 32 85 40 68 C42 78 46 79 46 70 C46 55 40 48 41 38 C56 48 65 62 62 76 C68 73 70 66 69 59 C77 72 76 92 62 106 Z" fill="#ffb15c" opacity="0.85"/>
-      </svg>
-    </div>
-  </div>
 
 </div>
 
 <script src="motion.js?v=4"></script>
-<script src="app.js?v=4"></script>
+<script src="reminder.js?v=5"></script>
+<script src="app.js?v=5"></script>
 </body>
 </html>

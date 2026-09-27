@@ -470,12 +470,9 @@ function loadScript(src, integrity){
 let libsPromise = null;
 function ensureReminderLibs(){
   if(!libsPromise){
-    libsPromise = Promise.all([
-      loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js',
-        'sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6FXzoEyYGjTe+vXA=='),
-      loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/4.2.1/jspdf.umd.min.js',
+    libsPromise = loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/4.2.1/jspdf.umd.min.js',
         'sha512-plOdviVmws4Y3JAvbnpfKb2hVxKM1lCwsi3vmElYRj+tiDLffZ4FVUj5a8vyKJ9pIgl8JCAHEJ4D1iUKBecswg==')
-    ]).catch(err => { libsPromise = null; throw err; });   // al prossimo clic si riprova
+      .catch(err => { libsPromise = null; throw err; });   // al prossimo clic si riprova
   }
   return libsPromise;
 }
@@ -502,16 +499,18 @@ function formatPorti(payload){
   return 'Qualcosa da condividere (ma è una scelta facoltativa)';
 }
 
-function fillReminderCard(payload){
-  document.getElementById('rem-nome').textContent = payload.nome || 'un ospite';
-  document.getElementById('rem-quando').textContent = formatEventWhen();
-  document.getElementById('rem-dove').textContent = CONFIG.EVENT_LOCATION || '[luogo da definire]';
-  document.getElementById('rem-quota').textContent = payload.quota;
-  document.getElementById('rem-porti').textContent = formatPorti(payload);
-
-  const online = payload.metodoPagamento.indexOf('Online') === 0;
-  document.getElementById('rem-pay-section').hidden = !online;
-  document.getElementById('rem-cash-note').hidden = online;
+// Dati per la card del promemoria disegnata da reminder.js.
+function reminderData(payload){
+  return {
+    nome: payload.nome || 'un ospite',
+    quando: formatEventWhen(),
+    dove: CONFIG.EVENT_LOCATION || '[luogo da definire]',
+    quota: payload.quota,
+    porti: formatPorti(payload),
+    online: payload.metodoPagamento.indexOf('Online') === 0,
+    dayMonth: CFG_TEXT.dayMonth,
+    cashNote: "Hai scelto di pagare in contanti la sera dell'evento: non serve nessun QR, ci vediamo il " + CFG_TEXT.dayMonth + "."
+  };
 }
 
 const downloadReminderBtn = document.getElementById('downloadReminderBtn');
@@ -522,11 +521,7 @@ downloadReminderBtn.addEventListener('click', async () => {
   downloadReminderBtn.disabled = true;
   downloadReminderBtn.textContent = 'Preparazione…';
   try{
-    await ensureReminderLibs();
-    fillReminderCard(payload);
-    await new Promise(r => setTimeout(r, 60)); // lascia assestare il layout
-    const card = document.getElementById('reminderCard');
-    const canvas = await html2canvas(card, {scale:2, backgroundColor:'#17141a'});
+    const [canvas] = await Promise.all([Reminder.draw(reminderData(payload)), ensureReminderLibs()]);
     const imgData = canvas.toDataURL('image/png');
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({unit:'pt', format:'a5', compress:true});   // ~125 KB invece di ~5 MB
