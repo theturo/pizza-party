@@ -632,7 +632,7 @@
           <label class="opt"><input type="radio" name="partecipazione" value="solo" checked><span>Vengo da solo/a</span></label>
           <label class="opt"><input type="radio" name="partecipazione" value="plus1"><span>Vengo con un +1</span></label>
         </div>
-        <div class="conditional" id="plus1-wrap">
+        <div class="conditional" id="plus1-wrap" inert>
           <label class="lbl" for="plus1nome">Nome del tuo +1</label>
           <input type="text" id="plus1nome" name="plus1nome" placeholder="Nome dell'accompagnatore">
         </div>
@@ -890,7 +890,10 @@ function setLoadingLabel(btn, text){ btn.innerHTML = text + LOADING_DOTS_HTML; }
 const form = document.getElementById('pizzaForm');
 const submitBtn = document.getElementById('submitBtn');
 const formError = document.getElementById('formError');
-const formLoadedAt = Date.now();
+// Inizio compilazione, per il filtro anti-bot "invio troppo rapido".
+// Viene salvato insieme al progresso: dopo una ricarica (es. ritorno da
+// PayPal/Satispay) si riparte dall'orario originale e non da zero.
+let formStartedAt = Date.now();
 
 const plus1Radio = document.querySelector('input[value="plus1"]');
 const soloRadio = document.querySelector('input[value="solo"]');
@@ -903,9 +906,15 @@ function isAttending(){
   return v && (v.value === 'si' || v.value === 'forse');
 }
 
+// Da chiuso il blocco è inert: i campi non restano raggiungibili con Tab.
+function setConditionalOpen(el, open){
+  el.classList.toggle('open', open);
+  el.inert = !open;
+}
+
 function updatePlus1(){
   const isPlus1 = plus1Radio.checked;
-  plus1Wrap.classList.toggle('open', isPlus1);
+  setConditionalOpen(plus1Wrap, isPlus1);
   quotaAmount.textContent = isPlus1 ? "10€" : "5€";
 }
 plus1Radio.addEventListener('change', updatePlus1);
@@ -914,7 +923,7 @@ soloRadio.addEventListener('change', updatePlus1);
 const onlineWrap = document.getElementById('online-wrap');
 document.querySelectorAll('input[name="metodo_pagamento"]').forEach(r => {
   r.addEventListener('change', () => {
-    onlineWrap.classList.toggle('open', r.value === 'online' && r.checked);
+    setConditionalOpen(onlineWrap, r.value === 'online' && r.checked);
   });
 });
 
@@ -970,7 +979,8 @@ function saveProgress(){
       sacchetto: document.getElementById('sacchetto').checked,
       metodo_pagamento: (form.querySelector('input[name="metodo_pagamento"]:checked') || {}).value,
       accetto: document.getElementById('accetto').checked,
-      currentIndex: currentIndex
+      currentIndex: currentIndex,
+      startedAt: formStartedAt
     }));
   }catch(e){ /* storage non disponibile: non è grave, si compila di nuovo */ }
 }
@@ -1002,7 +1012,8 @@ function restoreProgress(){
     document.getElementById('accetto').checked = !!data.accetto;
 
     updatePlus1();
-    onlineWrap.classList.toggle('open', (form.querySelector('input[name="metodo_pagamento"]:checked') || {}).value === 'online');
+    setConditionalOpen(onlineWrap, (form.querySelector('input[name="metodo_pagamento"]:checked') || {}).value === 'online');
+    if(typeof data.startedAt === 'number' && data.startedAt <= Date.now()) formStartedAt = data.startedAt;
 
     const target = Math.max(0, Math.min(data.currentIndex || 0, scenes.length - 1));
     if(target > 0 && !isSkipped(scenes[target])){
@@ -1278,12 +1289,16 @@ function showResult(payload, opts){
 }
 
 // ---- Promemoria scaricabile (PDF) -------------------------------------------
-function loadScript(src){
+// integrity (SRI): se il file sul CDN non corrisponde all'hash, il browser non lo esegue.
+function loadScript(src, integrity){
   return new Promise((resolve, reject) => {
     const s = document.createElement('script');
     s.src = src;
+    s.integrity = integrity;
+    s.crossOrigin = 'anonymous';
+    s.referrerPolicy = 'no-referrer';
     s.onload = () => resolve();
-    s.onerror = () => reject(new Error('Impossibile caricare ' + src));
+    s.onerror = () => { s.remove(); reject(new Error('Impossibile caricare ' + src)); };
     document.head.appendChild(s);
   });
 }
@@ -1292,9 +1307,11 @@ let libsPromise = null;
 function ensureReminderLibs(){
   if(!libsPromise){
     libsPromise = Promise.all([
-      loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js'),
-      loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js')
-    ]);
+      loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js',
+        'sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6FXzoEyYGjTe+vXA=='),
+      loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/4.2.1/jspdf.umd.min.js',
+        'sha512-plOdviVmws4Y3JAvbnpfKb2hVxKM1lCwsi3vmElYRj+tiDLffZ4FVUj5a8vyKJ9pIgl8JCAHEJ4D1iUKBecswg==')
+    ]).catch(err => { libsPromise = null; throw err; });   // al prossimo clic si riprova
   }
   return libsPromise;
 }
@@ -1348,7 +1365,7 @@ downloadReminderBtn.addEventListener('click', async () => {
     const canvas = await html2canvas(card, {scale:2, backgroundColor:'#17141a'});
     const imgData = canvas.toDataURL('image/png');
     const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({unit:'pt', format:'a5'});
+    const doc = new jsPDF({unit:'pt', format:'a5', compress:true});   // ~125 KB invece di ~5 MB
     const pageW = doc.internal.pageSize.getWidth();
     const pageH = doc.internal.pageSize.getHeight();
     doc.addImage(imgData, 'PNG', 0, 0, pageW, pageH);
@@ -1428,7 +1445,7 @@ form.addEventListener('submit', function(e){
 
   // anti-spam: honeypot + invio troppo rapido
   const trap = document.getElementById('website').value.trim();
-  const tooFast = (Date.now() - formLoadedAt) < 3000;
+  const tooFast = (Date.now() - formStartedAt) < 3000;
   if(trap || tooFast){
     showResult(payload, {});   // finto successo, nessun invio
     return;
