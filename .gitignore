@@ -1,0 +1,5 @@
+# Materiale di lavoro locale: non va pubblicato su GitHub Pages
+design-artboards/
+revisione-*/
+.DS_Store
+.claude/
