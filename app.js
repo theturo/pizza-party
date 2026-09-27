@@ -7,13 +7,41 @@ const CONFIG = {
   EVENT_TITLE: "PizzaParty — 10° Anniversario",
   EVENT_START: "2026-10-10T19:30",
   EVENT_END: "2026-10-10T23:30",
-  EVENT_LOCATION: "Corte Quaglio"
+  EVENT_LOCATION: "Corte Quaglio",
+  // Quote in euro: usate per il testo della pagina e per il payload.
+  QUOTA_SINGLE: 5,
+  QUOTA_PLUS1: 10,
+  // Giorni dopo l'evento entro cui i dati vengono cancellati (informativa privacy).
+  RETENTION_DAYS: 30
 };
 const SCRIPT_URL = CONFIG.SCRIPT_URL;
 const SCRIPT_READY = SCRIPT_URL && SCRIPT_URL.indexOf("INCOLLA_QUI") === -1;
-const REDUCED_MOTION = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const LOADING_DOTS_HTML = '<span class="loading-dots" aria-hidden="true"><span></span><span></span><span></span></span>';
 function setLoadingLabel(btn, text){ btn.innerHTML = text + LOADING_DOTS_HTML; }
+
+const formatEuro = n => n + '€';
+function quotaFor(plus1){ return plus1 ? CONFIG.QUOTA_PLUS1 : CONFIG.QUOTA_SINGLE; }
+
+// Testi della pagina derivati da CONFIG (elementi con data-cfg="…").
+// L'HTML contiene già gli stessi valori, così la pagina è corretta anche prima del JS.
+function applyConfigText(){
+  const start = new Date(CONFIG.EVENT_START);
+  const end = new Date(start); end.setDate(end.getDate() + CONFIG.RETENTION_DAYS);
+  const pad = n => String(n).padStart(2, '0');
+  const values = {
+    dateShort: pad(start.getDate()) + ' · ' + pad(start.getMonth() + 1) + ' · ' + start.getFullYear(),
+    dayMonth: start.toLocaleDateString('it-IT', {day: 'numeric', month: 'long'}),
+    retentionEnd: end.toLocaleDateString('it-IT', {day: 'numeric', month: 'long', year: 'numeric'}),
+    retentionDays: String(CONFIG.RETENTION_DAYS),
+    quotaSingle: formatEuro(CONFIG.QUOTA_SINGLE)
+  };
+  document.querySelectorAll('[data-cfg]').forEach(el => {
+    const v = values[el.dataset.cfg];
+    if(v) el.textContent = v;
+  });
+  return values;
+}
+const CFG_TEXT = applyConfigText();
 // ============================
 
 const form = document.getElementById('pizzaForm');
@@ -35,19 +63,22 @@ function isAttending(){
   return v && (v.value === 'si' || v.value === 'forse');
 }
 
-// Da chiuso il blocco è inert: i campi non restano raggiungibili con Tab.
-function setConditionalOpen(el, open){
-  el.classList.toggle('open', open);
-  el.inert = !open;
+// Apertura/chiusura animata (motion.js); da chiuso il blocco è inert.
+function setConditionalOpen(el, open, animate = true){
+  Motion.reveal(el, open, animate);
 }
 
-function updatePlus1(){
+let shownQuota = CONFIG.QUOTA_SINGLE;
+function updatePlus1(animate = true){
   const isPlus1 = plus1Radio.checked;
-  setConditionalOpen(plus1Wrap, isPlus1);
-  quotaAmount.textContent = isPlus1 ? "10€" : "5€";
+  setConditionalOpen(plus1Wrap, isPlus1, animate);
+  const q = quotaFor(isPlus1);
+  if(animate) Motion.countTo(quotaAmount, shownQuota, q, formatEuro);
+  else quotaAmount.textContent = formatEuro(q);
+  shownQuota = q;
 }
-plus1Radio.addEventListener('change', updatePlus1);
-soloRadio.addEventListener('change', updatePlus1);
+plus1Radio.addEventListener('change', () => updatePlus1());
+soloRadio.addEventListener('change', () => updatePlus1());
 
 const onlineWrap = document.getElementById('online-wrap');
 document.querySelectorAll('input[name="metodo_pagamento"]').forEach(r => {
@@ -144,8 +175,8 @@ function restoreProgress(){
     setRadioValue('metodo_pagamento', data.metodo_pagamento);
     document.getElementById('accetto').checked = !!data.accetto;
 
-    updatePlus1();
-    setConditionalOpen(onlineWrap, (form.querySelector('input[name="metodo_pagamento"]:checked') || {}).value === 'online');
+    updatePlus1(false);
+    setConditionalOpen(onlineWrap, (form.querySelector('input[name="metodo_pagamento"]:checked') || {}).value === 'online', false);
     if(typeof data.startedAt === 'number' && data.startedAt <= Date.now()) formStartedAt = data.startedAt;
 
     const target = Math.max(0, Math.min(data.currentIndex || 0, scenes.length - 1));
@@ -193,17 +224,21 @@ function findStep(fromIndex, direction){
   return i;
 }
 
-function renderReel(){
+// I fotogrammi già superati restano "impressionati"; con direction il
+// fotogramma corrente si riempie con un'animazione (motion.js).
+function renderReel(direction){
   const vis = visibleScenes();
   const cur = vis.indexOf(scenes[currentIndex]);
-  reel.innerHTML = vis.map((s,i) => '<span class="frame' + (i === cur ? ' on' : '') + '"></span>').join('');
+  reel.innerHTML = vis.map((s,i) =>
+    '<span class="frame' + (i === cur ? ' on' : i < cur ? ' done' : '') + '"><span class="fill"></span></span>').join('');
+  if(direction) Motion.reelAdvance(reel.children[cur], direction);
   const heading = scenes[currentIndex].querySelector('h2').textContent.trim();
   reelLabel.textContent = 'Scena ' + (cur + 1) + ' / ' + vis.length + ' — ' + heading;
 }
 
-function refreshFlow(){
+function refreshFlow(direction){
   accettoCheck.required = isAttending();
-  renderReel();
+  renderReel(direction);
   updateNav();
 }
 
@@ -246,33 +281,29 @@ function validateStep(index){
   });
 });
 
-function goTo(newIndex, direction){
+const scenesBox = document.getElementById('scenes');
+let sceneBusy = false;
+
+// Transizione animata (motion.js). Durante la transizione gli altri clic
+// vengono ignorati, così non si possono saltare o sovrapporre scene.
+async function goTo(newIndex, direction){
+  if(sceneBusy || newIndex === currentIndex) return;
+  sceneBusy = true;
   const oldScene = scenes[currentIndex];
   const newScene = scenes[newIndex];
-
-  function activate(){
-    newScene.classList.add('step-active');
-    currentIndex = newIndex;
-    refreshFlow();
-    saveProgress();
-    const h = newScene.querySelector('h2');
-    if(h) h.focus();
+  try{
+    await Motion.sceneSwap(scenesBox, oldScene, newScene, direction, () => {
+      oldScene.classList.remove('step-active');
+      newScene.classList.add('step-active');
+      currentIndex = newIndex;
+      refreshFlow(direction);
+      saveProgress();
+      const h = newScene.querySelector('h2');
+      if(h) h.focus({preventScroll: true});
+    });
+  }finally{
+    sceneBusy = false;
   }
-
-  if(REDUCED_MOTION){
-    oldScene.classList.remove('step-active');
-    activate();
-    return;
-  }
-
-  oldScene.classList.remove('step-active');
-  oldScene.classList.add(direction > 0 ? 'step-exit-left' : 'step-exit-right');
-  setTimeout(() => {
-    oldScene.classList.remove('step-exit-left','step-exit-right');
-    newScene.classList.add(direction > 0 ? 'step-enter-right' : 'step-enter-left');
-    activate();
-    setTimeout(() => newScene.classList.remove('step-enter-left','step-enter-right'), 320);
-  }, 260);
 }
 
 btnNext.addEventListener('click', async () => {
@@ -324,7 +355,7 @@ function buildPayload(){
     contributo: attending ? contributi.join(", ") : "",
     dettaglio: attending ? document.getElementById('dettaglio').value.trim() : "",
     sacchetto: attending && document.getElementById('sacchetto').checked ? "Sì" : "No",
-    quota: attending ? quotaAmount.textContent : "—",
+    quota: attending ? formatEuro(quotaFor(plus1Radio.checked)) : "—",
     metodoPagamento: !attending ? "—"
       : (form.querySelector('input[name="metodo_pagamento"]:checked').value === "contanti"
           ? "Contanti alla serata" : "Online (PayPal/Satispay)"),
@@ -359,11 +390,9 @@ function showResult(payload, opts){
   reelLabel.classList.add('hidden');
   form.classList.add('hidden');
 
-  const bakeScreen = document.getElementById('bakeScreen');
-  const pizzaWheel = document.getElementById('pizzaWheel');
-  const bakeCaption = document.getElementById('bakeCaption');
   const successScreen = document.getElementById('successScreen');
   const stamp = document.getElementById('successStamp');
+  const stampInk = document.getElementById('stampInk');
   const sTitle = document.getElementById('successTitle');
   const sText = document.getElementById('successText');
   const sPay = document.getElementById('successPay');
@@ -384,6 +413,7 @@ function showResult(payload, opts){
     stamp.textContent = "REGISTRATO";
     stamp.style.borderColor = "var(--parchment-dim)";
     stamp.style.color = "var(--parchment-dim)";
+    stampInk.style.borderColor = "var(--parchment-dim)";
     sTitle.textContent = "Ci mancherai!";
     sText.textContent = "Grazie per avercelo fatto sapere. Se cambi idea, riscrivici: alla prossima edizione!";
     calLink.hidden = true;
@@ -391,7 +421,8 @@ function showResult(payload, opts){
     stamp.textContent = "ISCRITTO";
     stamp.style.borderColor = "var(--basil)";
     stamp.style.color = "var(--basil)";
-    sTitle.textContent = "Ci vediamo il 10 ottobre!";
+    stampInk.style.borderColor = "var(--basil)";
+    sTitle.textContent = "Ci vediamo il " + CFG_TEXT.dayMonth + "!";
     sText.textContent = "Dopo la serata ti manderemo la galleria fotografica via mail.";
     if(payload.metodoPagamento.indexOf("Online") === 0){
       sPay.textContent = "Puoi versare la quota di " + payload.quota + " con PayPal o Satispay quando ti fa comodo.";
@@ -404,21 +435,21 @@ function showResult(payload, opts){
     }
   }
 
-  if(REDUCED_MOTION){
-    successScreen.classList.add('show');
-    return;
-  }
-
-  bakeScreen.classList.add('show');
-  pizzaWheel.classList.add('appear');
-  setTimeout(() => {
-    bakeCaption.textContent = attending ? "...ma finita in un lampo, fetta dopo fetta." : "...ma stavolta senza di te.";
-    pizzaWheel.classList.add('devour');
-  }, 1800);
-  setTimeout(() => {
-    bakeScreen.classList.remove('show');
-    successScreen.classList.add('show');
-  }, 1800 + 1900);
+  Motion.finale({
+    bake: document.getElementById('bakeScreen'),
+    wheel: document.getElementById('pizzaWheel'),
+    crumbs: document.getElementById('crumbCanvas'),
+    caption: document.getElementById('bakeCaption'),
+    skip: document.getElementById('skipBtn'),
+    success: successScreen,
+    stage: successScreen,
+    stamp: stamp,
+    ink: stampInk,
+    reveal: [sTitle, successScreen.querySelector('.success-body'), calLink, downloadBtn]
+  }, {
+    intro: "Sfornata al momento...",
+    outro: attending ? "...ma finita in un lampo, fetta dopo fetta." : "...ma stavolta senza di te."
+  });
 }
 
 // ---- Promemoria scaricabile (PDF) -------------------------------------------
@@ -598,6 +629,7 @@ document.querySelectorAll('.contact-email').forEach(a => {
 });
 
 // init
-updatePlus1();
+Motion.flame(document.querySelector('.hero'));
+updatePlus1(false);
 refreshFlow();
 restoreProgress();

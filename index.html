@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob:; connect-src https://script.google.com https://script.googleusercontent.com; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://cdnjs.cloudflare.com; style-src 'self' 'sha256-UP0QZg7irvSMvOBz9mH2PIIE28+57UiavRfeVea0l3g='; font-src 'self'; img-src 'self' data: blob:; connect-src https://script.google.com https://script.googleusercontent.com; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PizzaParty — 10 anni — Iscrizioni</title>
@@ -11,576 +11,14 @@
 <meta property="og:description" content="Il modulo di iscrizione per l'edizione dei 10 anni del PizzaParty, 10 ottobre 2026.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://www.pizza-party.net/">
-<meta property="og:image" content="https://www.pizza-party.net/og-image.png">
+<meta property="og:image" content="https://www.pizza-party.net/og-image.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="description" content="Il modulo di iscrizione per l'edizione dei 10 anni del PizzaParty, 10 ottobre 2026.">
 <meta name="theme-color" content="#151217">
 <link rel="preload" href="fonts/fraunces-italic-latin.woff2" as="font" type="font/woff2" crossorigin>
-<style>
-  /* Font ospitati sul sito (licenza OFL, vedi fonts/): nessuna richiesta a Google */
-  @font-face{font-family:"Fraunces";font-style:italic;font-weight:600 900;font-display:swap;src:url(fonts/fraunces-italic-latin-ext.woff2) format("woff2");unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;}
-  @font-face{font-family:"Fraunces";font-style:italic;font-weight:600 900;font-display:swap;src:url(fonts/fraunces-italic-latin.woff2) format("woff2");unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;}
-  @font-face{font-family:"Fraunces";font-style:normal;font-weight:600 900;font-display:swap;src:url(fonts/fraunces-normal-latin-ext.woff2) format("woff2");unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;}
-  @font-face{font-family:"Fraunces";font-style:normal;font-weight:600 900;font-display:swap;src:url(fonts/fraunces-normal-latin.woff2) format("woff2");unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;}
-  @font-face{font-family:"Kalam";font-style:normal;font-weight:700;font-display:swap;src:url(fonts/kalam-normal-latin-ext.woff2) format("woff2");unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;}
-  @font-face{font-family:"Kalam";font-style:normal;font-weight:700;font-display:swap;src:url(fonts/kalam-normal-latin.woff2) format("woff2");unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;}
-  :root{
-    --bg:#151217;
-    --bg-2:#1d1922;
-    --card:#221d29;
-    --field:#100d14;
-    --line:rgba(245,201,52,.16);
-    --line-strong:rgba(245,201,52,.42);
-    --gold:#f5c934;
-    --gold-bright:#ffd955;
-    --gold-dark:#c99a1e;
-    --tomato:#d24a30;
-    --tomato-dark:#b23a22;
-    --basil:#5c8a4a;
-    --parchment:#f3e8d6;
-    --parchment-dim:#cabfa8;
-    --ember:#ff8a4d;
-    --ok:#7bbf5e;
-    --serif:"Fraunces",Georgia,"Times New Roman",serif;
-    --hand:"Kalam","Bradley Hand",cursive;
-    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-  }
-  *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;}
-  body{
-    background:var(--bg);
-    color:var(--parchment);
-    font-family:var(--sans);
-    line-height:1.55;
-    min-height:100vh;
-    -webkit-font-smoothing:antialiased;
-  }
-  /* film-grain overlay */
-  body::before{
-    content:"";
-    position:fixed;inset:0;
-    pointer-events:none;z-index:9999;
-    opacity:.04;mix-blend-mode:overlay;
-    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  }
-  .wrap{max-width:600px;margin:0 auto;padding:0 0 72px;position:relative;z-index:1;}
-
-  /* ===== HERO ===== */
-  .hero{
-    position:relative;
-    padding:56px 24px 46px;
-    text-align:center;
-    overflow:hidden;
-    background:radial-gradient(120% 92% at 50% 122%, #3a1e12 0%, #241017 38%, var(--bg) 74%);
-    border-bottom:2px solid var(--gold);
-  }
-  .hero > *{position:relative;z-index:2;}
-  .flame{
-    position:absolute;
-    left:50%;bottom:-64px;
-    width:180px;height:210px;
-    transform:translateX(-50%);
-    opacity:.22;
-    filter:blur(3px);
-    z-index:1;
-    pointer-events:none;
-  }
-  .flame svg{width:100%;height:100%;}
-  .flame path{animation:flicker 2.6s ease-in-out infinite;transform-origin:50% 100%;}
-  .flame path:nth-child(2){animation-delay:.4s;animation-duration:3.1s;}
-  .flame path:nth-child(3){animation-delay:.9s;animation-duration:2.3s;}
-  @keyframes flicker{
-    0%,100%{transform:scaleY(1) scaleX(1) rotate(0deg);}
-    30%{transform:scaleY(1.08) scaleX(.96) rotate(-1deg);}
-    55%{transform:scaleY(.94) scaleX(1.04) rotate(1.5deg);}
-    80%{transform:scaleY(1.05) scaleX(.98) rotate(-.5deg);}
-  }
-  .hero::after{
-    content:"";
-    position:absolute;inset:0;z-index:1;pointer-events:none;
-    background:linear-gradient(to top, var(--bg) 4%, rgba(21,18,23,.35) 42%, transparent 68%);
-  }
-  .eyebrow{
-    font-size:12px;
-    letter-spacing:.16em;
-    text-transform:uppercase;
-    color:var(--parchment-dim);
-    font-weight:700;
-    margin:0 0 14px;
-  }
-  .title{
-    font-family:var(--serif);
-    font-weight:900;
-    font-style:italic;
-    font-size:clamp(46px,13vw,78px);
-    line-height:.92;
-    color:var(--gold);
-    letter-spacing:-.02em;
-    text-shadow:0 2px 0 #7a3f18, 0 10px 26px rgba(0,0,0,.55);
-    margin:0;
-  }
-  .title-sub{
-    font-family:var(--serif);
-    font-weight:700;
-    font-style:italic;
-    font-size:clamp(18px,5vw,27px);
-    color:var(--parchment);
-    margin:12px 0 0;
-  }
-  .title-sub::before,.title-sub::after{content:"—";color:var(--gold-dark);margin:0 .45em;}
-  .subtitle{
-    display:inline-block;
-    font-family:var(--hand);
-    font-weight:700;
-    font-style:italic;
-    font-size:16px;
-    color:#0c2a4a;
-    background:var(--parchment);
-    padding:8px 20px;
-    border-radius:3px;
-    transform:rotate(-1.5deg);
-    box-shadow:0 4px 12px rgba(0,0,0,.4);
-    margin:20px 0 0;
-  }
-  .ticket-stub{
-    display:inline-flex;
-    align-items:center;
-    gap:12px;
-    margin-top:22px;
-    padding:9px 20px;
-    border:1.5px dashed var(--gold);
-    border-radius:4px;
-    font-family:var(--serif);
-    font-weight:700;
-    font-size:14px;
-    letter-spacing:.12em;
-    color:var(--gold);
-    background:rgba(245,201,52,.05);
-  }
-  .ticket-stub .dot{width:7px;height:7px;border-radius:50%;background:var(--gold-dark);flex-shrink:0;}
-
-  /* ===== FILM REEL PROGRESS ===== */
-  .reel{
-    display:flex;
-    justify-content:center;
-    flex-wrap:wrap;
-    gap:5px;
-    padding:22px 20px 6px;
-  }
-  .frame{
-    position:relative;
-    width:34px;height:22px;
-    border-radius:2px;
-    background:#2b2733;
-    border:1px solid var(--line);
-    transition:background .35s ease,border-color .35s ease;
-  }
-  .frame::before,.frame::after{
-    content:"";
-    position:absolute;left:3px;right:3px;height:3px;
-    background-image:radial-gradient(circle, rgba(0,0,0,.55) 45%, transparent 46%);
-    background-size:7px 3px;
-    background-repeat:repeat-x;
-  }
-  .frame::before{top:2px;}
-  .frame::after{bottom:2px;}
-  .frame.on{background:var(--gold);border-color:var(--gold-dark);}
-  .reel-label{
-    text-align:center;
-    font-family:var(--serif);
-    font-style:italic;
-    font-size:13px;
-    color:var(--parchment-dim);
-    margin:0 0 4px;
-    padding:0 20px;
-  }
-
-  /* ===== SCENE CARDS ===== */
-  .scene{
-    display:none;
-    margin:26px 16px 0;
-    background:var(--card);
-    border:1px solid var(--line);
-    border-radius:10px;
-    padding:26px 22px;
-    box-shadow:0 16px 34px -14px rgba(0,0,0,.65), inset 0 1px 0 rgba(255,255,255,.03);
-  }
-  .scene.step-active{display:block;}
-  @keyframes stepExitLeft{ to{opacity:0; transform:translateX(-34px);} }
-  @keyframes stepExitRight{ to{opacity:0; transform:translateX(34px);} }
-  @keyframes stepEnterLeft{ from{opacity:0; transform:translateX(-34px);} to{opacity:1; transform:translateX(0);} }
-  @keyframes stepEnterRight{ from{opacity:0; transform:translateX(34px);} to{opacity:1; transform:translateX(0);} }
-  .scene.step-exit-left{animation:stepExitLeft .26s ease forwards;}
-  .scene.step-exit-right{animation:stepExitRight .26s ease forwards;}
-  .scene.step-enter-left{animation:stepEnterLeft .3s ease forwards;}
-  .scene.step-enter-right{animation:stepEnterRight .3s ease forwards;}
-
-  .slate{
-    display:inline-flex;
-    align-items:center;
-    gap:8px;
-    font-family:var(--serif);
-    font-style:italic;
-    font-weight:700;
-    font-size:12px;
-    letter-spacing:.14em;
-    text-transform:uppercase;
-    color:var(--tomato);
-    margin-bottom:12px;
-  }
-  .slate::before{
-    content:"";
-    width:18px;height:12px;
-    border-radius:2px;
-    background:repeating-linear-gradient(-45deg, var(--tomato) 0 3px, #2b2733 3px 6px);
-  }
-  .scene h2{
-    font-family:var(--serif);
-    font-weight:700;
-    font-size:22px;
-    line-height:1.22;
-    margin:0 0 18px;
-    color:var(--parchment);
-    outline:none;
-  }
-  .scene h2:focus-visible{outline:2px solid var(--gold);outline-offset:4px;border-radius:3px;}
-  .scene p.note{font-size:14px;color:var(--parchment-dim);margin:0 0 12px;}
-
-  fieldset{border:0;margin:0 0 22px;padding:0;min-width:0;}
-  fieldset:last-of-type{margin-bottom:0;}
-  legend,.lbl{
-    display:block;
-    font-size:13.5px;
-    color:var(--parchment-dim);
-    font-weight:600;
-    margin:0 0 8px;
-    padding:0;
-  }
-  .hint{
-    display:block;
-    font-size:12.5px;
-    color:var(--parchment-dim);
-    line-height:1.45;
-    margin:-2px 0 8px;
-  }
-
-  input[type=text], input[type=tel], input[type=email], textarea{
-    width:100%;
-    background:var(--field);
-    border:1px solid rgba(243,232,214,.16);
-    border-radius:7px;
-    color:var(--parchment);
-    padding:13px;
-    font-size:16px;
-    font-family:inherit;
-    min-height:46px;
-    margin-bottom:4px;
-    transition:border-color .15s ease, box-shadow .15s ease;
-  }
-  input:focus, textarea:focus{
-    outline:none;
-    border-color:var(--gold);
-    box-shadow:0 0 0 3px rgba(245,201,52,.22);
-  }
-  input[aria-invalid="true"], textarea[aria-invalid="true"]{
-    border-color:var(--ember);
-    box-shadow:0 0 0 3px rgba(255,138,77,.18);
-  }
-  textarea{resize:vertical;min-height:70px;}
-
-  .opt-list{display:flex;flex-direction:column;gap:9px;}
-  .opt{
-    display:flex;
-    align-items:center;
-    gap:11px;
-    padding:12px 14px;
-    background:var(--field);
-    border:1px solid rgba(243,232,214,.14);
-    border-radius:8px;
-    cursor:pointer;
-    min-height:46px;
-    transition:border-color .15s ease, background .15s ease;
-  }
-  .opt:hover{border-color:var(--line-strong);}
-  .opt:focus-within{border-color:var(--gold);box-shadow:0 0 0 3px rgba(245,201,52,.2);}
-  .opt:has(input:checked){border-color:var(--gold);background:rgba(245,201,52,.1);}
-  .opt input{accent-color:var(--gold);width:18px;height:18px;flex-shrink:0;}
-  .opt span{font-size:15px;color:var(--parchment);}
-
-  .conditional{max-height:0;overflow:hidden;transition:max-height .35s ease;}
-  .conditional.open{max-height:220px;}
-  .conditional .lbl{margin-top:14px;}
-
-  .quota-line{
-    display:flex;
-    justify-content:space-between;
-    align-items:baseline;
-    padding:16px;
-    background:rgba(210,74,48,.12);
-    border:1px solid var(--tomato);
-    border-radius:8px;
-    margin-bottom:14px;
-  }
-  .quota-line .amount{font-family:var(--serif);font-weight:900;font-size:26px;color:var(--gold);}
-  .pay-buttons{display:flex;gap:10px;margin:6px 0 16px;flex-wrap:wrap;}
-  .pay-btn{
-    flex:1;min-width:150px;text-align:center;
-    padding:12px 14px;border-radius:8px;
-    text-decoration:none;font-size:14px;font-weight:700;font-family:var(--serif);
-    border:1px solid var(--gold);color:var(--gold);
-    transition:background .15s ease, color .15s ease;
-  }
-  .pay-btn:hover{background:var(--gold);color:var(--bg);}
-
-  /* ===== NAV / BUTTONS ===== */
-  .step-nav{display:flex;gap:12px;margin:22px 16px 0;}
-  .btn{
-    flex:1;
-    padding:15px;
-    border-radius:9px;
-    font-size:15px;
-    font-weight:700;
-    font-family:var(--serif);
-    font-style:italic;
-    cursor:pointer;
-    border:1.5px solid transparent;
-    transition:background .15s ease, border-color .15s ease, transform .08s ease;
-  }
-  .btn:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
-  .btn:active{transform:translateY(1px);}
-  .btn-ghost{background:transparent;border-color:var(--parchment-dim);color:var(--parchment);}
-  .btn-ghost:hover{border-color:var(--parchment);background:rgba(243,232,214,.06);}
-  .btn-ghost:disabled{opacity:.3;cursor:not-allowed;}
-  .btn-primary{background:var(--gold);color:var(--bg);}
-  .btn-primary:hover{background:var(--gold-bright);}
-  .btn-primary:disabled{opacity:.6;cursor:not-allowed;}
-
-  .loading-dots{display:inline-flex;gap:3px;margin-left:5px;vertical-align:middle;}
-  .loading-dots span{width:4px;height:4px;border-radius:50%;background:currentColor;opacity:.3;animation:dotPulse 1.1s ease-in-out infinite;}
-  .loading-dots span:nth-child(2){animation-delay:.15s;}
-  .loading-dots span:nth-child(3){animation-delay:.3s;}
-  @keyframes dotPulse{0%,80%,100%{opacity:.3;transform:scale(.85);}40%{opacity:1;transform:scale(1);}}
-
-  .submit-btn{
-    display:block;
-    width:calc(100% - 32px);
-    margin:26px 16px 0;
-    padding:17px;
-    background:var(--gold);
-    color:var(--bg);
-    border:none;
-    border-radius:10px;
-    font-size:17px;
-    font-weight:900;
-    font-family:var(--serif);
-    font-style:italic;
-    letter-spacing:.01em;
-    cursor:pointer;
-    transition:background .15s ease, transform .08s ease;
-  }
-  .submit-btn:hover{background:var(--gold-bright);}
-  .submit-btn:active{transform:scale(.99);}
-  .submit-btn:disabled{opacity:.6;cursor:not-allowed;}
-
-  .error-msg{color:var(--ember);font-size:13px;margin:6px 0 10px;display:none;}
-  .error-msg.show{display:block;}
-  .form-error{
-    margin:16px 16px 0;
-    padding:12px 14px;
-    border:1px solid var(--ember);
-    border-radius:8px;
-    background:rgba(255,138,77,.1);
-    color:var(--parchment);
-    font-size:14px;
-    line-height:1.55;
-    display:none;
-  }
-  .form-error.show{display:block;}
-  .restore-note{
-    margin:16px 16px 0;
-    padding:10px 14px;
-    border:1px solid var(--line);
-    border-radius:8px;
-    background:rgba(245,201,52,.06);
-    color:var(--parchment-dim);
-    font-size:13px;
-    line-height:1.5;
-    display:none;
-  }
-  .restore-note.show{display:block;}
-
-  /* ===== PRIVACY ===== */
-  .privacy{margin:30px 16px 0;border-top:1px solid var(--line);padding-top:14px;font-size:13px;color:var(--parchment-dim);line-height:1.55;}
-  .privacy summary{cursor:pointer;font-weight:600;color:var(--parchment-dim);padding:6px 0;}
-  .privacy summary:hover{color:var(--parchment);}
-  .privacy summary:focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:3px;}
-  .privacy-body p{margin:8px 0 0;}
-  .privacy a{color:var(--gold);}
-
-  /* honeypot */
-  .hp{position:absolute !important;left:-9999px !important;top:auto !important;width:1px !important;height:1px !important;overflow:hidden !important;}
-
-  /* ===== BAKE ANIMATION ===== */
-  .bake-screen{
-    display:none;
-    position:fixed;inset:0;z-index:100;
-    background:var(--bg);
-    text-align:center;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    padding:32px 24px;
-  }
-  .bake-screen.show{display:flex;}
-  .pizza-stage{position:relative;width:250px;height:250px;margin:0 auto;}
-  .pizza-stage svg{width:100%;height:100%;overflow:visible;}
-  .board{fill:#6b4a1e;}
-  .board-ring{fill:none;stroke:#5a3d18;stroke-width:3;}
-
-  /* ogni fetta: assemblata sul tagliere, poi presa via una alla volta */
-  #pizzaWheel .slice{
-    transform-box:view-box;
-    transform-origin:100px 100px;
-    opacity:0;
-  }
-  #pizzaWheel.appear .slice{
-    animation:sliceIn .5s cubic-bezier(.34,1.4,.64,1) both;
-    animation-delay:calc(var(--i) * 120ms);
-  }
-  #pizzaWheel.devour .slice{
-    animation:sliceOut .45s ease-in both;
-    animation-delay:calc(var(--i) * 150ms);
-  }
-  @keyframes sliceIn{
-    0%{opacity:0;transform:translate(calc(var(--fx,0px) * .5), -66px) scale(.25) rotate(calc(var(--fr,0deg) * -1));}
-    60%{opacity:1;}
-    100%{opacity:1;transform:translate(0,0) scale(1) rotate(0deg);}
-  }
-  @keyframes sliceOut{
-    0%{opacity:1;transform:translate(0,0) scale(1) rotate(0deg);}
-    100%{opacity:0;transform:translate(var(--fx,0px), -92px) scale(.4) rotate(var(--fr,16deg));}
-  }
-
-  .crumb-field{position:absolute;inset:0;pointer-events:none;}
-  .crumb{position:absolute;border-radius:40% 60% 50% 50%;background:#a8781f;opacity:0;transform:scale(0);}
-  #pizzaWheel.devour ~ .crumb-field .crumb{animation:crumbPop .4s cubic-bezier(.34,1.56,.64,1) forwards;}
-  @keyframes crumbPop{
-    0%{opacity:0;transform:scale(0) translateY(-6px);}
-    60%{opacity:1;transform:scale(1.15) translateY(0);}
-    100%{opacity:.9;transform:scale(1) translateY(0);}
-  }
-  .bake-caption{margin-top:30px;font-family:var(--serif);font-style:italic;font-weight:700;font-size:17px;color:var(--gold);}
-
-  /* ===== SUCCESS ===== */
-  .success-screen{
-    display:none;
-    position:fixed;inset:0;z-index:100;
-    background:var(--bg);
-    text-align:center;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    padding:32px 24px;
-  }
-  .success-screen.show{display:flex;}
-  .stamp{
-    border:4px solid var(--basil);
-    color:var(--basil);
-    border-radius:50%;
-    width:150px;height:150px;
-    display:flex;align-items:center;justify-content:center;
-    font-family:var(--serif);
-    font-weight:900;
-    font-style:italic;
-    font-size:21px;
-    line-height:1.1;
-    text-align:center;
-    transform:rotate(-8deg) scale(0);
-    animation:stampIn .5s cubic-bezier(.34,1.56,.64,1) forwards;
-  }
-  @keyframes stampIn{to{transform:rotate(-8deg) scale(1);}}
-  .success-title{font-family:var(--serif);font-style:italic;font-weight:900;font-size:24px;color:var(--gold);margin:22px 0 0;}
-  .success-body{max-width:38ch;margin:14px auto 0;}
-  .success-body > *{margin:0;}
-  .success-body > * + *{margin-top:12px;}
-  .success-text{color:var(--parchment);font-size:15px;line-height:1.6;}
-  .success-pay{color:var(--parchment-dim);font-size:13.5px;line-height:1.55;}
-  .success-note{
-    color:var(--parchment-dim);
-    font-size:12.5px;
-    line-height:1.5;
-    margin-top:16px !important;
-    padding-top:12px;
-    border-top:1px solid var(--line);
-  }
-  .cal-link{
-    display:inline-block;
-    margin-top:26px;
-    padding:12px 20px;
-    background:transparent;
-    border:1.5px solid var(--gold);
-    border-radius:8px;
-    color:var(--gold);
-    text-decoration:none;
-    font-family:var(--serif);
-    font-weight:700;
-    font-size:14px;
-    cursor:pointer;
-  }
-  .cal-link:hover{background:var(--gold);color:var(--bg);}
-  .cal-link + .cal-link{margin-top:12px;}
-  .cal-link:disabled{opacity:.6;cursor:not-allowed;}
-  .cal-link:disabled:hover{background:transparent;color:var(--gold);}
-
-  /* ===== PROMEMORIA (rendering nascosto per il download PDF) ===== */
-  .reminder-offscreen{position:fixed;left:-99999px;top:0;pointer-events:none;}
-  .reminder-card{
-    position:relative;
-    width:559px;height:794px;
-    overflow:hidden;
-    background:#17141a;
-    font-family:var(--sans);
-    color:var(--parchment);
-  }
-  .reminder-card .strip{height:26px;background:repeating-linear-gradient(90deg,#2b2733 0 20px,#17141a 20px 33px);border-bottom:2px solid var(--gold);}
-  .reminder-card .stamp-mini{
-    position:absolute;top:44px;right:30px;width:70px;height:70px;
-    border:3px solid var(--basil);border-radius:50%;
-    display:flex;align-items:center;justify-content:center;text-align:center;
-    transform:rotate(-9deg);
-    font-family:var(--serif);font-weight:900;font-style:italic;font-size:12px;color:var(--basil);line-height:1.1;
-  }
-  .reminder-card .body{padding:38px 44px 0;}
-  .reminder-card .eyebrow{margin:0 0 8px;font-size:12px;letter-spacing:.16em;text-transform:uppercase;font-weight:700;color:var(--parchment-dim);}
-  .reminder-card h1{margin:0;font-family:var(--serif);font-weight:900;font-style:italic;font-size:60px;line-height:.9;color:var(--gold);max-width:400px;}
-  .reminder-card .sub{margin:8px 0 0;font-family:var(--serif);font-weight:700;font-style:italic;font-size:22px;color:var(--parchment);}
-  .reminder-card .sticker{display:inline-block;margin:20px 0 0;font-family:var(--hand);font-weight:700;font-style:italic;font-size:16px;color:#0c2a4a;background:var(--parchment);padding:7px 18px;border-radius:3px;transform:rotate(-1.5deg);}
-  .reminder-card .rule{margin:26px 0;height:1px;background:rgba(245,201,52,.3);}
-  .reminder-card .grid{margin:0;display:grid;grid-template-columns:92px 1fr;gap:15px 18px;font-size:15px;line-height:1.5;}
-  .reminder-card .grid dt{margin:0;font-family:var(--serif);font-style:italic;font-weight:700;color:var(--tomato);}
-  .reminder-card .grid dd{margin:0;}
-  .reminder-card .pay-title{margin:22px 0 16px;font-family:var(--serif);font-style:italic;font-weight:700;font-size:19px;color:var(--parchment);}
-  .reminder-card .pay-row{display:flex;gap:24px;}
-  .reminder-card .pay-col{flex:1;text-align:center;}
-  .reminder-card .pay-col img{width:128px;height:128px;border:2px solid var(--gold);border-radius:6px;}
-  .reminder-card .pay-col .lbl{margin:10px 0 0;font-size:14px;font-weight:700;color:var(--gold);}
-  .reminder-card .pay-col .id{margin:2px 0 0;font-size:11px;color:var(--parchment-dim);word-break:break-word;}
-  .reminder-card .cash-note{margin:26px 0 0;font-size:13px;color:var(--parchment-dim);line-height:1.5;}
-  .reminder-card .flame-corner{position:absolute;right:-34px;bottom:-44px;width:210px;height:252px;opacity:.22;}
-
-  .hidden{display:none !important;}
-
-  @media (prefers-reduced-motion: reduce){
-    *,*::before,*::after{
-      animation-duration:.001ms !important;
-      animation-iteration-count:1 !important;
-      transition-duration:.001ms !important;
-    }
-    .flame{display:none;}
-  }
-</style>
+<link rel="stylesheet" href="styles.css?v=4">
 </head>
 <body>
 <div class="wrap">
@@ -593,11 +31,12 @@
         <path d="M50 118 C42 108 41 96 46 86 C47 92 49 92 49 87 C49 78 46 73 46 67 C55 73 60 82 58 91 C61 89 63 84 62 80 C67 88 66 100 58 108 Z" fill="#ffd98c" opacity="0.9"/>
       </svg>
     </div>
+    <canvas class="embers" aria-hidden="true"></canvas>
     <p class="eyebrow">L'evento più atteso di questo rocambolesco 2026</p>
     <h1 class="title">PizzaParty</h1>
     <p class="title-sub">10° Anniversario</p>
     <p class="subtitle">Dieci anni di pizze più o meno riuscite</p>
-    <div><span class="ticket-stub"><span class="dot"></span>10 · 10 · 2026<span class="dot"></span></span></div>
+    <div><span class="ticket-stub"><span class="dot"></span><span data-cfg="dateShort">10 · 10 · 2026</span><span class="dot"></span></span></div>
   </div>
 
   <div class="reel" id="reel" aria-hidden="true"></div>
@@ -614,6 +53,7 @@
 
     <div class="restore-note" id="restoreNote" role="status">Abbiamo ritrovato la tua iscrizione da dove l'avevi lasciata.</div>
 
+    <div class="scenes" id="scenes">
     <div class="scene step-active">
       <span class="slate">PizzaID</span>
       <h2 tabindex="-1">Chi partecipa</h2>
@@ -666,7 +106,7 @@
       <span class="slate">HACCP</span>
       <h2 tabindex="-1">Intolleranze e allergie</h2>
       <label class="lbl" for="intolleranze">Qualcosa da segnalarci? (facoltativo)</label>
-      <span class="hint" id="hint-intolleranze">Serve solo per preparare la cena: lo leggerà solo chi cucina e verrà cancellato con il resto dei dati entro il 9 novembre 2026.</span>
+      <span class="hint" id="hint-intolleranze">Serve solo per preparare la cena: lo leggerà solo chi cucina e verrà cancellato con il resto dei dati entro il <span data-cfg="retentionEnd">9 novembre 2026</span>.</span>
       <textarea id="intolleranze" name="intolleranze" placeholder="Es. intolleranza al lattosio, allergia alle noci..."
                 aria-describedby="hint-intolleranze"></textarea>
     </div>
@@ -729,7 +169,7 @@
       <h2 tabindex="-1">La quota</h2>
       <div class="quota-line">
         <span>Quota di partecipazione</span>
-        <span class="amount" id="quota-amount">5€</span>
+        <span class="amount" id="quota-amount" data-cfg="quotaSingle">5€</span>
       </div>
       <p class="note">La quota copre i costi della serata. Puoi versarla con uno dei link qui sotto.</p>
       <fieldset>
@@ -752,6 +192,8 @@
       <div class="error-msg" id="err-accetto" role="alert">Devi confermare l'accettazione della quota per iscriverti.</div>
     </div>
 
+    </div>
+
     <div class="step-nav" id="stepNav">
       <button type="button" class="btn btn-ghost" id="btnBack">← Indietro</button>
       <button type="button" class="btn btn-primary" id="btnNext">Avanti →</button>
@@ -767,7 +209,7 @@
     <div class="privacy-body">
       <p>Le risposte che inserisci (nome, email, eventuali intolleranze e le altre scelte del modulo) servono solo a organizzare il PizzaParty: la lista alla porta, la cena e l'invio della galleria fotografica dopo la serata.</p>
       <p>Le raccoglie e le legge solo Arturo, che le conserva in un Foglio Google (servizio di Google LLC). Non vengono condivise con nessun altro né usate per altri scopi.</p>
-      <p>Tutti i dati verranno cancellati entro 30 giorni dall'evento, cioè entro il <strong>9 novembre 2026</strong>.</p>
+      <p>Tutti i dati verranno cancellati entro <span data-cfg="retentionDays">30</span> giorni dall'evento, cioè entro il <strong data-cfg="retentionEnd">9 novembre 2026</strong>.</p>
       <p>Puoi chiedere in qualsiasi momento di vederli, correggerli o cancellarli scrivendo a <a class="contact-email" data-user="theturo93" data-domain="gmail.com" href="#privacy">Arturo</a>.</p>
       <p>I pagamenti avvengono direttamente su PayPal o Satispay: questo sito non vede né salva dati di pagamento.</p>
     </div>
@@ -805,44 +247,24 @@
             <ellipse cx="84" cy="110" rx="7" ry="4" fill="#5c8a4a" transform="rotate(-25 84 110)"/>
             <ellipse cx="118" cy="90" rx="7" ry="4" fill="#5c8a4a" transform="rotate(15 118 90)"/>
           </g>
-          <clipPath id="w0"><path d="M100,100 L100,8 A92,92 0 0,1 165.05,34.95 Z"/></clipPath>
-          <clipPath id="w1"><path d="M100,100 L165.05,34.95 A92,92 0 0,1 192,100 Z"/></clipPath>
-          <clipPath id="w2"><path d="M100,100 L192,100 A92,92 0 0,1 165.05,165.05 Z"/></clipPath>
-          <clipPath id="w3"><path d="M100,100 L165.05,165.05 A92,92 0 0,1 100,192 Z"/></clipPath>
-          <clipPath id="w4"><path d="M100,100 L100,192 A92,92 0 0,1 34.95,165.05 Z"/></clipPath>
-          <clipPath id="w5"><path d="M100,100 L34.95,165.05 A92,92 0 0,1 8,100 Z"/></clipPath>
-          <clipPath id="w6"><path d="M100,100 L8,100 A92,92 0 0,1 34.95,34.95 Z"/></clipPath>
-          <clipPath id="w7"><path d="M100,100 L34.95,34.95 A92,92 0 0,1 100,8 Z"/></clipPath>
         </defs>
 
         <circle class="board" cx="100" cy="100" r="99"/>
         <circle class="board-ring" cx="100" cy="100" r="99"/>
+        <g class="slices"></g>
 
-        <g class="slice" style="--i:0; --fx:10px; --fr:-20deg"><g clip-path="url(#w0)"><use href="#pizzaArt"/></g><path d="M100,100 L100,8 A92,92 0 0,1 165.05,34.95 Z" fill="none" stroke="rgba(0,0,0,.26)" stroke-width="1.5"/></g>
-        <g class="slice" style="--i:3; --fx:38px; --fr:14deg"><g clip-path="url(#w1)"><use href="#pizzaArt"/></g><path d="M100,100 L165.05,34.95 A92,92 0 0,1 192,100 Z" fill="none" stroke="rgba(0,0,0,.26)" stroke-width="1.5"/></g>
-        <g class="slice" style="--i:6; --fx:44px; --fr:24deg"><g clip-path="url(#w2)"><use href="#pizzaArt"/></g><path d="M100,100 L192,100 A92,92 0 0,1 165.05,165.05 Z" fill="none" stroke="rgba(0,0,0,.26)" stroke-width="1.5"/></g>
-        <g class="slice" style="--i:1; --fx:22px; --fr:10deg"><g clip-path="url(#w3)"><use href="#pizzaArt"/></g><path d="M100,100 L165.05,165.05 A92,92 0 0,1 100,192 Z" fill="none" stroke="rgba(0,0,0,.26)" stroke-width="1.5"/></g>
-        <g class="slice" style="--i:4; --fx:-22px; --fr:-10deg"><g clip-path="url(#w4)"><use href="#pizzaArt"/></g><path d="M100,100 L100,192 A92,92 0 0,1 34.95,165.05 Z" fill="none" stroke="rgba(0,0,0,.26)" stroke-width="1.5"/></g>
-        <g class="slice" style="--i:7; --fx:-44px; --fr:-24deg"><g clip-path="url(#w5)"><use href="#pizzaArt"/></g><path d="M100,100 L34.95,165.05 A92,92 0 0,1 8,100 Z" fill="none" stroke="rgba(0,0,0,.26)" stroke-width="1.5"/></g>
-        <g class="slice" style="--i:2; --fx:-38px; --fr:-14deg"><g clip-path="url(#w6)"><use href="#pizzaArt"/></g><path d="M100,100 L8,100 A92,92 0 0,1 34.95,34.95 Z" fill="none" stroke="rgba(0,0,0,.26)" stroke-width="1.5"/></g>
-        <g class="slice" style="--i:5; --fx:-10px; --fr:20deg"><g clip-path="url(#w7)"><use href="#pizzaArt"/></g><path d="M100,100 L34.95,34.95 A92,92 0 0,1 100,8 Z" fill="none" stroke="rgba(0,0,0,.26)" stroke-width="1.5"/></g>
       </svg>
-      <div class="crumb-field" id="crumbField">
-        <span class="crumb" style="left:32%; top:88%; width:7px; height:6px; animation-delay:550ms;"></span>
-        <span class="crumb" style="left:44%; top:94%; width:5px; height:5px; animation-delay:680ms;"></span>
-        <span class="crumb" style="left:52%; top:90%; width:9px; height:7px; animation-delay:750ms;"></span>
-        <span class="crumb" style="left:61%; top:95%; width:6px; height:5px; animation-delay:880ms;"></span>
-        <span class="crumb" style="left:70%; top:89%; width:8px; height:6px; animation-delay:1000ms;"></span>
-        <span class="crumb" style="left:38%; top:98%; width:5px; height:4px; animation-delay:1080ms;"></span>
-        <span class="crumb" style="left:58%; top:99%; width:6px; height:5px; animation-delay:1200ms;"></span>
-        <span class="crumb" style="left:47%; top:87%; width:5px; height:5px; animation-delay:1320ms;"></span>
-      </div>
+      <canvas class="crumbs" id="crumbCanvas" aria-hidden="true"></canvas>
     </div>
     <p class="bake-caption" id="bakeCaption">Sfornata al momento...</p>
+    <button type="button" class="skip-btn" id="skipBtn" hidden>Salta ›</button>
   </div>
 
   <div class="success-screen" id="successScreen" role="status">
-    <div class="stamp" id="successStamp">ISCRITTO</div>
+    <div class="stamp-wrap">
+      <div class="stamp-ink" id="stampInk" aria-hidden="true"></div>
+      <div class="stamp" id="successStamp">ISCRITTO</div>
+    </div>
     <h2 class="success-title" id="successTitle">Ci vediamo il 10 ottobre!</h2>
     <div class="success-body">
       <p class="success-text" id="successText"></p>
@@ -861,7 +283,7 @@
         <p class="eyebrow">Promemoria di <span id="rem-nome">—</span></p>
         <h1>PizzaParty</h1>
         <p class="sub">10° Anniversario</p>
-        <div class="sticker">Ci vediamo il 10 ottobre!</div>
+        <div class="sticker">Ci vediamo il <span data-cfg="dayMonth">10 ottobre</span>!</div>
         <div class="rule"></div>
         <dl class="grid">
           <dt>Quando</dt><dd id="rem-quando">—</dd>
@@ -874,18 +296,18 @@
           <p class="pay-title">Paga la quota comodamente da qui</p>
           <div class="pay-row">
             <div class="pay-col">
-              <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPgAAAD4CAIAAABOs7xcAAAEKUlEQVR42u3dsW1bQRBF0UdDlTh0F65cXTB0zJwNuAErILHzZ0Y+J7VBUdTFYjFc7L89H/fAd/fDR4DQQeggdBA6CB2EDu/5+Ooffv76veIX+HP/PPL+X32dr/7/q7re56n/v6UHKzq2LiB0EDoIHYQOQoccnqPnxTlltS1z3Gnz8uq/45YerOjYuoDQQeggdBA6CB1y0Rw9xXPu6vlu9Ty++vW7zqNv78GKjq0LCB2EDkIHoYPQIc1z9Cw//z3tnPep91k9L7eig9BB6CB0EDoIHaFDzNFXqj5XPW1u3fW9gRUdhA5CB6GD0EHoCB1ijp7J92Rnyb001XPrac8HndaDFR1bFxA6CB2EDkIHoUMumqNved5n9T0tXfeLV9+P/l17sKJj6wJCB6GD0EHoIHR40+35uMf96Gk7//3q3N1951Z0EDpCB6GD0EHoIHTIiPPo1eebq89JV58Lz7B5/5b5fVdXVnRsXUDoIHQQOggdhA656Dx61znvac8BnXavS/V8fcv3G+bo2LqA0EHoIHQQOggd0nw/etc572nz8uq5b9e9MV3z9erfy4qOrQsIHYQOQgehg9Ahh8+jd82ts/ze9GrOozuPDrYuCB2EDkIHoYPQIaPn6Gma727/uV3vZ9r3G13n6a3o2LqA0EHoIHQQOggd0nw/+qk5btdzKNM0D+46H991rr3r+wQrOrYuIHQQOggdhA5Ch1w0R8+w+1i2zKe7nku6Zc5tjg62LiB0EDpCB6GD0CHf/F6XNM2Vu+4t6Zpbbz9H3vU5WNGxdQGhg9BB6CB0EDq86SNN94Sk+Dx69et3/dzq8+KnPoevXqfrew8rOrYuIHQQOggdhA5Chxyeo29/juarr9N130iW34N+6r6d6nt4rOjYuoDQQeggdBA6CB1yeI7e9bzP/+35nWn6XiJLvg859Xla0bF1AaGD0EHoIHQQOmToefQt8/Ku55hWfz5Z8v2AFR2EDkIHoSN0EDoIHbLsOaNZcp/3tPlu1zx+y3n9rr+vFR1bFxA6CB2EDkIHoUMumqNvUX2ee9p59Gn3qEy7V8eKjq0LCB2EDkIHoYPQIRfdj57l55W3n5vven5n9dy9et5vRcfWBYQOQgehg9BB6JDDc/QMu0eleq4/7T7yDLvXxf3oIHQQOggdhA5CB6ETc/RMmHNvOd88bU6/5T6WrvvarejYuoDQQeggdBA6CB3SPEfP8vvRpz03dNq9Oqfuw6l+Tq370bF1AaGD0EHoIHQQOsQcPRPOqU871179e1Xfm179eVrRsXUBoYPQQeggdBA6pHmOPu3+7Glz4mnPVe067971fYUVHVsXEDoIHYQOQgehQy6ao0+7b6TrvvZp98F3vZ8tzx+1omPrAkIHoYPQQeggdHjT7fm4+xSwooPQQeggdBA6CB2EDv/2FzC7JSBdU310AAAAAElFTkSuQmCC" alt="QR PayPal">
+              <img src="assets/qr-paypal.png" alt="QR PayPal" width="128" height="128">
               <p class="lbl">PayPal</p>
               <p class="id">paypal.me/ArturoScalori</p>
             </div>
             <div class="pay-col">
-              <img src="data:image/png;base64,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" alt="QR Satispay">
+              <img src="assets/qr-satispay.png" alt="QR Satispay" width="128" height="128">
               <p class="lbl">Satispay</p>
               <p class="id">@arturoscalori</p>
             </div>
           </div>
         </div>
-        <p class="cash-note" id="rem-cash-note" hidden>Hai scelto di pagare in contanti la sera dell'evento: non serve nessun QR, ci vediamo il 10 ottobre.</p>
+        <p class="cash-note" id="rem-cash-note" hidden>Hai scelto di pagare in contanti la sera dell'evento: non serve nessun QR, ci vediamo il <span data-cfg="dayMonth">10 ottobre</span>.</p>
       </div>
       <svg class="flame-corner" viewBox="0 0 100 120">
         <path d="M50 120 C20 100 15 70 30 45 C33 60 40 62 40 50 C40 30 30 20 32 5 C55 20 70 40 65 60 C75 55 78 45 76 35 C90 55 88 85 65 105 C70 90 60 90 55 100 C58 90 50 88 50 120 Z" fill="#ff8a4d"/>
@@ -896,6 +318,7 @@
 
 </div>
 
-<script src="app.js?v=3"></script>
+<script src="motion.js?v=4"></script>
+<script src="app.js?v=4"></script>
 </body>
 </html>
