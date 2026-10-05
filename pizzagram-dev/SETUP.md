@@ -69,15 +69,23 @@ Per bloccare nuovi ingressi basta eliminare il documento. Chi è già dentro res
 
 ## 6. CORS per il download dell'album
 
-Il download ZIP legge le foto dal browser, quindi lo Storage deve accettarlo.
-Apri **Cloud Shell** (icona `>_` in alto a destra in console.cloud.google.com, progetto
-giusto selezionato), carica `pizzagram-dev/cors.json` e lancia:
+Il download ZIP legge le foto dal browser, quindi lo Storage deve accettare richieste da
+`www.pizza-party.net`. Non serve caricare file: si fa tutto con un copia-incolla.
 
-```sh
-gcloud storage buckets update gs://NOME-BUCKET --cors-file=cors.json
-```
+1. Apri <https://console.cloud.google.com>, seleziona il progetto in alto e clicca l'icona
+   **Attiva Cloud Shell** (`>_`, in alto a destra). Si apre un terminale in fondo alla pagina.
+2. Incolla questo blocco e premi Invio (se chiede di autorizzare Cloud Shell, conferma):
 
-`NOME-BUCKET` è il valore `storageBucket` di `config.js` (es. `pizzagram-2026.firebasestorage.app`).
+   ```sh
+   cat > cors.json <<'EOF'
+   [{"origin": ["https://www.pizza-party.net", "https://pizza-party.net"], "method": ["GET"], "maxAgeSeconds": 3600}]
+   EOF
+   gcloud storage buckets update gs://NOME-BUCKET --cors-file=cors.json
+   ```
+
+   `NOME-BUCKET` è il valore `storageBucket` di `config.js` (es. `pizzagram-9fe92.firebasestorage.app`).
+3. Verifica: `gcloud storage buckets describe gs://NOME-BUCKET --format="default(cors_config)"`
+   deve mostrare i due indirizzi del sito.
 
 ## 7. Diventare admin
 
