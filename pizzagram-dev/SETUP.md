@@ -39,7 +39,11 @@ Firestore e il login anonimo restano nella quota gratuita. Il budget da 5 € è
 1. **Authentication** → Inizia → Metodo di accesso → **Anonimo** → Attiva.
 2. **Firestore Database** → Crea database → modalità **produzione** →
    località `europe-west8 (Milano)` o `eur3`.
-3. **Storage** → Inizia → modalità produzione → stessa località (o una vicina).
+3. **Storage** → Inizia → modalità produzione → località **regionale europea**, la stessa
+   zona di Firestore (es. `europe-west8 Milano`; con Firestore su `eur3` va bene `europe-west1`).
+   Non serve una multi-regionale: costa di più e la ridondanza tra paesi qui non serve.
+   Le località "senza costi" negli USA (`us-east1` ecc.) funzionano, ma portano le foto fuori
+   dall'UE per risparmiare al massimo 3–4 €. **La località non si può cambiare dopo.**
 
 ## 3. Regole di sicurezza
 
