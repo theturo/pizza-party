@@ -1,12 +1,12 @@
 // Service worker di Pizzagram: tiene in cache i file dell'app per aprirla subito
 // anche con rete scarsa. Rete prima, cache come riserva: un aggiornamento pubblicato
 // arriva al primo avvio online. Foto e dati Firebase non passano di qui.
-const CACHE = 'pizzagram-v1';
+const CACHE = 'pizzagram-v2';
 const SHELL = [
   './', 'index.html', 'styles.css', 'app.js', 'config.js',
-  'lib/image.js', 'lib/zip.js', 'vendor/firebase.js',
+  'lib/image.js', 'lib/zip.js', 'lib/intro.js', 'vendor/firebase.js',
   'manifest.webmanifest', 'icons/icon.svg', 'icons/icon-192.png',
-  '../fonts/kalam-normal-latin.woff2'
+  '../fonts/kalam-normal-latin.woff2', '../fonts/fraunces-italic-latin.woff2'
 ];
 
 self.addEventListener('install', e => {

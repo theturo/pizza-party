@@ -2,6 +2,7 @@ import { FIREBASE, EVENT } from './config.js';
 import * as fb from './vendor/firebase.js';
 import { prepareImage } from './lib/image.js';
 import { ZipWriter } from './lib/zip.js';
+import { playIntro } from './lib/intro.js';
 
 // ====== Ambiente ======
 // In locale (npm run dev in pizzagram-dev) l'app parla con gli emulatori Firebase.
@@ -85,15 +86,16 @@ function avatar(uid, nick, cls = 'avatar') {
   let hash = 0;
   for (const ch of uid || nick || '?') hash = (hash * 31 + ch.charCodeAt(0)) >>> 0;
   const el = h('div', { class: cls, 'aria-hidden': 'true' }, (nick || '?').trim().charAt(0).toUpperCase());
-  el.style.background = AVATAR_COLORS[hash % AVATAR_COLORS.length];
+  el.style.setProperty('--av', AVATAR_COLORS[hash % AVATAR_COLORS.length]);
   return el;
 }
 function paintAvatar(el, uid, nick) {
   const fresh = avatar(uid, nick, el.className);
   el.textContent = fresh.textContent;
-  el.style.background = fresh.style.background;
+  el.style.setProperty('--av', fresh.style.getPropertyValue('--av'));
 }
 
+const pad = n => String(n).padStart(2, '0');
 const toDate = v => (v && typeof v.toDate === 'function' ? v.toDate() : v instanceof Date ? v : null);
 const sameDay = (a, b) => a.toDateString() === b.toDateString();
 const timeFmt = new Intl.DateTimeFormat('it-IT', { hour: '2-digit', minute: '2-digit' });
@@ -190,7 +192,18 @@ function showView(view) {
 // ====== Avvio ======
 function applyConfigText() {
   const end = longDayFmt.format(EXPIRE_DATE);
+  const date = [EVENT_START.getDate(), EVENT_START.getMonth() + 1].map(pad).join(' · ') + ' · ' + EVENT_START.getFullYear();
   $$('[data-cfg="retentionEnd"]').forEach(el => { el.textContent = end; });
+  $$('[data-cfg="eventDate"]').forEach(el => { el.textContent = date; });
+}
+
+// Animazione d'avvio: completa la prima volta, più svelta le successive; ?intro=0 la salta (test).
+function startIntro() {
+  const root = $('#intro');
+  if (new URLSearchParams(location.search).get('intro') === '0') { root.hidden = true; return; }
+  playIntro(root, { fast: store.get('pg_intro_seen') === '1' })
+    .then(() => store.set('pg_intro_seen', '1'))
+    .catch(() => { root.hidden = true; });
 }
 
 function readHash() {
@@ -227,6 +240,7 @@ function registerServiceWorker() {
 }
 
 async function main() {
+  startIntro();
   applyConfigText();
   bindUi();
   readHash();
@@ -918,7 +932,6 @@ function openAlbum() {
 }
 
 const slug = s => s.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^A-Za-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 24) || 'ospite';
-const pad = n => String(n).padStart(2, '0');
 
 async function buildAlbum() {
   const start = $('#album-start');

@@ -7,7 +7,7 @@ import { chromium } from 'playwright';
 import { startServer, seedDoc } from '../dev-server.mjs';
 
 const CODE = 'pizza-test';
-const BASE = 'http://127.0.0.1:5173/pizzagram/';
+const BASE = 'http://127.0.0.1:5173/pizzagram/?intro=0';
 const SHOTS = new URL('../test-results/', import.meta.url).pathname;
 const PHONE = { viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, locale: 'it-IT', timezoneId: 'Europe/Rome' };
 let server, browser;

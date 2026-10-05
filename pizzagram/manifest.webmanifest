@@ -1,7 +1,7 @@
 {
   "name": "Pizzagram — PizzaParty",
   "short_name": "Pizzagram",
-  "description": "Il feed fotografico della PizzaParty.",
+  "description": "Il social network ufficiale del PizzaParty.",
   "lang": "it",
   "start_url": "./",
   "scope": "./",

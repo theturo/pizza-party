@@ -7,7 +7,7 @@
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex, nofollow">
 <title>Pizzagram</title>
-<meta name="description" content="Il feed fotografico della PizzaParty: solo per gli invitati.">
+<meta name="description" content="Il social network ufficiale del PizzaParty: solo per gli invitati.">
 <meta name="theme-color" content="#151217">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
@@ -16,6 +16,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Pizzagram">
+<link rel="preload" href="../fonts/fraunces-italic-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="styles.css">
 <script type="module" src="app.js"></script>
 </head>
@@ -37,6 +38,16 @@
   <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 5 8 12l7 7"/></symbol>
 </svg>
 
+<!-- Animazione d'avvio (lib/intro.js) -->
+<div id="intro" class="intro" aria-hidden="true">
+  <canvas></canvas>
+  <div class="intro-text">
+    <div class="logo logo-xl">Pizzagram</div>
+    <p class="note">Il social network ufficiale del PizzaParty</p>
+  </div>
+  <p class="intro-skip">Tocca per saltare</p>
+</div>
+
 <!-- Avvio -->
 <div id="boot" class="screen boot">
   <div class="logo logo-xl">Pizzagram</div>
@@ -52,8 +63,11 @@
 <!-- Ingresso -->
 <section id="join" class="screen join" hidden>
   <div class="join-card">
+    <p class="eyebrow">Riservato agli invitati</p>
     <div class="logo logo-xl">Pizzagram</div>
-    <p class="tagline">Il feed della <strong>PizzaParty</strong>.<br>Le foto della serata, tutte in un posto solo.</p>
+    <p class="note">Il social network ufficiale del PizzaParty</p>
+    <div><span class="ticket-stub"><span class="dot"></span><span data-cfg="eventDate">10 · 10 · 2026</span><span class="dot"></span></span></div>
+    <p class="tagline">Le foto della serata, tutte in un posto solo.</p>
     <form id="join-form" class="join-form" novalidate>
       <label class="field" id="code-field">
         <span>Codice invito</span>
@@ -218,7 +232,7 @@
   <div class="sheet-backdrop" data-close></div>
   <div class="sheet-panel" role="dialog" aria-modal="true" aria-labelledby="album-title">
     <div class="sheet-grip"></div>
-    <h2 class="sheet-title" id="album-title">Album della PizzaParty</h2>
+    <h2 class="sheet-title" id="album-title">Album del PizzaParty</h2>
     <p id="album-text">Prepariamo un file ZIP con tutte le foto in ordine di scatto. Meglio farlo con il Wi-Fi: può pesare qualche centinaio di MB.</p>
     <div class="progress" id="album-progress" hidden><div class="progress-bar"></div></div>
     <button class="btn btn-primary" type="button" id="album-start"><svg class="ic"><use href="#i-download"/></svg> Prepara lo ZIP</button>
