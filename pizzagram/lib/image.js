@@ -103,15 +103,17 @@ function toJpeg(img, maxSide, quality) {
   });
 }
 
-// Restituisce { full, thumb, w, h, takenAt }; errore "decode" se il formato non è leggibile
-// (es. HEIC su Android).
-export async function prepareImage(file, { fullSize, thumbSize }) {
+// Restituisce { feed, thumb, hd, w, h, takenAt }; errore "decode" se il formato non è leggibile
+// (es. HEIC su Android). L'HD ha qualità alta: a schermo e in stampa fino a ~20×15 cm
+// non si distingue dall'originale, ma pesa circa un terzo.
+export async function prepareImage(file, { feedSize, thumbSize, hdSize }) {
   const takenAt = await readExifDate(file);
   const { img, url } = await loadImage(file);
   try {
-    const full = await toJpeg(img, fullSize, 0.82);
+    const feed = await toJpeg(img, feedSize, 0.82);
     const thumb = await toJpeg(img, thumbSize, 0.72);
-    return { full: full.blob, thumb: thumb.blob, w: full.w, h: full.h, takenAt };
+    const hd = await toJpeg(img, hdSize, 0.9);
+    return { feed: feed.blob, thumb: thumb.blob, hd: hd.blob, w: feed.w, h: feed.h, takenAt };
   } finally {
     URL.revokeObjectURL(url);
   }

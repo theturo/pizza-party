@@ -83,14 +83,23 @@ service cloud.firestore {
               || newData().commentCount == resource.data.commentCount - 1);
       }
 
+      // Versione HD: la aggiunge l'autore dopo la pubblicazione, una volta sola.
+      function hdAdded() {
+        return changed().hasOnly(['hdUrl'])
+          && resource.data.uid == request.auth.uid
+          && resource.data.get('hdUrl', null) == null
+          && newData().hdUrl is string
+          && newData().hdUrl.size() <= 1024;
+      }
+
       allow read: if isMember();
       allow create: if isMember()
         && newData().keys().hasOnly(['uid', 'nickname', 'caption', 'takenAt', 'sortAt', 'createdAt',
                                      'url', 'thumbUrl', 'path', 'thumbPath', 'w', 'h',
-                                     'likes', 'commentCount', 'expireAt'])
+                                     'likes', 'commentCount', 'expireAt', 'hdUrl'])
         && newData().keys().hasAll(['uid', 'nickname', 'caption', 'takenAt', 'sortAt', 'createdAt',
                                     'url', 'thumbUrl', 'path', 'thumbPath', 'w', 'h',
-                                    'likes', 'commentCount', 'expireAt'])
+                                    'likes', 'commentCount', 'expireAt', 'hdUrl'])
         && newData().uid == request.auth.uid
         && validNick(newData().nickname)
         && newData().caption is string && newData().caption.size() <= 300
@@ -106,8 +115,9 @@ service cloud.firestore {
         && newData().h is int && newData().h > 0 && newData().h <= 4096
         && newData().likes == {}
         && newData().commentCount == 0
-        && newData().expireAt is timestamp;
-      allow update: if isMember() && (likeChange() || commentCountChange());
+        && newData().expireAt is timestamp
+        && newData().hdUrl == null;
+      allow update: if isMember() && (likeChange() || commentCountChange() || hdAdded());
       allow delete: if signedIn() && (resource.data.uid == request.auth.uid || isAdmin());
 
       match /comments/{commentId} {

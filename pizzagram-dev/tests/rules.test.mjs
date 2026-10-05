@@ -47,7 +47,7 @@ function post(uid, id = POST, extra = {}) {
     takenAt: Timestamp.now(), sortAt: Timestamp.now(), createdAt: serverTimestamp(),
     url: 'https://example/full', thumbUrl: 'https://example/thumb',
     path: `photos/${uid}/${id}.jpg`, thumbPath: `photos/${uid}/${id}_t.jpg`,
-    w: 1600, h: 1200, likes: {}, commentCount: 0, expireAt: EXPIRE, ...extra
+    w: 1080, h: 810, likes: {}, commentCount: 0, expireAt: EXPIRE, hdUrl: null, ...extra
   };
 }
 async function seedPost(uid = 'alice', extra = {}) {
@@ -98,6 +98,14 @@ test('post a nome di altri / percorso sbagliato / like precaricati rifiutati', a
   await assertFails(setDoc(doc(db('alice'), 'posts', POST), post('alice', POST, { likes: { bob: 'bob' } })));
   await assertFails(setDoc(doc(db('alice'), 'posts', POST), post('alice', POST, { commentCount: 99 })));
   await assertFails(setDoc(doc(db('alice'), 'posts', POST), post('alice', POST, { extra: 1 })));
+  await assertFails(setDoc(doc(db('alice'), 'posts', POST), post('alice', POST, { hdUrl: 'https://x' })));
+});
+test('versione HD: solo l’autore, una volta sola', async () => {
+  await seedPost();
+  await assertFails(updateDoc(doc(db('bob'), 'posts', POST), { hdUrl: 'https://example/hd' }));
+  await assertFails(updateDoc(doc(db('alice'), 'posts', POST), { hdUrl: 42 }));
+  await assertSucceeds(updateDoc(doc(db('alice'), 'posts', POST), { hdUrl: 'https://example/hd' }));
+  await assertFails(updateDoc(doc(db('alice'), 'posts', POST), { hdUrl: 'https://example/altra' }));
 });
 test('post datato nel futuro (per restare in cima) rifiutato', async () => {
   const future = Timestamp.fromMillis(Date.now() + 3 * 3600e3);
@@ -196,13 +204,14 @@ const jpeg = (n = 1000) => new Uint8Array(n).fill(7);
 test('storage: il membro carica nella propria cartella', async () => {
   await assertSucceeds(uploadBytes(ref(st('alice'), `photos/alice/${POST}.jpg`), jpeg(), { contentType: 'image/jpeg' }));
   await assertSucceeds(uploadBytes(ref(st('alice'), `photos/alice/${POST}_t.jpg`), jpeg(), { contentType: 'image/jpeg' }));
+  await assertSucceeds(uploadBytes(ref(st('alice'), `photos/alice/${POST}_hd.jpg`), jpeg(), { contentType: 'image/jpeg' }));
 });
 test('storage: rifiuta cartelle altrui, non membri, tipi e dimensioni sbagliate', async () => {
   await assertFails(uploadBytes(ref(st('alice'), `photos/bob/${POST}.jpg`), jpeg(), { contentType: 'image/jpeg' }));
   await assertFails(uploadBytes(ref(st('stranger'), `photos/stranger/${POST}.jpg`), jpeg(), { contentType: 'image/jpeg' }));
   await assertFails(uploadBytes(ref(st('alice'), `photos/alice/${POST}.jpg`), jpeg(), { contentType: 'video/mp4' }));
   await assertFails(uploadBytes(ref(st('alice'), `photos/alice/evil.html`), jpeg(), { contentType: 'image/jpeg' }));
-  await assertFails(uploadBytes(ref(st('alice'), `photos/alice/${POST}.jpg`), jpeg(4.5 * 1024 * 1024), { contentType: 'image/jpeg' }));
+  await assertFails(uploadBytes(ref(st('alice'), `photos/alice/${POST}.jpg`), jpeg(8.5 * 1024 * 1024), { contentType: 'image/jpeg' }));
 });
 test('storage: lettura solo membri; cancellazione autore o admin', async () => {
   await env.withSecurityRulesDisabled(ctx =>

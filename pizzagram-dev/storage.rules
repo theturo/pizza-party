@@ -1,7 +1,8 @@
 rules_version = '2';
 
 // Regole Storage di Pizzagram: solo i membri (vedi firestore.rules) caricano e leggono.
-// Ogni utente scrive solo nella propria cartella; file JPEG già compressi dall'app.
+// Ogni utente scrive solo nella propria cartella; file JPEG già compressi dall'app:
+// {id}_t.jpg anteprima, {id}.jpg feed, {id}_hd.jpg alta definizione per l'album.
 service firebase.storage {
   match /b/{bucket}/o {
     function isMember() {
@@ -17,8 +18,8 @@ service firebase.storage {
       allow read: if isMember();
       allow create: if isMember()
         && request.auth.uid == uid
-        && file.matches('^[A-Za-z0-9]{20}(_t)?[.]jpg$')
-        && request.resource.size < 4 * 1024 * 1024
+        && file.matches('^[A-Za-z0-9]{20}(_t|_hd)?[.]jpg$')
+        && request.resource.size < 8 * 1024 * 1024
         && request.resource.contentType == 'image/jpeg';
       allow update: if false;
       allow delete: if request.auth != null && (request.auth.uid == uid || isAdmin());

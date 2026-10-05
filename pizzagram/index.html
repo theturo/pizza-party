@@ -80,12 +80,7 @@
       <button class="btn btn-primary" type="submit" id="join-btn">Entra</button>
       <p class="form-error" id="join-error" role="alert"></p>
     </form>
-    <p class="fineprint" id="join-privacy">
-      Il feed è visibile solo a chi ha il codice. Le foto vengono ridimensionate e ripulite
-      dai dati di posizione prima del caricamento. Restano online fino al
-      <span data-cfg="retentionEnd">9 novembre 2026</span>, poi vengono cancellate.
-      Puoi eliminare le tue foto quando vuoi.
-    </p>
+    <div data-privacy></div>
   </div>
 </section>
 
@@ -135,7 +130,7 @@
 
       <div class="card">
         <h2>Album ricordo</h2>
-        <p>Tutte le foto della serata in un unico file ZIP, in ordine di scatto.</p>
+        <p>Tutte le foto della serata in alta qualità, in un file ZIP in ordine di scatto.</p>
         <button class="btn btn-primary" type="button" data-action="album"><svg class="ic"><use href="#i-download"/></svg> Scarica tutte le foto</button>
         <form id="email-form" class="stack">
           <label class="field">
@@ -163,11 +158,8 @@
         <p class="hint">Per eliminare un post usa il menu <b>⋯</b> sul post.</p>
       </div>
 
-      <div class="card">
-        <h2>Privacy</h2>
-        <p>Foto e commenti sono visibili solo agli invitati con il codice. Vengono cancellati il
-          <strong data-cfg="retentionEnd">9 novembre 2026</strong>. Puoi eliminare in qualsiasi momento
-          i tuoi post dal menu <b>⋯</b>. Per qualsiasi richiesta scrivi all'organizzatore.</p>
+      <div class="card card-privacy">
+        <div data-privacy></div>
         <p class="hint">ID dispositivo: <code id="device-id"></code></p>
       </div>
     </section>
@@ -233,12 +225,34 @@
   <div class="sheet-panel" role="dialog" aria-modal="true" aria-labelledby="album-title">
     <div class="sheet-grip"></div>
     <h2 class="sheet-title" id="album-title">Album del PizzaParty</h2>
-    <p id="album-text">Prepariamo un file ZIP con tutte le foto in ordine di scatto. Meglio farlo con il Wi-Fi: può pesare qualche centinaio di MB.</p>
+    <p id="album-text">Prepariamo un file ZIP con tutte le foto in alta qualità, in ordine di scatto. Meglio farlo con il Wi-Fi: può pesare qualche centinaio di MB.</p>
     <div class="progress" id="album-progress" hidden><div class="progress-bar"></div></div>
     <button class="btn btn-primary" type="button" id="album-start"><svg class="ic"><use href="#i-download"/></svg> Prepara lo ZIP</button>
-    <a class="btn btn-primary" id="album-save" hidden download="PizzaParty-Pizzagram.zip">Salva lo ZIP</a>
+    <a class="btn btn-primary" id="album-save" hidden download="PizzaParty-Pizzagram.zip"><svg class="ic"><use href="#i-download"/></svg> Salva lo ZIP</a>
   </div>
 </section>
+
+<!-- Informativa: inserita all'ingresso e nel profilo (data-privacy) -->
+<template id="privacy-tpl">
+  <details class="privacy">
+    <summary>Privacy: chi vede le foto e per quanto</summary>
+    <div class="privacy-body">
+      <p>Pizzagram serve solo a raccogliere le foto della serata del PizzaParty. Il feed è visibile
+        esclusivamente a chi entra con il codice invito che trovi all'ingresso: non è pubblico e non è indicizzato.</p>
+      <p>Salviamo il nickname che scegli, le foto che carichi con didascalie, like e commenti; l'indirizzo
+        email solo se lo lasci per ricevere l'album. Niente account, niente numero di telefono.</p>
+      <p>Prima del caricamento le foto vengono ridimensionate e ripulite dai metadati, compresa la posizione GPS.</p>
+      <p>I dati stanno su Firebase (servizio di Google LLC), li gestisce solo Arturo e non vengono
+        condivisi né usati per altri scopi: niente pubblicità, niente statistiche.</p>
+      <p>Tutto viene cancellato <span data-cfg="retentionDays">30</span> giorni dopo la festa, cioè il
+        <strong data-cfg="retentionEnd">9 novembre 2026</strong>. Puoi eliminare i tuoi post quando vuoi dal menu <b>⋯</b>.</p>
+      <p>Pubblica solo foto della serata in cui le persone ritratte sono d'accordo: chiunque può chiedere
+        di rimuovere una foto in cui compare, e l'organizzatore può eliminare qualsiasi post.</p>
+      <p>Per vedere, correggere o cancellare i tuoi dati scrivi ad
+        <a class="contact-email" data-user="theturo93" data-domain="gmail.com" href="#">Arturo</a>.</p>
+    </div>
+  </details>
+</template>
 
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 </body>

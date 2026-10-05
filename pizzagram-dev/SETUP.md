@@ -21,6 +21,19 @@ Tempo stimato: circa 45 minuti, tutti nella console di Firebase.
    Subito dopo imposta un **avviso di budget** (es. 5 €) in
    Google Cloud Console → Fatturazione → Budget e avvisi.
 
+### Quanto costa (stima)
+
+Ogni foto viene salvata in tre versioni: anteprima (~30 KB), feed (~200 KB, 1080 px) e
+HD per l'album (~1–1,5 MB, 2560 px). Con 60 invitati e ~300 foto:
+
+| Voce | Quantità | Costo indicativo |
+|---|---|---|
+| Spazio occupato | ~0,5 GB per un mese | pochi centesimi |
+| Feed sfogliato da tutti | ~3 GB scaricati | ~0,40 € |
+| ZIP scaricato da tutti i 60 invitati (caso estremo) | ~25 GB scaricati | ~3 € |
+
+Firestore e il login anonimo restano nella quota gratuita. Il budget da 5 € è un margine ampio.
+
 ## 2. Servizi
 
 1. **Authentication** → Inizia → Metodo di accesso → **Anonimo** → Attiva.

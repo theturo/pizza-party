@@ -190,11 +190,24 @@ function showView(view) {
 }
 
 // ====== Avvio ======
+// Informativa privacy: un solo modello, inserito all'ingresso e nel profilo.
+function mountPrivacy() {
+  const tpl = $('#privacy-tpl');
+  $$('[data-privacy]').forEach(slot => slot.replaceWith(tpl.content.cloneNode(true)));
+  // L'indirizzo è composto qui e non compare intero nell'HTML (meno esposto ai bot).
+  $$('.contact-email').forEach(a => {
+    const addr = a.dataset.user + '@' + a.dataset.domain;
+    a.href = 'mailto:' + addr + '?subject=' + encodeURIComponent('Pizzagram – i miei dati');
+    a.textContent = addr;
+  });
+}
+
 function applyConfigText() {
   const end = longDayFmt.format(EXPIRE_DATE);
   const date = [EVENT_START.getDate(), EVENT_START.getMonth() + 1].map(pad).join(' · ') + ' · ' + EVENT_START.getFullYear();
   $$('[data-cfg="retentionEnd"]').forEach(el => { el.textContent = end; });
   $$('[data-cfg="eventDate"]').forEach(el => { el.textContent = date; });
+  $$('[data-cfg="retentionDays"]').forEach(el => { el.textContent = String(EVENT.RETENTION_DAYS); });
 }
 
 // Animazione d'avvio: completa la prima volta, più svelta le successive; ?intro=0 la salta (test).
@@ -241,6 +254,7 @@ function registerServiceWorker() {
 
 async function main() {
   startIntro();
+  mountPrivacy();
   applyConfigText();
   bindUi();
   readHash();
@@ -330,6 +344,7 @@ function enterApp(nick) {
   subscribeFeed();
   subscribeMine();
   checkAdmin();
+  resumeHd();
   setupInstallCard();
   if (state.wantAlbum) {
     state.wantAlbum = false;
@@ -568,9 +583,11 @@ async function deletePost() {
     comments.forEach(c => batch.delete(c.ref));
     batch.delete(fb.doc(db, 'posts', id));
     await batch.commit();
+    dropHd(id);
     await Promise.allSettled([
       fb.deleteObject(fb.ref(storage, post.path)),
-      fb.deleteObject(fb.ref(storage, post.thumbPath))
+      fb.deleteObject(fb.ref(storage, post.thumbPath)),
+      fb.deleteObject(fb.ref(storage, post.path.replace(/\.jpg$/, '_hd.jpg')))
     ]);
     if (state.modalPost === id) closeSheet('post-modal');
     toast('Post eliminato.');
@@ -731,8 +748,10 @@ async function uploadOne(item) {
   try {
     item.status = 'prep';
     renderUploads();
-    if (!item.prepared) item.prepared = await prepareImage(item.file, { fullSize: EVENT.FULL_SIZE, thumbSize: EVENT.THUMB_SIZE });
-    const { full, thumb, w, h: height } = item.prepared;
+    if (!item.prepared) {
+      item.prepared = await prepareImage(item.file, { feedSize: EVENT.FEED_SIZE, thumbSize: EVENT.THUMB_SIZE, hdSize: EVENT.HD_SIZE });
+    }
+    const { feed: full, thumb, w, h: height } = item.prepared;
     item.postId ||= fb.doc(fb.collection(db, 'posts')).id;
     const base = `photos/${uid}/${item.postId}`;
     const total = full.size + thumb.size;
@@ -758,8 +777,11 @@ async function uploadOne(item) {
       url: item.done.full, thumbUrl: item.done.thumb,
       path: base + '.jpg', thumbPath: base + '_t.jpg',
       w, h: height, likes: {}, commentCount: 0,
-      expireAt: fb.Timestamp.fromDate(EXPIRE_DATE)
+      expireAt: fb.Timestamp.fromDate(EXPIRE_DATE), hdUrl: null
     });
+    // La foto è già nel feed; la versione HD per l'album parte dopo, senza fretta.
+    queueHd({ postId: item.postId, uid, blob: item.prepared.hd });
+    item.prepared = null;
     item.status = 'done';
     renderUploads();
     setTimeout(() => {
@@ -776,12 +798,115 @@ async function uploadOne(item) {
   }
 }
 
+// ====== Versione HD in background ======
+// Le foto HD (per l'album scaricabile) aspettano in IndexedDB finché non sono inviate:
+// se l'app viene chiusa, ripartono alla prossima apertura.
+const hdStore = {
+  db: null,
+  open() {
+    this.db ||= new Promise((resolve, reject) => {
+      const req = indexedDB.open('pizzagram', 1);
+      req.onupgradeneeded = () => req.result.createObjectStore('hd');
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+    return this.db;
+  },
+  async run(mode, fn) {
+    const db = await this.open();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction('hd', mode);
+      const req = fn(tx.objectStore('hd'));
+      tx.oncomplete = () => resolve(req.result);
+      tx.onerror = () => reject(tx.error);
+    });
+  },
+  put(job) { return this.run('readwrite', s => s.put(job, job.postId)).catch(() => {}); },
+  del(id) { return this.run('readwrite', s => s.delete(id)).catch(() => {}); },
+  all() { return this.run('readonly', s => s.getAll()).catch(() => []); }
+};
+
+const hdQueue = [];
+let hdRunning = false, hdRetry = 0;
+
+function queueHd(job) {
+  hdQueue.push(job);
+  hdStore.put(job);
+  renderUploads();
+  runHd();
+}
+
+async function resumeHd() {
+  for (const job of await hdStore.all()) {
+    if (job.uid === state.user.uid && !hdQueue.some(j => j.postId === job.postId)) hdQueue.push(job);
+  }
+  renderUploads();
+  runHd();
+}
+
+async function uploadHd(job) {
+  const path = `photos/${job.uid}/${job.postId}_hd.jpg`;
+  let url;
+  try {
+    url = await putFile(path, job.blob, () => {});
+  } catch (ex) {
+    // Già caricata in un tentativo precedente (sovrascrivere è vietato): basta l'indirizzo.
+    url = await fb.getDownloadURL(fb.ref(storage, path)).catch(() => null);
+    if (!url) throw ex;
+  }
+  try {
+    await fb.updateDoc(fb.doc(db, 'posts', job.postId), { hdUrl: url });
+  } catch (ex) {
+    const code = ex.code || '';
+    if (code.includes('not-found')) await fb.deleteObject(fb.ref(storage, path)).catch(() => {}); // post eliminato nel frattempo
+    else if (!code.includes('permission-denied')) throw ex; // permission-denied: HD già registrata
+  }
+}
+
+async function runHd() {
+  if (hdRunning) return;
+  hdRunning = true;
+  try {
+    while (hdQueue.length) {
+      // Prima si pubblicano le foto nuove, poi le HD.
+      if (uploading) { await new Promise(r => setTimeout(r, 1500)); continue; }
+      const job = hdQueue[0];
+      try {
+        await uploadHd(job);
+      } catch {
+        // Rete assente o instabile: si riprova tra 20 secondi o appena torna la rete.
+        clearTimeout(hdRetry);
+        hdRetry = setTimeout(runHd, 20000);
+        return;
+      }
+      hdQueue.shift();
+      await hdStore.del(job.postId);
+      renderUploads();
+    }
+  } finally {
+    hdRunning = false;
+  }
+}
+
+function dropHd(postId) {
+  const i = hdQueue.findIndex(j => j.postId === postId);
+  if (i > 0) hdQueue.splice(i, 1); // l'eventuale primo è già in invio: ci pensa uploadHd
+  hdStore.del(postId);
+}
+
 const UPLOAD_LABEL = { wait: 'In coda', prep: 'Preparo la foto…', up: 'Caricamento', save: 'Pubblico…', done: 'Pubblicata!' };
 
 function renderUploads() {
   const box = $('#uploads');
   box.textContent = '';
-  box.hidden = !state.uploads.length;
+  box.hidden = !state.uploads.length && !hdQueue.length;
+  if (hdQueue.length) {
+    const n = hdQueue.length;
+    box.append(h('div', { class: 'upload upload-hd' },
+      h('span', { class: 'hd-badge' }, 'HD'),
+      h('span', null, `${n === 1 ? '1 foto' : n + ' foto'} in alta qualità per l'album: si inviano da sole, ` +
+        'anche alla prossima apertura dell\'app.')));
+  }
   for (const item of state.uploads) {
     const bar = h('div', { class: 'progress' }, h('div', { class: 'progress-bar' }));
     item.bar = bar.firstChild;
@@ -923,54 +1048,83 @@ async function copyAlbumLink() {
 }
 
 // ====== Download album ======
+const ALBUM_TEXT = 'Prepariamo un file ZIP con tutte le foto in alta qualità, in ordine di scatto. ' +
+  'Meglio farlo con il Wi-Fi: può pesare qualche centinaio di MB.';
+// Oltre questa dimensione lo ZIP si divide in più parti: i telefoni tengono tutto in memoria.
+// (In locale ?zippart=N imposta la soglia in byte, per provare la divisione.)
+const ALBUM_PART_MAX = (EMULATOR && Number(new URLSearchParams(location.search).get('zippart'))) || 180 * 1048576;
+
 function openAlbum() {
   $('#album-progress').hidden = true;
   $('#album-start').hidden = false;
   $('#album-save').hidden = true;
-  $('#album-text').textContent = 'Prepariamo un file ZIP con tutte le foto in ordine di scatto. Meglio farlo con il Wi-Fi: può pesare qualche centinaio di MB.';
+  $('#album-text').textContent = ALBUM_TEXT;
   openSheet('album');
 }
 
 const slug = s => s.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^A-Za-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 24) || 'ospite';
+
+// Mostra il pulsante per salvare una parte; se non è l'ultima, aspetta che venga toccato.
+function offerAlbumPart(blob, part, last) {
+  const save = $('#album-save');
+  const old = save.href;
+  if (old) setTimeout(() => URL.revokeObjectURL(old), 60000);
+  save.href = URL.createObjectURL(blob);
+  const single = last && part === 1;
+  save.download = single ? 'PizzaParty-Pizzagram.zip' : `PizzaParty-Pizzagram-parte-${part}.zip`;
+  save.lastChild.textContent = single ? ' Salva lo ZIP' : ` Salva la parte ${part}`;
+  save.hidden = false;
+  if (last) return Promise.resolve();
+  return new Promise(resolve => save.addEventListener('click', () => {
+    save.hidden = true;
+    setTimeout(resolve, 300);
+  }, { once: true }));
+}
 
 async function buildAlbum() {
   const start = $('#album-start');
   const text = $('#album-text');
   const bar = $('#album-progress .progress-bar');
   start.hidden = true;
+  $('#album-save').hidden = true;
   $('#album-progress').hidden = false;
   bar.style.width = '0%';
   try {
     const snap = await fb.getDocs(fb.query(fb.collection(db, 'posts'), fb.orderBy('sortAt', 'asc')));
     const posts = snap.docs.map(d => d.data());
     if (!posts.length) throw new Error('empty');
-    const files = new Array(posts.length);
-    let done = 0, next = 0;
-    const worker = async () => {
-      while (next < posts.length) {
-        const i = next++;
-        const res = await fetch(posts[i].url);
-        if (!res.ok) throw new Error('fetch');
-        files[i] = new Uint8Array(await res.arrayBuffer());
-        done++;
-        bar.style.width = Math.round(done / posts.length * 100) + '%';
-        text.textContent = `Scarico le foto: ${done} di ${posts.length}…`;
-      }
-    };
-    await Promise.all([worker(), worker(), worker(), worker()]);
 
-    const zip = new ZipWriter();
-    posts.forEach((p, i) => {
+    // Si scarica qualche foto in anticipo, ma si aggiungono allo ZIP sempre in ordine.
+    const pending = new Map();
+    const fetchAt = i => fetch(posts[i].hdUrl || posts[i].url)
+      .then(res => { if (!res.ok) throw new Error('fetch'); return res.arrayBuffer(); })
+      .then(buf => new Uint8Array(buf));
+    let zip = new ZipWriter(), part = 1;
+    for (let i = 0; i < posts.length; i++) {
+      for (let k = i; k < Math.min(posts.length, i + 4); k++) if (!pending.has(k)) pending.set(k, fetchAt(k));
+      const bytes = await pending.get(i);
+      pending.delete(i);
+      const p = posts[i];
       const d = toDate(p.sortAt) || new Date();
       const name = `${String(i + 1).padStart(3, '0')}_${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}_${pad(d.getHours())}-${pad(d.getMinutes())}_${slug(p.nickname)}.jpg`;
-      zip.add(name, files[i], d);
-    });
-    const blob = zip.finish();
-    const save = $('#album-save');
-    if (save.href) URL.revokeObjectURL(save.href);
-    save.href = URL.createObjectURL(blob);
-    save.hidden = false;
-    text.textContent = `Pronto: ${posts.length} foto, ${(blob.size / 1048576).toFixed(0)} MB.`;
+      zip.add(name, bytes, d);
+      bar.style.width = Math.round((i + 1) / posts.length * 100) + '%';
+      text.textContent = `Scarico le foto: ${i + 1} di ${posts.length}…`;
+
+      const last = i === posts.length - 1;
+      if (last || zip.offset >= ALBUM_PART_MAX) {
+        const blob = zip.finish();
+        const mb = (blob.size / 1048576).toFixed(0);
+        text.textContent = last
+          ? (part === 1
+            ? `Pronto: ${posts.length} foto, ${mb} MB.`
+            : `Ultima parte pronta (${mb} MB): ${posts.length} foto in ${part} file.`)
+          : `Parte ${part} pronta (${mb} MB). Salvala: poi preparo la successiva.`;
+        await offerAlbumPart(blob, part, last);
+        zip = new ZipWriter();
+        part++;
+      }
+    }
   } catch (ex) {
     start.hidden = false;
     $('#album-progress').hidden = true;
@@ -1017,6 +1171,8 @@ function bindUi() {
   }, { rootMargin: '800px 0px' });
   io.observe($('#feed-more'));
   io.observe($('#grid-more'));
+
+  window.addEventListener('online', () => { if (state.user && hdQueue.length) runHd(); });
 
   window.addEventListener('beforeunload', e => {
     if (state.uploads.some(u => ['wait', 'prep', 'up', 'save'].includes(u.status))) e.preventDefault();
