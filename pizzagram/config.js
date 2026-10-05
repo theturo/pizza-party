@@ -2,12 +2,12 @@
 // Dati del progetto Firebase: Console Firebase → Impostazioni progetto → Le tue app → App web.
 // Non sono segreti (finiscono comunque nel browser): la protezione è nelle regole di sicurezza.
 export const FIREBASE = {
-  apiKey: "INCOLLA_QUI",
-  authDomain: "INCOLLA_QUI.firebaseapp.com",
-  projectId: "INCOLLA_QUI",
-  storageBucket: "INCOLLA_QUI.firebasestorage.app",
-  messagingSenderId: "INCOLLA_QUI",
-  appId: "INCOLLA_QUI"
+  apiKey: "AIzaSyBPRrBdgRcTUemUQZ87iCiozBh364w67Uc",
+  authDomain: "pizzagram-9fe92.firebaseapp.com",
+  projectId: "pizzagram-9fe92",
+  storageBucket: "pizzagram-9fe92.firebasestorage.app",
+  messagingSenderId: "591830021990",
+  appId: "1:591830021990:web:9f9090551bafc0a1c67aa7"
 };
 
 export const EVENT = {
