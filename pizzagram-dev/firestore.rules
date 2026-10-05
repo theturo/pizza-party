@@ -1,0 +1,150 @@
+rules_version = '2';
+
+// Regole Firestore di Pizzagram.
+// Modello: chi apre l'app entra con login anonimo; diventa "membro" solo se crea
+// members/{uid} indicando un codice che esiste in invites/{codice}. Il codice
+// vive solo nel database (creato a mano da console), mai nel codice pubblico.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function isMember() {
+      return signedIn() && exists(/databases/$(database)/documents/members/$(request.auth.uid));
+    }
+    function isAdmin() {
+      return signedIn() && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+    function validNick(n) { return n is string && n.size() >= 2 && n.size() <= 24; }
+    function validCode(c) { return c is string && c.matches('^[A-Za-z0-9_-]{4,64}$'); }
+
+    // Codici invito: si gestiscono solo da console, nessun accesso dall'app.
+    match /invites/{code} {
+      allow read, write: if false;
+    }
+
+    // Admin: documento creato a mano da console con ID = UID del dispositivo.
+    match /admins/{uid} {
+      allow get: if signedIn() && request.auth.uid == uid;
+      allow list, write: if false;
+    }
+
+    match /members/{uid} {
+      allow get: if signedIn() && (request.auth.uid == uid || isAdmin());
+      allow list: if isAdmin();
+      allow create: if signedIn() && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['nickname', 'code', 'joinedAt', 'expireAt'])
+        && request.resource.data.keys().hasAll(['nickname', 'code', 'joinedAt', 'expireAt'])
+        && validNick(request.resource.data.nickname)
+        && validCode(request.resource.data.code)
+        && exists(/databases/$(database)/documents/invites/$(request.resource.data.code))
+        && request.resource.data.joinedAt == request.time
+        && request.resource.data.expireAt is timestamp;
+      allow update: if signedIn() && request.auth.uid == uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['nickname'])
+        && validNick(request.resource.data.nickname);
+      allow delete: if false;
+    }
+
+    // Email di chi vuole ricevere il link all'album: le legge solo l'admin.
+    match /albumRequests/{uid} {
+      allow get: if signedIn() && (request.auth.uid == uid || isAdmin());
+      allow list: if isAdmin();
+      allow create, update: if isMember() && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['email', 'nickname', 'updatedAt', 'expireAt'])
+        && request.resource.data.keys().hasAll(['email', 'nickname', 'updatedAt', 'expireAt'])
+        && request.resource.data.email is string
+        && request.resource.data.email.size() <= 254
+        && request.resource.data.email.matches('^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$')
+        && validNick(request.resource.data.nickname)
+        && request.resource.data.updatedAt == request.time
+        && request.resource.data.expireAt is timestamp;
+      allow delete: if signedIn() && (request.auth.uid == uid || isAdmin());
+    }
+
+    match /posts/{postId} {
+      function newData() { return request.resource.data; }
+      function changed() { return newData().diff(resource.data).affectedKeys(); }
+
+      // Like: mappa uid -> nickname; ognuno può aggiungere/togliere solo la propria chiave.
+      function likeChange() {
+        return changed().hasOnly(['likes'])
+          && newData().likes is map
+          && newData().likes.diff(resource.data.likes).affectedKeys().hasOnly([request.auth.uid])
+          && (!(request.auth.uid in newData().likes)
+              || (newData().likes[request.auth.uid] is string
+                  && newData().likes[request.auth.uid].size() <= 24));
+      }
+      // Contatore commenti: solo +1 / -1, mai negativo.
+      function commentCountChange() {
+        return changed().hasOnly(['commentCount'])
+          && newData().commentCount is int
+          && newData().commentCount >= 0
+          && (newData().commentCount == resource.data.commentCount + 1
+              || newData().commentCount == resource.data.commentCount - 1);
+      }
+
+      // Versione HD: la aggiunge l'autore dopo la pubblicazione, una volta sola.
+      function hdAdded() {
+        return changed().hasOnly(['hdUrl'])
+          && resource.data.uid == request.auth.uid
+          && resource.data.get('hdUrl', null) == null
+          && newData().hdUrl is string
+          && newData().hdUrl.size() <= 1024;
+      }
+
+      allow read: if isMember();
+      allow create: if isMember()
+        && newData().keys().hasOnly(['uid', 'nickname', 'caption', 'takenAt', 'sortAt', 'createdAt',
+                                     'url', 'thumbUrl', 'path', 'thumbPath', 'w', 'h',
+                                     'likes', 'commentCount', 'expireAt', 'hdUrl'])
+        && newData().keys().hasAll(['uid', 'nickname', 'caption', 'takenAt', 'sortAt', 'createdAt',
+                                    'url', 'thumbUrl', 'path', 'thumbPath', 'w', 'h',
+                                    'likes', 'commentCount', 'expireAt', 'hdUrl'])
+        && newData().uid == request.auth.uid
+        && validNick(newData().nickname)
+        && newData().caption is string && newData().caption.size() <= 300
+        && (newData().takenAt == null || newData().takenAt is timestamp)
+        && newData().sortAt is timestamp
+        && newData().sortAt <= request.time + duration.value(1, 'h')
+        && newData().createdAt == request.time
+        && newData().path == 'photos/' + request.auth.uid + '/' + postId + '.jpg'
+        && newData().thumbPath == 'photos/' + request.auth.uid + '/' + postId + '_t.jpg'
+        && newData().url is string && newData().url.size() <= 1024
+        && newData().thumbUrl is string && newData().thumbUrl.size() <= 1024
+        && newData().w is int && newData().w > 0 && newData().w <= 4096
+        && newData().h is int && newData().h > 0 && newData().h <= 4096
+        && newData().likes == {}
+        && newData().commentCount == 0
+        && newData().expireAt is timestamp
+        && newData().hdUrl == null;
+      allow update: if isMember() && (likeChange() || commentCountChange() || hdAdded());
+      allow delete: if signedIn() && (resource.data.uid == request.auth.uid || isAdmin());
+
+      match /comments/{commentId} {
+        function postPath() { return /databases/$(database)/documents/posts/$(postId); }
+        function post() { return get(postPath()).data; }
+
+        allow read: if isMember();
+        // Il commento va creato nello stesso batch che incrementa commentCount.
+        allow create: if isMember()
+          && request.resource.data.keys().hasOnly(['uid', 'nickname', 'text', 'createdAt', 'expireAt'])
+          && request.resource.data.keys().hasAll(['uid', 'nickname', 'text', 'createdAt', 'expireAt'])
+          && request.resource.data.uid == request.auth.uid
+          && validNick(request.resource.data.nickname)
+          && request.resource.data.text is string
+          && request.resource.data.text.size() >= 1
+          && request.resource.data.text.size() <= 300
+          && request.resource.data.createdAt == request.time
+          && request.resource.data.expireAt is timestamp
+          && getAfter(postPath()).data.commentCount == post().commentCount + 1;
+        // Cancellano: autore del commento, autore del post, admin.
+        // Va decrementato commentCount nello stesso batch, a meno che il post sparisca insieme.
+        allow delete: if signedIn()
+          && (resource.data.uid == request.auth.uid || post().uid == request.auth.uid || isAdmin())
+          && (!existsAfter(postPath())
+              || getAfter(postPath()).data.commentCount == post().commentCount - 1);
+        allow update: if false;
+      }
+    }
+  }
+}

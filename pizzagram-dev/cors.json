@@ -1,0 +1,7 @@
+[
+  {
+    "origin": ["https://www.pizza-party.net", "https://pizza-party.net"],
+    "method": ["GET"],
+    "maxAgeSeconds": 3600
+  }
+]
