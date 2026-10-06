@@ -287,10 +287,13 @@ a{color:var(--gold);}
 .p-cheese{fill:var(--gold);}
 .p-crust{fill:var(--gold-dark);}
 .p-pep{fill:var(--tomato);}
-.post-actions{display:flex;gap:14px;padding:10px 14px 4px;}
-.like-btn .ic{width:27px;height:27px;}
+.post-actions{display:flex;align-items:center;gap:14px;padding:10px 14px 4px;}
+/* Stessa misura per pizza e fumetto, centrati sulla stessa linea; la fetta sale di un
+   pixel perché nel suo riquadro il disegno sta più in basso del fumetto. */
+.post-actions .ic{width:26px;height:26px;}
+.like-btn .ic{transform:translateY(-1px);}
 .like-btn.on .ic{stroke:none;animation:likepop .35s ease;}
-@keyframes likepop{50%{transform:scale(1.25);}}
+@keyframes likepop{50%{transform:translateY(-1px) scale(1.25);}}
 .post-likes{padding:2px 14px;font-size:14px;}
 .post-caption{margin:4px 14px 0;font-size:14px;overflow-wrap:anywhere;}
 .post-comments-link{background:none;border:0;padding:4px 14px;color:var(--muted);font-size:14px;text-align:left;}
