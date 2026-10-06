@@ -247,9 +247,34 @@ function initFirebase() {
   }
 }
 
+// Service worker: apertura veloce con rete scarsa e avviso quando esce una nuova versione.
+// (In locale con gli emulatori è spento; ?sw=1 lo attiva per provarlo.)
 function registerServiceWorker() {
-  if (EMULATOR || !('serviceWorker' in navigator)) return;
-  navigator.serviceWorker.register('sw.js').catch(() => { /* l'app funziona anche senza */ });
+  if (!('serviceWorker' in navigator)) return;
+  if (EMULATOR && !new URLSearchParams(location.search).has('sw')) return;
+  navigator.serviceWorker.register('sw.js').then(reg => {
+    // Le app sulla Home restano aperte a lungo: si controlla al ritorno in primo piano
+    // e ogni mezz'ora, non solo all'avvio.
+    const check = () => reg.update().catch(() => {});
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') check(); });
+    setInterval(check, 30 * 60 * 1000);
+  }).catch(() => { /* l'app funziona anche senza */ });
+
+  // Il nuovo service worker prende il controllo da solo (skipWaiting), ma la pagina aperta
+  // usa ancora i file vecchi: si propone di ricaricare. Al primo avvio non c'è nulla da aggiornare.
+  let controlled = !!navigator.serviceWorker.controller;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (controlled) $('#update-banner').hidden = false;
+    controlled = true;
+  });
+}
+
+function applyUpdate() {
+  if (state.uploads.some(u => ['wait', 'prep', 'up', 'save'].includes(u.status))) {
+    toast('Aspetta che finiscano i caricamenti, poi aggiorna.');
+    return;
+  }
+  location.reload();
 }
 
 async function main() {
@@ -668,7 +693,13 @@ async function deleteComment(postId, commentId) {
 let composerItems = [];
 
 function pickFiles() {
-  $('#file-input').click();
+  openSheet('picker');
+}
+
+// L'input va "cliccato" dentro il tocco dell'utente, altrimenti il browser lo blocca.
+function pickFrom(inputId) {
+  closeSheet('picker');
+  $('#' + inputId).click();
 }
 
 function onFilesPicked(e) {
@@ -743,6 +774,19 @@ function putFile(path, blob, onProgress) {
   });
 }
 
+// Messaggi per i problemi con il file della foto (vedi lib/image.js); tra parentesi tipo e
+// peso, utili per capire il caso se qualcuno lo segnala.
+function uploadErrorText(ex) {
+  const info = ex && ex.fileInfo ? ` (${ex.fileInfo})` : '';
+  switch (ex && ex.message) {
+    case 'empty': return 'La foto non è ancora sul telefono: aprila prima in Galleria/Foto' + info;
+    case 'read': return 'Non riesco a leggere la foto dal telefono' + info;
+    case 'decode': return 'Formato della foto non supportato' + info;
+    case 'encode': return 'Il telefono non è riuscito a preparare la foto';
+    default: return errorMessage(ex, 'Caricamento non riuscito');
+  }
+}
+
 async function uploadOne(item) {
   const uid = state.user.uid;
   try {
@@ -791,9 +835,7 @@ async function uploadOne(item) {
     }, 1500);
   } catch (ex) {
     item.status = 'error';
-    item.error = ex && ex.message === 'decode'
-      ? 'Formato non supportato'
-      : errorMessage(ex, 'Caricamento non riuscito');
+    item.error = uploadErrorText(ex);
     renderUploads();
   }
 }
@@ -1156,6 +1198,9 @@ function bindUi() {
     if (open) open.id === 'composer' ? closeComposer() : closeSheet(open.id);
   });
   $('#file-input').addEventListener('change', onFilesPicked);
+  $('#camera-input').addEventListener('change', onFilesPicked);
+  $('#pick-camera').addEventListener('click', () => pickFrom('camera-input'));
+  $('#pick-gallery').addEventListener('click', () => pickFrom('file-input'));
   $('#composer-publish').addEventListener('click', publish);
   $('#comment-form').addEventListener('submit', addComment);
   $('#action-delete').addEventListener('click', deletePost);
@@ -1165,6 +1210,7 @@ function bindUi() {
   $('#admin-emails').addEventListener('click', copyAdminEmails);
   $('#admin-link').addEventListener('click', copyAlbumLink);
   $('#album-start').addEventListener('click', buildAlbum);
+  $('#update-btn').addEventListener('click', applyUpdate);
 
   const io = new IntersectionObserver(entries => {
     if (entries.some(en => en.isIntersecting)) loadMore();
