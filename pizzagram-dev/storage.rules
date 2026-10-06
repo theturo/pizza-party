@@ -14,13 +14,27 @@ service firebase.storage {
         && firestore.exists(/databases/(default)/documents/admins/$(request.auth.uid));
     }
 
+    // Fino alla mezzanotte tra il 12 e il 13 ottobre 2026 (allineata con firestore.rules).
+    function uploadsOpen() { return request.time < timestamp.value(1791842400000); }
+
     match /photos/{uid}/{file} {
+      // ID del post a cui appartiene il file ({id}.jpg, {id}_t.jpg, {id}_hd.jpg).
+      function postId() { return file.split('[._]')[0]; }
+      // Si caricano solo i file della foto appena prenotata (members.pendingPost, che conta
+      // verso il limite di foto per persona) o di un post già pubblicato (la versione HD).
+      function forReservedOrOwnPost() {
+        return firestore.get(/databases/(default)/documents/members/$(request.auth.uid)).data.get('pendingPost', '') == postId()
+          || firestore.get(/databases/(default)/documents/posts/$(postId())).data.uid == request.auth.uid;
+      }
+
       allow read: if isMember();
-      allow create: if isMember()
+      allow create: if request.auth != null
         && request.auth.uid == uid
         && file.matches('^[A-Za-z0-9]{20}(_t|_hd)?[.]jpg$')
         && request.resource.size < 8 * 1024 * 1024
-        && request.resource.contentType == 'image/jpeg';
+        && request.resource.contentType == 'image/jpeg'
+        && uploadsOpen()
+        && forReservedOrOwnPost();
       allow update: if false;
       allow delete: if request.auth != null && (request.auth.uid == uid || isAdmin());
     }

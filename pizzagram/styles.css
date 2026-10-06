@@ -214,6 +214,24 @@ a{color:var(--gold);}
   .tabbar{left:50%;right:auto;width:var(--w);transform:translateX(-50%);border:1px solid var(--line);border-bottom:0;border-radius:16px 16px 0 0;}
 }
 
+/* Trascina giù per aggiornare */
+.ptr{
+  position:fixed;left:50%;top:calc(var(--bar) + var(--safe-t) + 8px);z-index:15;
+  width:44px;height:44px;border-radius:50%;
+  display:grid;place-items:center;
+  background:var(--card);border:1px solid var(--line-strong);
+  box-shadow:0 6px 18px rgba(0,0,0,.45);
+  opacity:0;pointer-events:none;
+  transform:translate(-50%,-56px);
+  transition:transform .2s ease,opacity .2s ease;
+}
+.ptr .ic{width:26px;height:26px;stroke:none;}
+.ptr.ready{border-color:var(--gold);}
+.ptr.dragging{transition:none;}
+.ptr.spinning{animation:ptr-spin .8s linear infinite;}
+@keyframes ptr-spin{from{transform:translate(-50%,8px) rotate(0);}to{transform:translate(-50%,8px) rotate(360deg);}}
+.topbar .logo{cursor:pointer;}
+
 /* Caricamenti in corso */
 .uploads{display:grid;gap:1px;background:var(--line);border-bottom:1px solid var(--line);}
 .upload{display:flex;gap:12px;align-items:center;padding:10px 14px;background:var(--bg-2);font-size:13.5px;}
@@ -337,6 +355,13 @@ a{color:var(--gold);}
 .comment-caption{border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:6px;}
 .comment-meta{display:flex;gap:10px;align-items:center;font-size:12px;color:var(--muted);margin-top:2px;}
 .comment-meta .link{font-size:12px;padding:0;}
+.comments-closed{text-align:center;font-size:13px;padding:12px 0 4px;border-top:1px solid var(--line);margin:6px 0 0;}
+.closed-panel{text-align:center;align-items:center;}
+.closed-panel > p{text-align:center;}
+.closed-panel strong{color:var(--text);}
+.closed-ic{stroke:none;margin:6px auto 10px;}
+.closed-panel .closed-note{margin:2px 0 18px;color:#0c2a4a;}
+.closed-panel .btn{width:100%;}
 .comment-form{display:flex;gap:10px;align-items:center;padding-top:10px;border-top:1px solid var(--line);margin-top:6px;}
 .comment-form .avatar{width:32px;height:32px;font-size:14px;}
 .comment-form input{border-radius:999px;padding:9px 14px;}

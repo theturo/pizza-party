@@ -173,6 +173,8 @@ test('due invitati alla PizzaParty', { timeout: 120_000 }, async () => {
   await a.waitForSelector('#feed .post-likes:has-text("Piace a te")');
   await a.locator('#feed .post-comments-link').first().click();
   await a.waitForSelector('#comments.open');
+  await a.waitForTimeout(400);
+  assert.notEqual(await a.evaluate(() => document.activeElement?.id), 'comment-input', 'niente tastiera all\'apertura');
   await a.fill('#comment-input', 'Che fame!');
   await a.press('#comment-input', 'Enter');
   await a.waitForSelector('#comments-list .comment-body:has-text("Che fame!")');
@@ -188,6 +190,19 @@ test('due invitati alla PizzaParty', { timeout: 120_000 }, async () => {
   await b.locator('#feed .post-media').first().dblclick();
   await a.waitForSelector('#feed .post-likes:has-text("Zio Totò")');
   await a.screenshot({ path: SHOTS + '3-feed.png' });
+
+  // Trascina giù per aggiornare (gesto simulato con eventi touch)
+  await b.evaluate(() => window.scrollTo(0, 0));
+  await b.evaluate(async () => {
+    const t = y => new Touch({ identifier: 1, target: document.body, clientX: 200, clientY: y });
+    const fire = (type, y) => window.dispatchEvent(new TouchEvent(type, {
+      touches: type === 'touchend' ? [] : [t(y)], changedTouches: [t(y)], bubbles: true }));
+    fire('touchstart', 150);
+    for (let y = 160; y <= 330; y += 20) { fire('touchmove', y); await new Promise(r => setTimeout(r, 16)); }
+    fire('touchend', 330);
+  });
+  await b.waitForSelector('#toast.show:has-text("Feed aggiornato")');
+  await b.waitForFunction(() => document.querySelectorAll('#feed .post').length === 2);
 
   // Ordine "dall'inizio"
   await b.click('#sort-btn');
@@ -248,6 +263,22 @@ test('due invitati alla PizzaParty', { timeout: 120_000 }, async () => {
   await totoPost.locator('.post-head .icon-btn').click();
   await a.click('#action-delete');
   await b.waitForFunction(() => document.querySelectorAll('#feed .post').length === 1, null, { timeout: 15_000 });
+
+  // Dopo il 12 ottobre: popup di fine festa, niente caricamenti né commenti
+  await b.clock.setFixedTime(new Date('2026-10-13T09:00:00+02:00'));
+  await b.click('.tabbar [data-view="feed"]');
+  await b.click('.tabbar [data-action="upload"]');
+  await b.waitForSelector('#closed.open #closed-title:has-text("Il PizzaParty si è concluso")');
+  assert.equal(await b.locator('#picker').isHidden(), true);
+  await b.waitForTimeout(300);
+  await b.screenshot({ path: SHOTS + '8-fine-festa.png' });
+  await b.click('#closed-album');
+  await b.waitForSelector('#album.open');
+  await b.click('#album .sheet-backdrop', { position: { x: 20, y: 20 } });
+  await b.waitForSelector('#album', { state: 'hidden' });
+  await b.locator('#feed .post-comments-link').first().click();
+  await b.waitForSelector('#comments.open #comments-closed:not([hidden])');
+  assert.equal(await b.locator('#comment-form').isHidden(), true);
 
   await a.context().close();
   await b.context().close();

@@ -15,6 +15,12 @@ service cloud.firestore {
       return signedIn() && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
     }
     function validNick(n) { return n is string && n.size() >= 2 && n.size() <= 24; }
+    // Caricamenti e commenti aperti fino alla mezzanotte tra il 12 e il 13 ottobre 2026
+    // (ora italiana). Va tenuta allineata con storage.rules e con EVENT.UPLOAD_UNTIL in config.js.
+    function uploadsOpen() { return request.time < timestamp.value(1791842400000); }
+    // Foto che ogni invitato può pubblicare (va allineato con EVENT.MAX_POSTS in config.js).
+    function maxPosts() { return 150; }
+    function memberDoc() { return get(/databases/$(database)/documents/members/$(request.auth.uid)).data; }
     function validCode(c) { return c is string && c.matches('^[A-Za-z0-9_-]{4,64}$'); }
 
     // Codici invito: si gestiscono solo da console, nessun accesso dall'app.
@@ -39,9 +45,21 @@ service cloud.firestore {
         && exists(/databases/$(database)/documents/invites/$(request.resource.data.code))
         && request.resource.data.joinedAt == request.time
         && request.resource.data.expireAt is timestamp;
+      // Prenotazione di una foto prima del caricamento: contatore +1 (fino a maxPosts)
+      // e ID del post che si sta per creare. Storage accetta solo i file della foto prenotata.
+      function reservesPost() {
+        return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['postCount', 'pendingPost'])
+          && request.resource.data.postCount == resource.data.get('postCount', 0) + 1
+          && request.resource.data.postCount <= maxPosts()
+          && request.resource.data.pendingPost is string
+          && request.resource.data.pendingPost.matches('^[A-Za-z0-9]{20}$')
+          && !exists(/databases/$(database)/documents/posts/$(request.resource.data.pendingPost))
+          && uploadsOpen();
+      }
       allow update: if signedIn() && request.auth.uid == uid
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['nickname'])
-        && validNick(request.resource.data.nickname);
+        && ((request.resource.data.diff(resource.data).affectedKeys().hasOnly(['nickname'])
+             && validNick(request.resource.data.nickname))
+            || reservesPost());
       allow delete: if false;
     }
 
@@ -94,6 +112,8 @@ service cloud.firestore {
 
       allow read: if isMember();
       allow create: if isMember()
+        && uploadsOpen()
+        && memberDoc().get('pendingPost', '') == postId
         && newData().keys().hasOnly(['uid', 'nickname', 'caption', 'takenAt', 'sortAt', 'createdAt',
                                      'url', 'thumbUrl', 'path', 'thumbPath', 'w', 'h',
                                      'likes', 'commentCount', 'expireAt', 'hdUrl'])
@@ -127,6 +147,7 @@ service cloud.firestore {
         allow read: if isMember();
         // Il commento va creato nello stesso batch che incrementa commentCount.
         allow create: if isMember()
+          && uploadsOpen()
           && request.resource.data.keys().hasOnly(['uid', 'nickname', 'text', 'createdAt', 'expireAt'])
           && request.resource.data.keys().hasAll(['uid', 'nickname', 'text', 'createdAt', 'expireAt'])
           && request.resource.data.uid == request.auth.uid
