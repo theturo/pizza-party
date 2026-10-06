@@ -211,11 +211,17 @@ function applyConfigText() {
 }
 
 // Animazione d'avvio: completa la prima volta, più svelta le successive; ?intro=0 la salta (test).
+// Una volta per sessione: ricaricare la pagina (o "Aggiorna" dal banner) non la ripete.
 function startIntro() {
   const root = $('#intro');
-  if (new URLSearchParams(location.search).get('intro') === '0') { root.hidden = true; return; }
+  let shown = false;
+  try { shown = sessionStorage.getItem('pg_intro_session') === '1'; } catch { /* ignora */ }
+  if (shown || new URLSearchParams(location.search).get('intro') === '0') { root.hidden = true; return; }
   playIntro(root, { fast: store.get('pg_intro_seen') === '1' })
-    .then(() => store.set('pg_intro_seen', '1'))
+    .then(() => {
+      store.set('pg_intro_seen', '1');
+      try { sessionStorage.setItem('pg_intro_session', '1'); } catch { /* ignora */ }
+    })
     .catch(() => { root.hidden = true; });
 }
 
@@ -414,6 +420,58 @@ function subscribeFeed() {
     state.loadingMore = false;
     toast('Feed non raggiungibile: controlla la connessione.');
   });
+}
+
+// Aggiornamento manuale (trascina giù o tocca il logo): il feed è già in tempo reale,
+// ma dopo ore in background la connessione può essersi addormentata. Si riparte dalla
+// prima pagina e si controlla anche se c'è una nuova versione dell'app.
+async function refreshFeed() {
+  state.limit = PAGE;
+  subscribeFeed();
+  navigator.serviceWorker?.getRegistration().then(r => r && r.update()).catch(() => {});
+  await new Promise(r => setTimeout(r, 800));
+  toast('Feed aggiornato');
+}
+
+function setupPullToRefresh() {
+  const ptr = $('#ptr');
+  const MAX = 96, TRIGGER = 64;
+  let startY = null, pull = 0, busy = false;
+  const render = () => {
+    ptr.style.transform = `translate(-50%, ${pull - 56}px) rotate(${pull * 4}deg)`;
+    ptr.style.opacity = String(Math.min(1, pull / TRIGGER));
+    ptr.classList.toggle('ready', pull >= TRIGGER);
+  };
+  const canStart = () => !busy && state.view === 'feed' && window.scrollY <= 0
+    && !$('#app').hidden && !document.body.classList.contains('locked');
+  window.addEventListener('touchstart', e => {
+    startY = canStart() && e.touches.length === 1 ? e.touches[0].clientY : null;
+    pull = 0;
+  }, { passive: true });
+  window.addEventListener('touchmove', e => {
+    if (startY == null) return;
+    const dy = e.touches[0].clientY - startY;
+    pull = dy > 0 && window.scrollY <= 0 ? Math.min(MAX, dy * 0.5) : 0;
+    ptr.classList.add('dragging');
+    render();
+  }, { passive: true });
+  window.addEventListener('touchend', async () => {
+    if (startY == null) return;
+    startY = null;
+    ptr.classList.remove('dragging');
+    if (pull >= TRIGGER) {
+      busy = true;
+      pull = TRIGGER;
+      render();
+      ptr.classList.add('spinning');
+      await refreshFeed();
+      ptr.classList.remove('spinning');
+      busy = false;
+    }
+    pull = 0;
+    render();
+  });
+  render();
 }
 
 function loadMore() {
@@ -653,7 +711,6 @@ function openComments(id) {
     });
     list.scrollTop = list.scrollHeight;
   }, () => toast('Commenti non disponibili offline.'));
-  setTimeout(() => $('#comment-input').focus({ preventScroll: true }), 250);
 }
 
 async function addComment(e) {
@@ -1211,6 +1268,12 @@ function bindUi() {
   $('#admin-link').addEventListener('click', copyAlbumLink);
   $('#album-start').addEventListener('click', buildAlbum);
   $('#update-btn').addEventListener('click', applyUpdate);
+  $('.topbar .logo').addEventListener('click', () => {
+    if (state.view !== 'feed') showView('feed');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    refreshFeed();
+  });
+  setupPullToRefresh();
 
   const io = new IntersectionObserver(entries => {
     if (entries.some(en => en.isIntersecting)) loadMore();

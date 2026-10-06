@@ -89,12 +89,13 @@
 <!-- App -->
 <div id="app" class="app" hidden>
   <header class="topbar">
-    <h1 class="logo">Pizzagram</h1>
+    <h1 class="logo" title="Aggiorna il feed">Pizzagram</h1>
     <button class="chip" id="sort-btn" type="button" aria-live="polite">
       <svg class="ic"><use href="#i-sort"/></svg><span id="sort-label">Più recenti</span>
     </button>
   </header>
 
+  <div id="ptr" class="ptr" aria-hidden="true"><svg class="ic"><use href="#i-pizza-on"/></svg></div>
   <div id="uploads" class="uploads" hidden></div>
 
   <main>
