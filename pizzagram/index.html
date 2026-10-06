@@ -195,6 +195,7 @@
     <div class="sheet-grip"></div>
     <h2 class="sheet-title" id="comments-title">Commenti</h2>
     <div id="comments-list" class="comments-list"></div>
+    <p class="comments-closed muted" id="comments-closed" hidden>Il PizzaParty si è concluso: i commenti sono chiusi.</p>
     <form id="comment-form" class="comment-form">
       <div class="avatar" id="comment-avatar"></div>
       <input id="comment-input" maxlength="300" placeholder="Aggiungi un commento…" autocomplete="off" enterkeyhint="send">
@@ -222,6 +223,23 @@
     <button class="sheet-btn sheet-btn-ic" type="button" id="pick-camera"><svg class="ic"><use href="#i-camera"/></svg> Scatta una foto</button>
     <button class="sheet-btn sheet-btn-ic" type="button" id="pick-gallery"><svg class="ic"><use href="#i-photos"/></svg> Scegli dalla galleria</button>
     <button class="sheet-btn" type="button" data-close>Annulla</button>
+  </div>
+</section>
+
+<!-- Fine festa: caricamenti chiusi (EVENT.UPLOAD_UNTIL) -->
+<section id="closed" class="sheet" hidden>
+  <div class="sheet-backdrop" data-close></div>
+  <div class="sheet-panel closed-panel" role="dialog" aria-modal="true" aria-labelledby="closed-title">
+    <div class="sheet-grip"></div>
+    <svg class="ic ic-xl closed-ic" aria-hidden="true"><use href="#i-pizza-on"/></svg>
+    <h2 class="sheet-title" id="closed-title">Il PizzaParty si è concluso</h2>
+    <p>Grazie per le foto e i commenti che hanno raccontato la serata!<br>
+      Il caricamento di nuovi contenuti è stato disattivato.</p>
+    <p>L'album con tutte le foto resta a tua disposizione: lo scarichi dal profilo, alla voce
+      <strong>Album ricordo</strong>.</p>
+    <p class="note closed-note">Ci vediamo alla prossima edizione!</p>
+    <button class="btn btn-primary" type="button" id="closed-album"><svg class="ic"><use href="#i-download"/></svg> Scarica l'album</button>
+    <button class="sheet-btn" type="button" data-close>Chiudi</button>
   </div>
 </section>
 

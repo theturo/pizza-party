@@ -15,6 +15,11 @@ export const EVENT = {
   START: "2026-10-10T19:30",
   // Giorni dopo la festa in cui foto e commenti restano online.
   RETENTION_DAYS: 30,
+  // Fine dei caricamenti (foto e commenti): mezzanotte tra il 12 e il 13 ottobre, ora italiana.
+  // Il blocco vero è nelle regole Firebase (storage.rules e firestore.rules): tenere allineati.
+  UPLOAD_UNTIL: "2026-10-13T00:00",
+  // Foto che ogni invitato può pubblicare (anche questo nelle regole Firebase).
+  MAX_POSTS: 150,
   // Foto selezionabili in una volta.
   MAX_PER_BATCH: 10,
   // Lato lungo in pixel delle tre versioni di ogni foto:

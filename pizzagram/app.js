@@ -16,6 +16,8 @@ const CONFIGURED = EMULATOR || !Object.values(FIREBASE).some(v => String(v).incl
 const EVENT_START = new Date(EVENT.START);
 const EXPIRE_DATE = new Date(EVENT_START);
 EXPIRE_DATE.setDate(EXPIRE_DATE.getDate() + EVENT.RETENTION_DAYS);
+const UPLOAD_UNTIL = new Date(EVENT.UPLOAD_UNTIL);
+const uploadsClosed = () => Date.now() >= UPLOAD_UNTIL.getTime();
 const NICK_MIN = 2, NICK_MAX = 24;
 const CODE_RE = /^[A-Za-z0-9_-]{4,64}$/;
 const PAGE = 15;
@@ -33,6 +35,8 @@ const state = {
   code: '',
   isAdmin: false,
   joining: false,
+  postCount: 0,
+  pendingPost: null,
   order: store.get('pg_order') === 'asc' ? 'asc' : 'desc',
   limit: PAGE,
   posts: [],
@@ -303,6 +307,8 @@ async function onAuth(user) {
     const snap = await fb.getDoc(fb.doc(db, 'members', user.uid));
     if (snap.exists()) {
       state.code = snap.data().code;
+      state.postCount = snap.data().postCount || 0;
+      state.pendingPost = snap.data().pendingPost || null;
       enterApp(snap.data().nickname);
       return;
     }
@@ -377,6 +383,7 @@ function enterApp(nick) {
   checkAdmin();
   resumeHd();
   setupInstallCard();
+  if (uploadsClosed() && store.get('pg_closed_seen') !== '1') showClosed();
   if (state.wantAlbum) {
     state.wantAlbum = false;
     openAlbum();
@@ -683,6 +690,9 @@ async function deletePost() {
 function openComments(id) {
   const post = state.byId.get(id);
   if (!post) return;
+  const closed = uploadsClosed();
+  $('#comment-form').hidden = closed;
+  $('#comments-closed').hidden = !closed;
   state.commentsPost = id;
   const list = $('#comments-list');
   list.textContent = '';
@@ -750,7 +760,15 @@ async function deleteComment(postId, commentId) {
 let composerItems = [];
 
 function pickFiles() {
+  if (uploadsClosed()) { showClosed(); return; }
   openSheet('picker');
+}
+
+// Popup di fine festa: compare da solo alla prima apertura dopo la chiusura e ogni volta
+// che si prova a caricare o commentare.
+function showClosed() {
+  store.set('pg_closed_seen', '1');
+  openSheet('closed');
 }
 
 // L'input va "cliccato" dentro il tocco dell'utente, altrimenti il browser lo blocca.
@@ -797,6 +815,7 @@ function closeComposer(keepPreviews = false) {
 }
 
 function publish() {
+  if (uploadsClosed()) { closeComposer(); showClosed(); return; }
   const items = composerItems.map(i => ({
     file: i.file, caption: i.caption.trim().slice(0, 300), preview: i.preview,
     status: 'wait', progress: 0, done: {}
@@ -831,6 +850,19 @@ function putFile(path, blob, onProgress) {
   });
 }
 
+async function reservePost(postId) {
+  if (uploadsClosed()) throw new Error('closed');
+  if (state.postCount >= EVENT.MAX_POSTS) throw new Error('limit');
+  try {
+    await fb.updateDoc(fb.doc(db, 'members', state.user.uid), { postCount: fb.increment(1), pendingPost: postId });
+  } catch (ex) {
+    if ((ex.code || '').includes('permission-denied')) throw new Error(uploadsClosed() ? 'closed' : 'limit');
+    throw ex;
+  }
+  state.postCount++;
+  state.pendingPost = postId;
+}
+
 // Messaggi per i problemi con il file della foto (vedi lib/image.js); tra parentesi tipo e
 // peso, utili per capire il caso se qualcuno lo segnala.
 function uploadErrorText(ex) {
@@ -840,6 +872,8 @@ function uploadErrorText(ex) {
     case 'read': return 'Non riesco a leggere la foto dal telefono' + info;
     case 'decode': return 'Formato della foto non supportato' + info;
     case 'encode': return 'Il telefono non è riuscito a preparare la foto';
+    case 'closed': return 'Caricamenti chiusi: il PizzaParty si è concluso';
+    case 'limit': return `Hai raggiunto il limite di ${EVENT.MAX_POSTS} foto`;
     default: return errorMessage(ex, 'Caricamento non riuscito');
   }
 }
@@ -854,6 +888,9 @@ async function uploadOne(item) {
     }
     const { feed: full, thumb, w, h: height } = item.prepared;
     item.postId ||= fb.doc(fb.collection(db, 'posts')).id;
+    // Prenotazione: conta verso il limite di foto e autorizza i file di questo post.
+    // Si rifà solo se nel frattempo è stata prenotata un'altra foto (es. riprova dopo un errore).
+    if (state.pendingPost !== item.postId) await reservePost(item.postId);
     const base = `photos/${uid}/${item.postId}`;
     const total = full.size + thumb.size;
     item.status = 'up';
@@ -967,6 +1004,12 @@ async function runHd() {
   hdRunning = true;
   try {
     while (hdQueue.length) {
+      // A caricamenti chiusi le HD rimaste non possono più partire: l'album usa la versione del feed.
+      if (uploadsClosed()) {
+        for (const job of hdQueue.splice(0)) await hdStore.del(job.postId);
+        renderUploads();
+        break;
+      }
       // Prima si pubblicano le foto nuove, poi le HD.
       if (uploading) { await new Promise(r => setTimeout(r, 1500)); continue; }
       const job = hdQueue[0];
@@ -1268,6 +1311,7 @@ function bindUi() {
   $('#admin-link').addEventListener('click', copyAlbumLink);
   $('#album-start').addEventListener('click', buildAlbum);
   $('#update-btn').addEventListener('click', applyUpdate);
+  $('#closed-album').addEventListener('click', () => { closeSheet('closed'); openAlbum(); });
   $('.topbar .logo').addEventListener('click', () => {
     if (state.view !== 'feed') showView('feed');
     window.scrollTo({ top: 0, behavior: 'smooth' });

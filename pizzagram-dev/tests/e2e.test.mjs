@@ -264,6 +264,22 @@ test('due invitati alla PizzaParty', { timeout: 120_000 }, async () => {
   await a.click('#action-delete');
   await b.waitForFunction(() => document.querySelectorAll('#feed .post').length === 1, null, { timeout: 15_000 });
 
+  // Dopo il 12 ottobre: popup di fine festa, niente caricamenti né commenti
+  await b.clock.setFixedTime(new Date('2026-10-13T09:00:00+02:00'));
+  await b.click('.tabbar [data-view="feed"]');
+  await b.click('.tabbar [data-action="upload"]');
+  await b.waitForSelector('#closed.open #closed-title:has-text("Il PizzaParty si è concluso")');
+  assert.equal(await b.locator('#picker').isHidden(), true);
+  await b.waitForTimeout(300);
+  await b.screenshot({ path: SHOTS + '8-fine-festa.png' });
+  await b.click('#closed-album');
+  await b.waitForSelector('#album.open');
+  await b.click('#album .sheet-backdrop', { position: { x: 20, y: 20 } });
+  await b.waitForSelector('#album', { state: 'hidden' });
+  await b.locator('#feed .post-comments-link').first().click();
+  await b.waitForSelector('#comments.open #comments-closed:not([hidden])');
+  assert.equal(await b.locator('#comment-form').isHidden(), true);
+
   await a.context().close();
   await b.context().close();
 });

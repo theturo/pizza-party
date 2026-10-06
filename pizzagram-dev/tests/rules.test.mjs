@@ -50,6 +50,14 @@ function post(uid, id = POST, extra = {}) {
     w: 1080, h: 810, likes: {}, commentCount: 0, expireAt: EXPIRE, hdUrl: null, ...extra
   };
 }
+// Prenotazione della foto come fa l'app: contatore +1 e ID del post in arrivo.
+function reserve(uid, id = POST, count = 1) {
+  return updateDoc(doc(db(uid), 'members', uid), { postCount: count, pendingPost: id });
+}
+async function seedMember(uid, extra) {
+  await env.withSecurityRulesDisabled(ctx => updateDoc(doc(ctx.firestore(), 'members', uid), extra));
+}
+
 async function seedPost(uid = 'alice', extra = {}) {
   await env.withSecurityRulesDisabled(ctx =>
     setDoc(doc(ctx.firestore(), 'posts', POST), { ...post(uid), createdAt: Timestamp.now(), ...extra }));
@@ -89,10 +97,29 @@ test('il non membro non legge né pubblica', async () => {
   await assertFails(getDoc(doc(db(null), 'posts', POST)));
   await assertFails(setDoc(doc(db('stranger'), 'posts', 'ZZZZZZZZZZZZZZZZZZZZ'), post('stranger', 'ZZZZZZZZZZZZZZZZZZZZ')));
 });
-test('il membro pubblica un post valido', async () => {
+test('il membro pubblica un post valido dopo averlo prenotato', async () => {
+  await assertSucceeds(reserve('alice'));
   await assertSucceeds(setDoc(doc(db('alice'), 'posts', POST), post('alice')));
 });
+test('senza prenotazione (o con un altro ID) il post è rifiutato', async () => {
+  await assertFails(setDoc(doc(db('alice'), 'posts', POST), post('alice')));
+  await assertSucceeds(reserve('alice', 'ZZZZZZZZZZZZZZZZZZZZ'));
+  await assertFails(setDoc(doc(db('alice'), 'posts', POST), post('alice')));
+});
+test('prenotazione: +1 alla volta, massimo 150, solo per sé, ID valido e nuovo', async () => {
+  await assertFails(reserve('alice', POST, 2));
+  await assertFails(reserve('alice', 'corto'));
+  await assertFails(updateDoc(doc(db('bob'), 'members', 'alice'), { postCount: 1, pendingPost: POST }));
+  await assertFails(updateDoc(doc(db('alice'), 'members', 'alice'), { postCount: 1, pendingPost: POST, nickname: 'Altro' }));
+  await seedMember('alice', { postCount: 149 });
+  await assertSucceeds(reserve('alice', POST, 150));
+  await assertFails(reserve('alice', 'ZZZZZZZZZZZZZZZZZZZZ', 151));
+  await seedPost('bob');
+  await seedMember('bob', { postCount: 3 });
+  await assertFails(reserve('bob', POST, 4)); // il post esiste già
+});
 test('post a nome di altri / percorso sbagliato / like precaricati rifiutati', async () => {
+  await reserve('alice');
   await assertFails(setDoc(doc(db('alice'), 'posts', POST), post('bob')));
   await assertFails(setDoc(doc(db('alice'), 'posts', POST), post('alice', POST, { path: 'photos/bob/x.jpg' })));
   await assertFails(setDoc(doc(db('alice'), 'posts', POST), post('alice', POST, { likes: { bob: 'bob' } })));
@@ -108,6 +135,7 @@ test('versione HD: solo l’autore, una volta sola', async () => {
   await assertFails(updateDoc(doc(db('alice'), 'posts', POST), { hdUrl: 'https://example/altra' }));
 });
 test('post datato nel futuro (per restare in cima) rifiutato', async () => {
+  await reserve('alice');
   const future = Timestamp.fromMillis(Date.now() + 3 * 3600e3);
   await assertFails(setDoc(doc(db('alice'), 'posts', POST), post('alice', POST, { sortAt: future })));
 });
@@ -201,12 +229,21 @@ test('admin: ognuno vede solo se stesso', async () => {
 
 // ---------- Storage ----------
 const jpeg = (n = 1000) => new Uint8Array(n).fill(7);
-test('storage: il membro carica nella propria cartella', async () => {
+test('storage: il membro carica i file della foto prenotata', async () => {
+  await reserve('alice');
   await assertSucceeds(uploadBytes(ref(st('alice'), `photos/alice/${POST}.jpg`), jpeg(), { contentType: 'image/jpeg' }));
   await assertSucceeds(uploadBytes(ref(st('alice'), `photos/alice/${POST}_t.jpg`), jpeg(), { contentType: 'image/jpeg' }));
   await assertSucceeds(uploadBytes(ref(st('alice'), `photos/alice/${POST}_hd.jpg`), jpeg(), { contentType: 'image/jpeg' }));
 });
+test('storage: senza prenotazione no; HD di un proprio post già pubblicato sì', async () => {
+  await assertFails(uploadBytes(ref(st('alice'), `photos/alice/${POST}.jpg`), jpeg(), { contentType: 'image/jpeg' }));
+  await seedPost('alice');
+  await assertSucceeds(uploadBytes(ref(st('alice'), `photos/alice/${POST}_hd.jpg`), jpeg(), { contentType: 'image/jpeg' }));
+  // Il post è di Alice: Bob non può caricarci file nella propria cartella con quell'ID
+  await assertFails(uploadBytes(ref(st('bob'), `photos/bob/${POST}_hd.jpg`), jpeg(), { contentType: 'image/jpeg' }));
+});
 test('storage: rifiuta cartelle altrui, non membri, tipi e dimensioni sbagliate', async () => {
+  await reserve('alice');
   await assertFails(uploadBytes(ref(st('alice'), `photos/bob/${POST}.jpg`), jpeg(), { contentType: 'image/jpeg' }));
   await assertFails(uploadBytes(ref(st('stranger'), `photos/stranger/${POST}.jpg`), jpeg(), { contentType: 'image/jpeg' }));
   await assertFails(uploadBytes(ref(st('alice'), `photos/alice/${POST}.jpg`), jpeg(), { contentType: 'video/mp4' }));
