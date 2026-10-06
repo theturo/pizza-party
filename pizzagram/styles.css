@@ -326,6 +326,8 @@ a{color:var(--gold);}
 .sheet-panel > .progress{margin-bottom:14px;height:6px;}
 .sheet-btn{width:100%;background:none;border:0;border-top:1px solid var(--line);padding:15px;font-size:15px;}
 .sheet-btn:first-of-type{border-top:0;}
+.sheet-btn-ic{display:flex;align-items:center;justify-content:center;gap:10px;font-weight:600;}
+.sheet-btn-ic .ic{color:var(--gold);}
 .sheet-btn.danger{color:#ff6e55;font-weight:700;}
 
 .comments-list{overflow-y:auto;flex:1;min-height:120px;overscroll-behavior:contain;padding-left:4px;}

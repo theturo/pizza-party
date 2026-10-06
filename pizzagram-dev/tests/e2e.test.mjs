@@ -109,6 +109,29 @@ test('due invitati alla PizzaParty', { timeout: 120_000 }, async () => {
   await a.waitForSelector('#feed-empty:not([hidden])');
   await a.screenshot({ path: SHOTS + '1-feed-vuoto.png' });
 
+  // Il + apre la scelta: fotocamera (input con capture) o galleria
+  await a.click('.tabbar [data-action="upload"]');
+  await a.waitForSelector('#picker.open #pick-camera');
+  assert.equal(await a.getAttribute('#camera-input', 'capture'), 'environment');
+  assert.equal(await a.getAttribute('#file-input', 'capture'), null);
+  await a.screenshot({ path: SHOTS + '1b-scelta-foto.png' });
+  await a.click('#picker [data-close].sheet-btn');
+  await a.waitForSelector('#picker', { state: 'hidden' });
+
+  // File problematici: messaggi chiari con tipo e peso, nessun post creato
+  await a.setInputFiles('#file-input', [
+    { name: 'vuota.jpg', mimeType: 'image/jpeg', buffer: Buffer.alloc(0) },
+    { name: 'rotta.jpg', mimeType: 'image/jpeg', buffer: Buffer.from('non sono una foto') }
+  ]);
+  await a.waitForSelector('#composer.open');
+  await a.click('#composer-publish');
+  await a.waitForSelector('#uploads .upload-error:has-text("non è ancora sul telefono")');
+  await a.waitForSelector('#uploads .upload-error:has-text("Formato della foto non supportato (image/jpeg, 0.0 MB)")');
+  await a.screenshot({ path: SHOTS + '1c-errori.png' });
+  for (let i = 0; i < 2; i++) await a.locator('#uploads .upload-error .link:not(.link-strong)').first().click();
+  await a.waitForSelector('#uploads', { state: 'hidden' });
+  assert.equal(await a.locator('#feed .post').count(), 0);
+
   // Carica due foto
   await a.setInputFiles('#file-input', [
     { name: 'festa.jpg', mimeType: 'image/jpeg', buffer: await fixtureJpeg(a, 20) },

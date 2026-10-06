@@ -4,15 +4,6 @@
 //   tutti i metadati, compresa la posizione GPS.
 
 // Data di scatto (DateTimeOriginal, altrimenti DateTime) da un JPEG; null se assente.
-export async function readExifDate(file) {
-  try {
-    const buf = await file.slice(0, 256 * 1024).arrayBuffer();
-    return parseExifDate(new DataView(buf));
-  } catch {
-    return null;
-  }
-}
-
 export function parseExifDate(view) {
   if (view.byteLength < 4 || view.getUint16(0) !== 0xFFD8) return null;
   let off = 2;
@@ -73,32 +64,76 @@ export function exifStringToDate(str) {
   return isNaN(d) || year < 2000 || year > 2100 ? null : d;
 }
 
-function loadImage(file) {
+// Errore con un codice leggibile dall'app ('read', 'empty', 'decode', 'encode').
+function fail(code, file) {
+  const err = new Error(code);
+  err.fileInfo = file ? `${file.type || 'tipo sconosciuto'}, ${(file.size / 1048576).toFixed(1)} MB` : '';
+  return err;
+}
+
+// Legge tutto il file in memoria. Sui telefoni il file scelto può essere un riferimento
+// "pigro" (es. foto solo su Google Foto): leggerlo subito fa emergere l'errore qui,
+// con un messaggio chiaro, invece che durante la decodifica.
+async function readAll(file) {
+  if (!file.size) throw fail('empty', file);
+  let buf;
+  try {
+    buf = await file.arrayBuffer();
+  } catch {
+    throw fail('read', file);
+  }
+  if (!buf.byteLength) throw fail('empty', file);
+  return { buf, blob: new Blob([buf], { type: file.type || 'image/jpeg' }) };
+}
+
+function decodeWithImg(blob) {
   return new Promise((resolve, reject) => {
-    const url = URL.createObjectURL(file);
+    const url = URL.createObjectURL(blob);
     const img = new Image();
     img.decoding = 'async';
-    img.onload = () => resolve({ img, url });
-    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('decode')); };
+    img.onload = () => resolve({
+      source: img, w: img.naturalWidth, h: img.naturalHeight,
+      release: () => URL.revokeObjectURL(url)
+    });
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('img')); };
     img.src = url;
   });
 }
 
-function toJpeg(img, maxSide, quality) {
-  const scale = Math.min(1, maxSide / Math.max(img.naturalWidth, img.naturalHeight));
-  const w = Math.max(1, Math.round(img.naturalWidth * scale));
-  const h = Math.max(1, Math.round(img.naturalHeight * scale));
+async function decodeWithBitmap(blob) {
+  if (typeof createImageBitmap !== 'function') throw new Error('bitmap');
+  const bmp = await createImageBitmap(blob, { imageOrientation: 'from-image' });
+  return { source: bmp, w: bmp.width, h: bmp.height, release: () => bmp.close() };
+}
+
+// Prima <img> (su iPhone è l'unico che rispetta sempre la rotazione EXIF),
+// poi createImageBitmap, che su Android usa un percorso di decodifica diverso.
+async function decode(blob, file) {
+  try {
+    return await decodeWithImg(blob);
+  } catch { /* si prova l'altro decoder */ }
+  try {
+    return await decodeWithBitmap(blob);
+  } catch {
+    throw fail('decode', file);
+  }
+}
+
+function toJpeg(image, maxSide, quality) {
+  const scale = Math.min(1, maxSide / Math.max(image.w, image.h));
+  const w = Math.max(1, Math.round(image.w * scale));
+  const h = Math.max(1, Math.round(image.h * scale));
   const canvas = document.createElement('canvas');
   canvas.width = w;
   canvas.height = h;
   const ctx = canvas.getContext('2d');
   ctx.imageSmoothingQuality = 'high';
-  // L'orientamento EXIF viene già applicato dal browser quando decodifica <img>.
-  ctx.drawImage(img, 0, 0, w, h);
+  // L'orientamento EXIF viene già applicato in decodifica.
+  ctx.drawImage(image.source, 0, 0, w, h);
   return new Promise((resolve, reject) => {
     canvas.toBlob(b => {
       canvas.width = canvas.height = 0; // libera memoria subito (iOS è severo)
-      b ? resolve({ blob: b, w, h }) : reject(new Error('encode'));
+      b ? resolve({ blob: b, w, h }) : reject(fail('encode'));
     }, 'image/jpeg', quality);
   });
 }
@@ -107,14 +142,23 @@ function toJpeg(img, maxSide, quality) {
 // (es. HEIC su Android). L'HD ha qualità alta: a schermo e in stampa fino a ~20×15 cm
 // non si distingue dall'originale, ma pesa circa un terzo.
 export async function prepareImage(file, { feedSize, thumbSize, hdSize }) {
-  const takenAt = await readExifDate(file);
-  const { img, url } = await loadImage(file);
+  const { buf, blob } = await readAll(file);
+  const takenAt = parseExifDateSafe(buf);
+  const image = await decode(blob, file);
   try {
-    const feed = await toJpeg(img, feedSize, 0.82);
-    const thumb = await toJpeg(img, thumbSize, 0.72);
-    const hd = await toJpeg(img, hdSize, 0.9);
+    const feed = await toJpeg(image, feedSize, 0.82);
+    const thumb = await toJpeg(image, thumbSize, 0.72);
+    const hd = await toJpeg(image, hdSize, 0.9);
     return { feed: feed.blob, thumb: thumb.blob, hd: hd.blob, w: feed.w, h: feed.h, takenAt };
   } finally {
-    URL.revokeObjectURL(url);
+    image.release();
+  }
+}
+
+function parseExifDateSafe(buf) {
+  try {
+    return parseExifDate(new DataView(buf, 0, Math.min(buf.byteLength, 256 * 1024)));
+  } catch {
+    return null;
   }
 }

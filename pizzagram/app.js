@@ -668,7 +668,13 @@ async function deleteComment(postId, commentId) {
 let composerItems = [];
 
 function pickFiles() {
-  $('#file-input').click();
+  openSheet('picker');
+}
+
+// L'input va "cliccato" dentro il tocco dell'utente, altrimenti il browser lo blocca.
+function pickFrom(inputId) {
+  closeSheet('picker');
+  $('#' + inputId).click();
 }
 
 function onFilesPicked(e) {
@@ -743,6 +749,19 @@ function putFile(path, blob, onProgress) {
   });
 }
 
+// Messaggi per i problemi con il file della foto (vedi lib/image.js); tra parentesi tipo e
+// peso, utili per capire il caso se qualcuno lo segnala.
+function uploadErrorText(ex) {
+  const info = ex && ex.fileInfo ? ` (${ex.fileInfo})` : '';
+  switch (ex && ex.message) {
+    case 'empty': return 'La foto non è ancora sul telefono: aprila prima in Galleria/Foto' + info;
+    case 'read': return 'Non riesco a leggere la foto dal telefono' + info;
+    case 'decode': return 'Formato della foto non supportato' + info;
+    case 'encode': return 'Il telefono non è riuscito a preparare la foto';
+    default: return errorMessage(ex, 'Caricamento non riuscito');
+  }
+}
+
 async function uploadOne(item) {
   const uid = state.user.uid;
   try {
@@ -791,9 +810,7 @@ async function uploadOne(item) {
     }, 1500);
   } catch (ex) {
     item.status = 'error';
-    item.error = ex && ex.message === 'decode'
-      ? 'Formato non supportato'
-      : errorMessage(ex, 'Caricamento non riuscito');
+    item.error = uploadErrorText(ex);
     renderUploads();
   }
 }
@@ -1156,6 +1173,9 @@ function bindUi() {
     if (open) open.id === 'composer' ? closeComposer() : closeSheet(open.id);
   });
   $('#file-input').addEventListener('change', onFilesPicked);
+  $('#camera-input').addEventListener('change', onFilesPicked);
+  $('#pick-camera').addEventListener('click', () => pickFrom('camera-input'));
+  $('#pick-gallery').addEventListener('click', () => pickFrom('file-input'));
   $('#composer-publish').addEventListener('click', publish);
   $('#comment-form').addEventListener('submit', addComment);
   $('#action-delete').addEventListener('click', deletePost);
