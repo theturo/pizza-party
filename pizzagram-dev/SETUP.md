@@ -165,5 +165,5 @@ npm run build        # rigenera pizzagram/vendor/firebase.js dopo un aggiornamen
 npm run icons        # rigenera le icone PNG da pizzagram/icons/icon.svg
 ```
 
-Dopo aver modificato i file dell'app, aumenta `CACHE` in `pizzagram/sw.js`
+Dopo aver modificato i file dell'app, aumenta `CACHE` in `pizzagram/sw.js` e `APP_VERSION` in `pizzagram/app.js`
 (`pizzagram-v2`, `-v3`…): così chi ha l'app installata riceve subito la versione nuova.
