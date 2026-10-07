@@ -30,6 +30,9 @@ const store = {
 };
 
 // ====== Stato ======
+// Da aumentare insieme a CACHE in sw.js: nel profilo si vede quale versione è caricata.
+const APP_VERSION = 'v11';
+
 const state = {
   user: null,
   nick: '',
@@ -465,6 +468,7 @@ function renderMe() {
   paintAvatar($('#me-avatar'), state.user?.uid, state.nick);
   paintAvatar($('#comment-avatar'), state.user?.uid, state.nick);
   $('#device-id').textContent = state.user?.uid || '';
+  $('#app-version').textContent = APP_VERSION;
 }
 
 async function checkAdmin() {
