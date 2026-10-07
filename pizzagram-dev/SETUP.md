@@ -101,8 +101,19 @@ Attenzione: se cancelli i dati del browser l'ID cambia e va rifatto.
 
 Ogni documento ha un campo `expireAt` (10 ottobre + 30 giorni).
 
-- Firestore → **TTL** (o "Criteri TTL") → crea un criterio per ciascun gruppo di raccolte
-  `posts`, `comments`, `members`, `albumRequests`, campo `expireAt`.
+- **Firestore TTL**: nella console Firebase non c'è, si imposta da Google Cloud. In Cloud Shell
+  (stesso progetto selezionato):
+
+  ```sh
+  for g in posts comments members albumRequests profiles; do
+    gcloud firestore fields ttls update expireAt --collection-group=$g --enable-ttl --async
+  done
+  gcloud firestore fields ttls list   # dopo qualche minuto: 5 righe ACTIVE
+  ```
+
+  In alternativa da interfaccia: console.cloud.google.com → Firestore → **Time-to-live (TTL)**
+  → Crea criterio, una volta per gruppo di raccolte, campo `expireAt`.
+  Google cancella i documenti scaduti di solito entro 24 ore dalla data.
 - Google Cloud Console → Cloud Storage → bucket → **Ciclo di vita** → Aggiungi regola →
   *Elimina oggetto* con condizione *Età: 40 giorni*.
 

@@ -211,6 +211,20 @@ test('admin elimina post con i commenti in un batch', async () => {
   await assertSucceeds(b.commit());
 });
 
+// ---------- Profili pubblici ----------
+test('profilo: ognuno scrive il proprio, gli invitati lo leggono', async () => {
+  const prof = (extra = {}) => ({ nickname: 'Alice', avatar: 'margherita', updatedAt: serverTimestamp(), expireAt: EXPIRE, ...extra });
+  await assertSucceeds(setDoc(doc(db('alice'), 'profiles', 'alice'), prof()));
+  await assertSucceeds(setDoc(doc(db('alice'), 'profiles', 'alice'), prof({ avatar: null })));
+  await assertFails(setDoc(doc(db('bob'), 'profiles', 'alice'), prof()));
+  await assertFails(setDoc(doc(db('stranger'), 'profiles', 'stranger'), prof()));
+  await assertFails(setDoc(doc(db('alice'), 'profiles', 'alice'), prof({ avatar: '<svg onload=x>' })));
+  await assertFails(setDoc(doc(db('alice'), 'profiles', 'alice'), prof({ nickname: 'A' })));
+  await assertFails(setDoc(doc(db('alice'), 'profiles', 'alice'), prof({ code: 'pizza' })));
+  await assertSucceeds(getDocs(collection(db('bob'), 'profiles')));
+  await assertFails(getDocs(collection(db('stranger'), 'profiles')));
+});
+
 // ---------- Album via mail ----------
 test('email album: la scrive il membro, la legge solo admin', async () => {
   const data = { email: 'a@b.it', nickname: 'alice', updatedAt: serverTimestamp(), expireAt: EXPIRE };

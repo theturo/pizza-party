@@ -3,6 +3,7 @@ import * as fb from './vendor/firebase.js';
 import { prepareImage } from './lib/image.js';
 import { ZipWriter } from './lib/zip.js';
 import { playIntro } from './lib/intro.js';
+import { AVATARS, AVATAR_BY_ID, avatarSvg } from './lib/avatars.js';
 
 // ====== Ambiente ======
 // In locale (npm run dev in pizzagram-dev) l'app parla con gli emulatori Firebase.
@@ -37,6 +38,12 @@ const state = {
   joining: false,
   postCount: 0,
   pendingPost: null,
+  profiles: new Map(),   // uid -> { nickname, avatar } (profili pubblici)
+  myAvatar: null,
+  extraPosts: new Map(), // post fuori dalla pagina del feed (mie foto, profili altrui)
+  profileUid: null,
+  profileNick: '',
+  profilePosts: [],
   order: store.get('pg_order') === 'asc' ? 'asc' : 'desc',
   limit: PAGE,
   posts: [],
@@ -86,18 +93,50 @@ function icon(name, cls = 'ic') {
 }
 
 const AVATAR_COLORS = ['#d24a30', '#c99a1e', '#5c8a4a', '#ff8a4d', '#8a5cc2', '#3d8fb0', '#c2477f'];
-function avatar(uid, nick, cls = 'avatar') {
+// Nome e avatar mostrati vengono dal profilo pubblico (profiles/{uid}) quando c'è;
+// altrimenti dal nickname salvato su post e commenti, con l'iniziale come avatar.
+const displayName = (uid, nick) => state.profiles.get(uid)?.nickname || nick || '?';
+
+function paintLetter(el, uid, name) {
   let hash = 0;
-  for (const ch of uid || nick || '?') hash = (hash * 31 + ch.charCodeAt(0)) >>> 0;
-  const el = h('div', { class: cls, 'aria-hidden': 'true' }, (nick || '?').trim().charAt(0).toUpperCase());
+  for (const ch of uid || name || '?') hash = (hash * 31 + ch.charCodeAt(0)) >>> 0;
+  el.classList.remove('has-art');
+  el.textContent = (name || '?').trim().charAt(0).toUpperCase();
   el.style.setProperty('--av', AVATAR_COLORS[hash % AVATAR_COLORS.length]);
+}
+
+function paintAvatar(el, uid, nick) {
+  el.dataset.uid = uid || '';
+  el.dataset.nick = nick || '';
+  const art = AVATAR_BY_ID.get(state.profiles.get(uid)?.avatar);
+  if (!art) { paintLetter(el, uid, displayName(uid, nick)); return; }
+  el.textContent = '';
+  el.classList.add('has-art');
+  el.append(avatarSvg(art.id));
+  el.style.setProperty('--av', art.bg);
+}
+
+// openProfile: tocco su avatar/nome apre il profilo di quella persona.
+function avatar(uid, nick, cls = 'avatar', openProfile = false) {
+  const el = h('div', { class: cls, 'aria-hidden': 'true', 'data-open-profile': openProfile });
+  paintAvatar(el, uid, nick);
   return el;
 }
-function paintAvatar(el, uid, nick) {
-  const fresh = avatar(uid, nick, el.className);
-  el.textContent = fresh.textContent;
-  el.style.setProperty('--av', fresh.style.getPropertyValue('--av'));
+
+function nameEl(tag, uid, nick, cls) {
+  const el = h(tag, { class: cls, 'data-open-profile': true, role: 'link', tabindex: '0' }, displayName(uid, nick));
+  el.dataset.nameUid = uid || '';
+  el.dataset.nick = nick || '';
+  return el;
 }
+
+// Quando cambiano i profili pubblici si ridipingono avatar e nomi già sullo schermo.
+function repaintPeople() {
+  $$('.avatar[data-uid]').forEach(el => { if (el.dataset.uid) paintAvatar(el, el.dataset.uid, el.dataset.nick); });
+  $$('[data-name-uid]').forEach(el => { el.textContent = displayName(el.dataset.nameUid, el.dataset.nick); });
+}
+
+const getPost = id => state.byId.get(id) || state.extraPosts.get(id);
 
 const pad = n => String(n).padStart(2, '0');
 const toDate = v => (v && typeof v.toDate === 'function' ? v.toDate() : v instanceof Date ? v : null);
@@ -161,14 +200,40 @@ function showScreen(id) {
   for (const s of ['boot', 'setup', 'join', 'app']) $('#' + s).hidden = s !== id;
 }
 
+// Pannelli impilati: ognuno si apre sopra il precedente (es. profilo dai commenti, post dal
+// profilo) e ha una voce nella cronologia, così il tasto Indietro di Android chiude quello in cima.
+const sheetStack = [];
 function openSheet(id) {
   const el = $('#' + id);
+  if (!el.hidden && sheetStack.includes(id)) return;
+  sheetStack.push(id);
+  el.style.zIndex = String(40 + sheetStack.length * 2);
   el.hidden = false;
   document.body.classList.add('locked');
   requestAnimationFrame(() => el.classList.add('open'));
+  history.pushState({ pgSheet: id, depth: sheetStack.length }, '');
 }
 function closeSheet(id) {
+  // Chiusura dall'interfaccia del pannello in cima: si torna indietro nella cronologia
+  // e sarà l'evento popstate a chiuderlo davvero.
+  if (sheetStack[sheetStack.length - 1] === id && history.state?.pgSheet === id) { history.back(); return; }
+  hideSheet(id);
+}
+// Si chiudono i pannelli finché la pila torna alla profondità della voce di cronologia attuale.
+window.addEventListener('popstate', () => {
+  const depth = history.state?.depth || 0;
+  while (sheetStack.length > depth) hideSheet(sheetStack[sheetStack.length - 1]);
+});
+// Chiude tutti i pannelli aperti (anche quelli sotto), allineando la cronologia.
+function closeAllSheets() {
+  const n = sheetStack.filter(id => !$('#' + id).hidden).length;
+  if (n && history.state?.pgSheet) history.go(-n);
+  else while (sheetStack.length) hideSheet(sheetStack[sheetStack.length - 1]);
+}
+function hideSheet(id) {
   const el = $('#' + id);
+  const i = sheetStack.lastIndexOf(id);
+  if (i >= 0) sheetStack.splice(i, 1);
   if (el.hidden) return;
   el.classList.remove('open');
   const done = () => {
@@ -178,7 +243,8 @@ function closeSheet(id) {
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) done();
   else setTimeout(done, 220);
   if (id === 'comments') { unsubComments?.(); unsubComments = null; state.commentsPost = null; }
-  if (id === 'post-modal') { state.modalPost = null; $('#post-modal-body').textContent = ''; }
+  if (id === 'post-modal') { state.modalPost = null; modalCard = null; $('#post-modal-body').textContent = ''; }
+  if (id === 'user-profile') { unsubUser?.(); unsubUser = null; state.profileUid = null; }
 }
 
 function showView(view) {
@@ -380,6 +446,7 @@ function enterApp(nick) {
   updateSortLabel();
   subscribeFeed();
   subscribeMine();
+  subscribeProfiles();
   checkAdmin();
   resumeHd();
   setupInstallCard();
@@ -506,7 +573,7 @@ const feedCards = new Map();
 
 function buildCard(post) {
   const refs = {};
-  refs.avatar = avatar(post.uid, post.nickname);
+  refs.avatar = avatar(post.uid, post.nickname, 'avatar', true);
   refs.when = h('span', { class: 'post-when' });
   refs.more = h('button', { class: 'icon-btn', type: 'button', 'aria-label': 'Altre azioni',
     onclick: () => openActions(post.id) }, icon('more'));
@@ -530,13 +597,13 @@ function buildCard(post) {
     onclick: () => openComments(post.id) }, icon('comment'));
   refs.likes = h('div', { class: 'post-likes' });
   refs.caption = post.caption
-    ? h('p', { class: 'post-caption' }, h('b', null, post.nickname), ' ', post.caption)
+    ? h('p', { class: 'post-caption' }, nameEl('b', post.uid, post.nickname), ' ', post.caption)
     : null;
   refs.comments = h('button', { class: 'post-comments-link', type: 'button', onclick: () => openComments(post.id) });
 
   const el = h('article', { class: 'post', 'data-id': post.id },
     h('header', { class: 'post-head' }, refs.avatar,
-      h('div', { class: 'post-who' }, h('span', { class: 'post-user' }, post.nickname), refs.when), refs.more),
+      h('div', { class: 'post-who' }, nameEl('span', post.uid, post.nickname, 'post-user'), refs.when), refs.more),
     refs.media,
     h('div', { class: 'post-actions' }, refs.like, refs.comment),
     refs.likes, refs.caption, refs.comments);
@@ -599,7 +666,7 @@ function popBurst(el) {
 }
 
 async function likePost(id, onlyAdd = false) {
-  const post = state.byId.get(id);
+  const post = getPost(id);
   const uid = state.user?.uid;
   if (!post || !uid) return;
   const liked = !!(post.likes || {})[uid];
@@ -631,7 +698,8 @@ function subscribeMine() {
   unsubMine = fb.onSnapshot(q, snap => {
     const mine = snap.docs.map(d => ({ id: d.id, ...d.data({ serverTimestamps: 'estimate' }) }))
       .sort((a, b) => toDate(b.sortAt) - toDate(a.sortAt));
-    for (const p of mine) if (!state.byId.has(p.id)) state.byId.set(p.id, p);
+    for (const p of mine) state.extraPosts.set(p.id, p);
+    if (state.modalPost) renderModal();
     renderList($('#my-grid'), mine, myGridItems, buildTile, () => {});
     $('#me-count').textContent = mine.length === 1 ? '1 foto pubblicata' : `${mine.length} foto pubblicate`;
   }, () => {});
@@ -645,7 +713,7 @@ function openModal(id) {
 
 let modalCard = null;
 function renderModal() {
-  const post = state.byId.get(state.modalPost);
+  const post = getPost(state.modalPost);
   const body = $('#post-modal-body');
   if (!post) { closeSheet('post-modal'); return; }
   if (!modalCard || modalCard.id !== post.id) {
@@ -664,7 +732,7 @@ function openActions(id) {
 
 async function deletePost() {
   const id = state.actionPost;
-  const post = state.byId.get(id);
+  const post = getPost(id);
   closeSheet('actions');
   if (!post || !confirm('Eliminare questo post? Non si può annullare.')) return;
   try {
@@ -688,7 +756,7 @@ async function deletePost() {
 
 // ====== Commenti ======
 function openComments(id) {
-  const post = state.byId.get(id);
+  const post = getPost(id);
   if (!post) return;
   const closed = uploadsClosed();
   $('#comment-form').hidden = closed;
@@ -697,8 +765,8 @@ function openComments(id) {
   const list = $('#comments-list');
   list.textContent = '';
   const head = post.caption
-    ? h('div', { class: 'comment comment-caption' }, avatar(post.uid, post.nickname),
-        h('div', { class: 'comment-body' }, h('b', null, post.nickname), ' ', post.caption))
+    ? h('div', { class: 'comment comment-caption' }, avatar(post.uid, post.nickname, 'avatar', true),
+        h('div', { class: 'comment-body' }, nameEl('b', post.uid, post.nickname), ' ', post.caption))
     : null;
   const items = h('div');
   const empty = h('p', { class: 'muted center' }, 'Ancora nessun commento. Rompi il ghiaccio!');
@@ -712,10 +780,10 @@ function openComments(id) {
     empty.hidden = snap.size > 0;
     snap.docs.forEach(d => {
       const c = d.data({ serverTimestamps: 'estimate' });
-      const p = state.byId.get(id);
+      const p = getPost(id);
       const canDelete = c.uid === state.user.uid || state.isAdmin || (p && p.uid === state.user.uid);
-      items.append(h('div', { class: 'comment' }, avatar(c.uid, c.nickname),
-        h('div', { class: 'comment-body' }, h('b', null, c.nickname), ' ', c.text,
+      items.append(h('div', { class: 'comment' }, avatar(c.uid, c.nickname, 'avatar', true),
+        h('div', { class: 'comment-body' }, nameEl('b', c.uid, c.nickname), ' ', c.text,
           h('div', { class: 'comment-meta' }, ago(toDate(c.createdAt)),
             canDelete ? h('button', { class: 'link', type: 'button', onclick: () => deleteComment(id, d.id) }, 'Elimina') : null))));
     });
@@ -1075,6 +1143,111 @@ function renderUploadProgress(item) {
   item.bar.style.width = Math.round(pct * 100) + '%';
 }
 
+// ====== Profili pubblici e avatar ======
+let unsubProfiles = null, creatingProfile = false;
+
+function saveProfile(avatarId = state.myAvatar) {
+  return fb.setDoc(fb.doc(db, 'profiles', state.user.uid), {
+    nickname: state.nick, avatar: avatarId || null,
+    updatedAt: fb.serverTimestamp(), expireAt: fb.Timestamp.fromDate(EXPIRE_DATE)
+  });
+}
+
+function subscribeProfiles() {
+  unsubProfiles?.();
+  unsubProfiles = fb.onSnapshot(fb.collection(db, 'profiles'), snap => {
+    state.profiles = new Map(snap.docs.map(d => [d.id, d.data()]));
+    const mine = state.profiles.get(state.user.uid);
+    state.myAvatar = mine?.avatar || null;
+    // Chi è entrato prima che esistessero i profili pubblici riceve il suo al primo avvio.
+    if (!mine && !creatingProfile && !snap.metadata.fromCache) {
+      creatingProfile = true;
+      saveProfile(null).catch(() => {}).finally(() => { creatingProfile = false; });
+    }
+    repaintPeople();
+    renderAvatarPicker();
+    if (state.profileUid) renderUserProfileHead();
+  }, () => {});
+}
+
+function renderAvatarPicker() {
+  const box = $('#avatar-picker');
+  if (!box.childElementCount) {
+    const letter = h('div', { class: 'avatar avatar-pick' });
+    box.append(h('button', { class: 'pick', type: 'button', 'data-avatar': '', 'aria-label': 'Iniziale del nickname' }, letter,
+      h('span', null, 'Iniziale')));
+    for (const a of AVATARS) {
+      const el = h('div', { class: 'avatar avatar-pick has-art' }, avatarSvg(a.id));
+      el.style.setProperty('--av', a.bg);
+      box.append(h('button', { class: 'pick', type: 'button', 'data-avatar': a.id, 'aria-label': a.label }, el, h('span', null, a.label)));
+    }
+    box.addEventListener('click', e => {
+      const btn = e.target.closest('[data-avatar]');
+      if (btn) chooseAvatar(btn.dataset.avatar || null);
+    });
+  }
+  paintLetter(box.querySelector('[data-avatar=""] .avatar'), state.user?.uid, state.nick);
+  box.querySelectorAll('[data-avatar]').forEach(btn => {
+    const on = (btn.dataset.avatar || null) === state.myAvatar;
+    btn.classList.toggle('on', on);
+    btn.setAttribute('aria-pressed', String(on));
+  });
+}
+
+async function chooseAvatar(id) {
+  if (id === state.myAvatar) return;
+  const previous = state.myAvatar;
+  state.myAvatar = id;
+  renderAvatarPicker();
+  try {
+    await saveProfile(id);
+    toast(id ? 'Avatar aggiornato.' : 'Torni all\'iniziale del nickname.');
+  } catch (ex) {
+    state.myAvatar = previous;
+    renderAvatarPicker();
+    toast(errorMessage(ex, 'Avatar non salvato.'));
+  }
+}
+
+// ====== Profilo di un invitato ======
+let unsubUser = null;
+const userGridItems = new Map();
+
+function openUserProfile(uid, nick) {
+  if (!uid) return;
+  state.profileUid = uid;
+  state.profileNick = nick || '';
+  state.profilePosts = [];
+  userGridItems.clear();
+  $('#up-grid').textContent = '';
+  $('#up-empty').hidden = true;
+  renderUserProfileHead();
+  openSheet('user-profile');
+  unsubUser?.();
+  unsubUser = fb.onSnapshot(fb.query(fb.collection(db, 'posts'), fb.where('uid', '==', uid)), snap => {
+    const posts = snap.docs.map(d => ({ id: d.id, ...d.data({ serverTimestamps: 'estimate' }) }))
+      .sort((a, b) => toDate(b.sortAt) - toDate(a.sortAt));
+    for (const p of posts) state.extraPosts.set(p.id, p);
+    state.profilePosts = posts;
+    renderList($('#up-grid'), posts, userGridItems, buildTile, () => {});
+    $('#up-empty').hidden = posts.length > 0;
+    renderUserProfileHead();
+    if (state.modalPost) renderModal();
+  }, () => toast('Profilo non disponibile offline.'));
+}
+
+function renderUserProfileHead() {
+  const uid = state.profileUid;
+  const posts = state.profilePosts;
+  const nick = displayName(uid, state.profileNick || posts[0]?.nickname);
+  $('#up-title').textContent = nick;
+  $('#up-name').textContent = nick;
+  paintAvatar($('#up-avatar'), uid, nick);
+  const pizzas = posts.reduce((n, p) => n + Object.keys(p.likes || {}).length, 0);
+  $('#up-stats').textContent = `${posts.length === 1 ? '1 foto' : posts.length + ' foto'} · ${pizzas} 🍕 ricevute`;
+  $('#up-you').hidden = uid !== state.user?.uid;
+}
+
 // ====== Profilo ======
 async function saveNick(e) {
   e.preventDefault();
@@ -1089,6 +1262,7 @@ async function saveNick(e) {
     state.nick = nick;
     store.set('pg_nick', nick);
     renderMe();
+    saveProfile().catch(() => {});
     toast('Nickname aggiornato.');
   } catch (ex) {
     toast(errorMessage(ex, 'Nickname non salvato.'));
@@ -1282,6 +1456,11 @@ function bindUi() {
   $('#sort-btn').addEventListener('click', toggleOrder);
   $$('.tabbar [data-view]').forEach(b => b.addEventListener('click', () => showView(b.dataset.view)));
   document.addEventListener('click', e => {
+    const who = e.target.closest('[data-open-profile]');
+    if (who) {
+      openUserProfile(who.dataset.uid || who.dataset.nameUid, who.dataset.nick);
+      return;
+    }
     const action = e.target.closest('[data-action]')?.dataset.action;
     if (action === 'upload') pickFiles();
     if (action === 'album') openAlbum();
@@ -1312,6 +1491,17 @@ function bindUi() {
   $('#album-start').addEventListener('click', buildAlbum);
   $('#update-btn').addEventListener('click', applyUpdate);
   $('#closed-album').addEventListener('click', () => { closeSheet('closed'); openAlbum(); });
+  $('#up-you').addEventListener('click', () => {
+    // Dal proprio profilo pubblico alla pagina Profilo: si chiudono tutti i pannelli.
+    closeAllSheets();
+    showView('profile');
+  });
+  document.addEventListener('keydown', e => {
+    if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('[data-open-profile][tabindex]')) {
+      e.preventDefault();
+      e.target.click();
+    }
+  });
   $('.topbar .logo').addEventListener('click', () => {
     if (state.view !== 'feed') showView('feed');
     window.scrollTo({ top: 0, behavior: 'smooth' });

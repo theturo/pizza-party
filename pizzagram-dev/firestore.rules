@@ -63,6 +63,21 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // Profilo pubblico (per gli altri invitati): solo nickname attuale e avatar scelto.
+    // I dati privati (codice, contatore foto) restano in members.
+    match /profiles/{uid} {
+      allow read: if isMember();
+      allow create, update: if isMember() && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['nickname', 'avatar', 'updatedAt', 'expireAt'])
+        && request.resource.data.keys().hasAll(['nickname', 'avatar', 'updatedAt', 'expireAt'])
+        && validNick(request.resource.data.nickname)
+        && (request.resource.data.avatar == null
+            || (request.resource.data.avatar is string && request.resource.data.avatar.matches('^[a-z]{2,20}$')))
+        && request.resource.data.updatedAt == request.time
+        && request.resource.data.expireAt is timestamp;
+      allow delete: if false;
+    }
+
     // Email di chi vuole ricevere il link all'album: le legge solo l'admin.
     match /albumRequests/{uid} {
       allow get: if signedIn() && (request.auth.uid == uid || isAdmin());
