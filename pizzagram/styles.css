@@ -295,6 +295,14 @@ a{color:var(--gold);}
 .like-btn.on .ic{stroke:none;animation:likepop .35s ease;}
 @keyframes likepop{50%{transform:translateY(-1px) scale(1.25);}}
 .post-likes{padding:2px 14px;font-size:14px;}
+.post-likes b[data-open-profile]{cursor:pointer;}
+.likes-more{background:none;border:0;padding:0;font:inherit;font-weight:700;color:inherit;cursor:pointer;}
+.likes-list{overflow-y:auto;max-height:60vh;overscroll-behavior:contain;margin:0 -4px;}
+.liker{display:flex;align-items:center;gap:12px;width:100%;background:none;border:0;padding:8px 4px;font:inherit;font-size:15px;color:inherit;text-align:left;cursor:pointer;border-radius:12px;}
+.liker:active{background:var(--line);}
+.liker .avatar{width:40px;height:40px;font-size:16px;flex:none;}
+.liker-name{flex:1;min-width:0;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.liker-you{font-size:13px;}
 .post-caption{margin:4px 14px 0;font-size:14px;overflow-wrap:anywhere;}
 .post-comments-link{background:none;border:0;padding:4px 14px;color:var(--muted);font-size:14px;text-align:left;}
 
@@ -312,7 +320,7 @@ a{color:var(--gold);}
 .avatar.has-art{text-shadow:none;}
 .avatar svg{width:94%;height:94%;display:block;}
 [data-open-profile]{cursor:pointer;}
-.post-user[data-open-profile]:hover,.comment-body b[data-open-profile]:hover{text-decoration:underline;}
+.post-user[data-open-profile]:hover,.comment-body b[data-open-profile]:hover,.post-likes b[data-open-profile]:hover{text-decoration:underline;}
 .avatar-picker{display:grid;grid-template-columns:repeat(auto-fill,minmax(70px,1fr));gap:10px 6px;margin-top:4px;}
 .pick{display:grid;justify-items:center;gap:5px;background:none;border:0;padding:4px 0;color:var(--muted);font-size:11px;line-height:1.2;}
 .pick .avatar{width:52px;height:52px;font-size:22px;transition:transform .15s ease;}
