@@ -105,10 +105,10 @@ Ogni documento ha un campo `expireAt` (10 ottobre + 30 giorni).
   (stesso progetto selezionato):
 
   ```sh
-  for g in posts comments members albumRequests; do
+  for g in posts comments members albumRequests profiles; do
     gcloud firestore fields ttls update expireAt --collection-group=$g --enable-ttl --async
   done
-  gcloud firestore fields ttls list   # dopo qualche minuto: 4 righe ACTIVE
+  gcloud firestore fields ttls list   # dopo qualche minuto: 5 righe ACTIVE
   ```
 
   In alternativa da interfaccia: console.cloud.google.com → Firestore → **Time-to-live (TTL)**

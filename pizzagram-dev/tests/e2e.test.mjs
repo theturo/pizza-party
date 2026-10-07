@@ -191,6 +191,38 @@ test('due invitati alla PizzaParty', { timeout: 120_000 }, async () => {
   await a.waitForSelector('#feed .post-likes:has-text("Zio Totò")');
   await a.screenshot({ path: SHOTS + '3-feed.png' });
 
+  // Marghe sceglie un avatar e cambia nickname: Zio Totò li vede aggiornati sul feed
+  await a.click('.tabbar [data-view="profile"]');
+  await a.waitForSelector('#avatar-picker [data-avatar="margherita"]');
+  await a.click('#avatar-picker [data-avatar="margherita"]');
+  await a.waitForSelector('#avatar-picker [data-avatar="margherita"].on');
+  await a.fill('#nick-input', 'Marghe Regina');
+  await a.click('#nick-form button');
+  await a.waitForSelector('#me-nick:has-text("Marghe Regina")');
+  await a.waitForSelector('#me-avatar.has-art svg');
+  await a.screenshot({ path: SHOTS + '9-scelta-avatar.png', fullPage: true });
+  await a.click('.tabbar [data-view="feed"]');
+  await b.waitForSelector('#feed .post-head .avatar.has-art svg', { timeout: 15_000 });
+  await b.waitForSelector('#feed .post-user:has-text("Marghe Regina")');
+
+  // Profilo di Marghe dal nome sul post; da lì una foto; Indietro chiude un pannello alla volta
+  await b.locator('#feed .post-user').first().click();
+  await b.waitForSelector('#user-profile.open #up-name:has-text("Marghe Regina")');
+  await b.waitForSelector('#up-stats:has-text("2 foto")');
+  await b.waitForFunction(() => document.querySelectorAll('#up-grid .tile').length === 2);
+  assert.equal(await b.locator('#up-you').isHidden(), true, 'niente "modifica" sul profilo altrui');
+  await b.screenshot({ path: SHOTS + '10-profilo-altrui.png' });
+  await b.locator('#up-grid .tile').first().click();
+  await b.waitForSelector('#post-modal.open .post');
+  const z = await b.evaluate(() => [+document.querySelector('#post-modal').style.zIndex, +document.querySelector('#user-profile').style.zIndex]);
+  assert.ok(z[0] > z[1], 'il post si apre sopra il profilo');
+  await b.goBack();
+  await b.waitForSelector('#post-modal', { state: 'hidden' });
+  assert.equal(await b.locator('#user-profile').isVisible(), true);
+  await b.goBack();
+  await b.waitForSelector('#user-profile', { state: 'hidden' });
+  assert.ok(b.url().includes('/pizzagram/'), 'Indietro non esce dall\'app');
+
   // Trascina giù per aggiornare (gesto simulato con eventi touch)
   await b.evaluate(() => window.scrollTo(0, 0));
   await b.evaluate(async () => {

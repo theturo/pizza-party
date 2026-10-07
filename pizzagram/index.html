@@ -127,7 +127,13 @@
         <input id="nick-input" maxlength="24" aria-label="Nickname" autocomplete="nickname">
         <button class="btn btn-small" type="submit">Salva</button>
       </form>
-      <p class="hint">Il nuovo nickname vale per i prossimi post e commenti.</p>
+      <p class="hint">Il nickname nuovo compare su tutti i tuoi post e commenti.</p>
+
+      <div class="card">
+        <h2>Il tuo avatar</h2>
+        <p>Scegline uno a tema PizzaParty, oppure resta con l'iniziale del nickname.</p>
+        <div id="avatar-picker" class="avatar-picker" role="group" aria-label="Avatar"></div>
+      </div>
 
       <div id="my-grid" class="grid grid-small"></div>
 
@@ -240,6 +246,27 @@
     <p class="note closed-note">Ci vediamo alla prossima edizione!</p>
     <button class="btn btn-primary" type="button" id="closed-album"><svg class="ic"><use href="#i-download"/></svg> Scarica l'album</button>
     <button class="sheet-btn" type="button" data-close>Chiudi</button>
+  </div>
+</section>
+
+<!-- Profilo di un invitato (si apre toccando avatar o nome) -->
+<section id="user-profile" class="fullsheet" hidden>
+  <header class="sheet-bar">
+    <button class="link" type="button" data-close aria-label="Indietro"><svg class="ic"><use href="#i-back"/></svg></button>
+    <strong id="up-title"></strong>
+    <span></span>
+  </header>
+  <div class="up-body">
+    <div class="profile-head">
+      <div class="avatar avatar-xl" id="up-avatar"></div>
+      <div>
+        <div class="profile-name" id="up-name"></div>
+        <div class="muted" id="up-stats"></div>
+        <button class="btn btn-small up-you" type="button" id="up-you" hidden>Modifica il tuo profilo</button>
+      </div>
+    </div>
+    <div id="up-grid" class="grid"></div>
+    <p id="up-empty" class="empty-note muted" hidden>Ancora nessuna foto pubblicata.</p>
   </div>
 </section>
 
