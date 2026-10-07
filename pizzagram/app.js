@@ -38,6 +38,7 @@ const state = {
   joining: false,
   postCount: 0,
   pendingPost: null,
+  likesPost: null,
   profiles: new Map(),   // uid -> { nickname, avatar } (profili pubblici)
   myAvatar: null,
   extraPosts: new Map(), // post fuori dalla pagina del feed (mie foto, profili altrui)
@@ -242,6 +243,7 @@ function hideSheet(id) {
   };
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) done();
   else setTimeout(done, 220);
+  if (id === 'likes') state.likesPost = null;
   if (id === 'comments') { unsubComments?.(); unsubComments = null; state.commentsPost = null; }
   if (id === 'post-modal') { state.modalPost = null; modalCard = null; $('#post-modal-body').textContent = ''; }
   if (id === 'user-profile') { unsubUser?.(); unsubUser = null; state.profileUid = null; }
@@ -624,13 +626,16 @@ function updateCard(card, post) {
 
   refs.likes.textContent = '';
   if (count) {
-    const others = Object.entries(likes).filter(([k]) => k !== uid).map(([, v]) => v);
-    const first = liked ? 'te' : others[0];
+    const others = Object.entries(likes).filter(([k]) => k !== uid);
     const rest = count - 1;
-    refs.likes.append('🍕 Piace a ', h('b', null, first));
-    if (rest > 0) refs.likes.append(' e ', h('b', null, rest === 1 ? (liked ? others[0] : '1 altra persona') : `altre ${rest} persone`));
+    const person = ([k, v]) => nameEl('b', k, v);
+    const more = text => h('button', { class: 'likes-more', type: 'button', onclick: () => openLikes(post.id) }, text);
+    refs.likes.append('🍕 Piace a ', liked ? h('b', null, 'te') : person(others[0]));
+    if (rest === 1 && liked) refs.likes.append(' e ', person(others[0]));
+    else if (rest > 0) refs.likes.append(' e ', more(rest === 1 ? '1 altra persona' : `altre ${rest} persone`));
   }
   refs.likes.hidden = !count;
+  if (state.likesPost === post.id) renderLikes();
 
   const n = post.commentCount || 0;
   refs.comments.textContent = n === 0 ? 'Aggiungi un commento…'
@@ -752,6 +757,38 @@ async function deletePost() {
   } catch (ex) {
     toast(errorMessage(ex, 'Non sono riuscito a eliminare il post.'));
   }
+}
+
+// ====== Chi ha messo like ======
+function openLikes(id) {
+  state.likesPost = id;
+  renderLikes();
+  openSheet('likes');
+}
+
+// I like sono una mappa uid → nickname: prima tu, poi gli altri in ordine alfabetico.
+function renderLikes() {
+  const post = getPost(state.likesPost);
+  const list = $('#likes-list');
+  list.textContent = '';
+  if (!post) return;
+  const me = state.user?.uid;
+  const people = Object.entries(post.likes || {})
+    .map(([uid, nick]) => ({ uid, nick, name: displayName(uid, nick) }))
+    .sort((a, b) => (b.uid === me) - (a.uid === me) || a.name.localeCompare(b.name, 'it', { sensitivity: 'base' }));
+  for (const p of people) {
+    const row = h('button', { class: 'liker', type: 'button', 'data-open-profile': true },
+      avatar(p.uid, p.nick),
+      h('span', { class: 'liker-name' }, p.name),
+      p.uid === me ? h('span', { class: 'muted liker-you' }, 'tu') : null);
+    row.dataset.uid = p.uid;
+    row.dataset.nick = p.nick;
+    row.querySelector('.liker-name').dataset.nameUid = p.uid;
+    row.querySelector('.liker-name').dataset.nick = p.nick;
+    list.append(row);
+  }
+  $('#likes-title').textContent = people.length === 1 ? '1 pizza' : `${people.length} pizze`;
+  $('#likes-empty').hidden = people.length > 0;
 }
 
 // ====== Commenti ======

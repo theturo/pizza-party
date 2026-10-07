@@ -223,6 +223,32 @@ test('due invitati alla PizzaParty', { timeout: 120_000 }, async () => {
   await b.waitForSelector('#user-profile', { state: 'hidden' });
   assert.ok(b.url().includes('/pizzagram/'), 'Indietro non esce dall\'app');
 
+  // Dai like: il nome apre il profilo; con più persone "altre N persone" apre l'elenco
+  await b.locator('#feed .post-likes b[data-open-profile]').first().click();
+  await b.waitForSelector('#user-profile.open #up-name:has-text("Marghe Regina")');
+  await b.goBack();
+  await b.waitForSelector('#user-profile', { state: 'hidden' });
+  const c = await joinAs('Cugina Ciccia', CODE);
+  await c.waitForFunction(() => document.querySelectorAll('#feed .post').length === 2);
+  await c.locator('#feed .like-btn').first().click();
+  await c.waitForSelector('#feed .post-likes:has-text("Piace a te e altre 2 persone")');
+  await b.waitForSelector('#feed .post-likes:has-text("Piace a te e altre 2 persone")');
+  await b.locator('#feed .likes-more').first().click();
+  await b.waitForSelector('#likes.open');
+  await b.waitForSelector('#likes-title:has-text("3 pizze")');
+  assert.deepEqual(await b.locator('#likes-list .liker-name').allTextContents(), ['Zio Totò', 'Cugina Ciccia', 'Marghe Regina']);
+  await b.screenshot({ path: SHOTS + '11-pizze.png' });
+  await c.locator('#feed .like-btn').first().click(); // tolto in diretta
+  await b.waitForSelector('#likes-title:has-text("2 pizze")');
+  await b.locator('#likes-list .liker', { hasText: 'Marghe Regina' }).click();
+  await b.waitForSelector('#user-profile.open #up-name:has-text("Marghe Regina")');
+  await b.goBack();
+  await b.waitForSelector('#user-profile', { state: 'hidden' });
+  assert.equal(await b.locator('#likes').isVisible(), true, 'si torna all\'elenco delle pizze');
+  await b.goBack();
+  await b.waitForSelector('#likes', { state: 'hidden' });
+  await c.context().close();
+
   // Trascina giù per aggiornare (gesto simulato con eventi touch)
   await b.evaluate(() => window.scrollTo(0, 0));
   await b.evaluate(async () => {
@@ -289,7 +315,7 @@ test('due invitati alla PizzaParty', { timeout: 120_000 }, async () => {
   await a.reload();
   await a.click('.tabbar [data-view="profile"]');
   await a.waitForSelector('#admin-card:not([hidden])');
-  await a.waitForSelector('#admin-stats:has-text("2 foto · 2 invitati entrati · 1 email")');
+  await a.waitForSelector('#admin-stats:has-text("2 foto · 3 invitati entrati · 1 email")');
   await a.click('.tabbar [data-view="feed"]');
   const totoPost = a.locator('#feed .post', { hasText: 'Zio Totò' }).first();
   await totoPost.locator('.post-head .icon-btn').click();
