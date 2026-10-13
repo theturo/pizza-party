@@ -5,22 +5,23 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://cdnjs.cloudflare.com; style-src 'self'; font-src 'self'; img-src 'self' data: blob:; connect-src https://script.google.com https://script.googleusercontent.com; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PizzaParty — 10 anni — Iscrizioni</title>
+<title>PizzaParty — 10° Anniversario — Grazie a tutti!</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M32 6 L58 56 L6 56 Z' fill='%23e8b34a' stroke='%23a8781f' stroke-width='2'/%3E%3Cpath d='M32 6 L54 50 L10 50 Z' fill='%23c1432e'/%3E%3Ccircle cx='27' cy='30' r='4' fill='%23f7f0dc'/%3E%3Ccircle cx='37' cy='36' r='4.5' fill='%23f7f0dc'/%3E%3Ccircle cx='31' cy='42' r='3.5' fill='%23e2503a' stroke='%238f2a18' stroke-width='1'/%3E%3C/svg%3E">
-<meta property="og:title" content="PizzaParty — 10° Anniversario — Iscrizioni">
-<meta property="og:description" content="Il modulo di iscrizione per l'edizione dei 10 anni del PizzaParty, 10 ottobre 2026.">
+<meta property="og:title" content="PizzaParty — 10° Anniversario — Grazie a tutti!">
+<meta property="og:description" content="Grazie a tutti per aver festeggiato i 10 anni del PizzaParty. Le iscrizioni sono chiuse: ci rivediamo la prossima primavera!">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://www.pizza-party.net/">
 <meta property="og:image" content="https://www.pizza-party.net/og-image.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="description" content="Il modulo di iscrizione per l'edizione dei 10 anni del PizzaParty, 10 ottobre 2026.">
+<meta name="description" content="Grazie a tutti per aver festeggiato i 10 anni del PizzaParty. Le iscrizioni sono chiuse: ci rivediamo la prossima primavera!">
 <meta name="theme-color" content="#151217">
 <link rel="preload" href="fonts/fraunces-italic-latin.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="styles.css?v=5">
+<link rel="stylesheet" href="styles.css?v=6">
 </head>
-<body>
+<!-- Iscrizioni chiuse: per riaprirle basta togliere la classe "registrations-closed" da <body>. -->
+<body class="registrations-closed">
 <div class="wrap">
 
   <div class="hero">
@@ -38,6 +39,13 @@
     <p class="subtitle">Dieci anni di pizze più o meno riuscite</p>
     <div><span class="ticket-stub"><span class="dot"></span><span data-cfg="dateShort">10 · 10 · 2026</span><span class="dot"></span></span></div>
   </div>
+
+  <section class="closed-notice" aria-labelledby="closedTitle">
+    <h2 id="closedTitle">Grazie di cuore!</h2>
+    <p>Il decennale del PizzaParty è andato in scena e il merito è tutto di chi c'era: grazie a ciascuno di voi per essere venuto, per aver portato qualcosa da condividere e per aver reso questa serata speciale.</p>
+    <p>Le iscrizioni non sono più aperte, perché la festa si è già svolta.</p>
+    <p class="closed-farewell">Ci rivediamo la prossima primavera!</p>
+  </section>
 
   <div class="reel" id="reel" aria-hidden="true"></div>
   <p class="reel-label" id="reelLabel" aria-live="polite"></p>

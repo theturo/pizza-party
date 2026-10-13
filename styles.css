@@ -499,3 +499,23 @@ textarea{resize:vertical;min-height:70px;}
   }
   .flame{display:none;}
 }
+
+/* ===== ISCRIZIONI CHIUSE ===== */
+.closed-notice{display:none;}
+.registrations-closed .closed-notice{
+  display:block;
+  max-width:44ch;
+  margin:40px auto 0;
+  padding:0 24px;
+  text-align:center;
+}
+.closed-notice h2{font-family:var(--serif);font-style:italic;font-weight:900;font-size:30px;color:var(--gold);margin:0 0 18px;}
+.closed-notice p{color:var(--parchment);font-size:16px;line-height:1.65;margin:0;}
+.closed-notice p + p{margin-top:14px;}
+.closed-notice .closed-farewell{font-family:var(--serif);font-style:italic;font-weight:700;font-size:22px;color:var(--gold);margin-top:26px;}
+.registrations-closed .eyebrow,
+.registrations-closed .reel,
+.registrations-closed .reel-label,
+.registrations-closed #pizzaForm,
+.registrations-closed .bake-screen,
+.registrations-closed .success-screen{display:none !important;}
