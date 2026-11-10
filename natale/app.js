@@ -3,14 +3,14 @@ const CONFIG = {
   // URL del Web App di Google Apps Script (vedi ../natale-dev/SETUP.md).
   // Finché resta il segnaposto, la pagina funziona in anteprima e non salva nulla.
   SCRIPT_URL: "INCOLLA_QUI",
-  EVENT_TITLE: "Cena di Natale",
+  EVENT_TITLE: "Cena di Natale 2026",
   // "AAAA-MM-GG" (giornata intera) oppure "AAAA-MM-GGTHH:mm" (con orario).
   EVENT_START: "2026-12-19T20:00",
   EVENT_END: "2026-12-19T23:30",
   EVENT_LOCATION: "",
   // Quote in euro. Con null la pagina mostra "da definire".
-  QUOTA_SINGLE: null,
-  QUOTA_PLUS1: null,
+  QUOTA_SINGLE: 5,
+  QUOTA_PLUS1: 10,
   // Giorni dopo la cena entro cui i dati vengono cancellati (informativa privacy).
   RETENTION_DAYS: 30
 };
@@ -63,6 +63,7 @@ function updateConditionals(){
   Scene.reveal($('attending-wrap'), isAttending());
   Scene.reveal($('plus1-wrap'), isPlus1());
   Scene.reveal($('online-wrap'), checked('metodo_pagamento') === 'online');
+  Scene.reveal($('ss-plus1-wrap'), isPlus1());
   $('quota-amount').textContent = formatEuro(quotaFor(isPlus1()));
 }
 
@@ -91,11 +92,11 @@ async function confirmSignup(email){
 // questa pagina: sessionStorage permette di ritrovare le risposte al ritorno.
 const PROGRESS_KEY = 'cenaNataleProgress';
 const TEXT_FIELDS = ['email', 'nome', 'plus1nome', 'dettaglio'];
-const RADIO_FIELDS = ['conferma', 'partecipazione', 'metodo_pagamento'];
+const RADIO_FIELDS = ['conferma', 'partecipazione', 'secret_santa', 'metodo_pagamento'];
 
 function saveProgress(){
   try{
-    const data = {v: 1, currentIndex, startedAt: formStartedAt, accetto: $('accetto').checked};
+    const data = {v: 2, currentIndex, startedAt: formStartedAt, accetto: $('accetto').checked, ss_plus1: $('ss_plus1').checked};
     TEXT_FIELDS.forEach(id => { data[id] = $(id).value; });
     RADIO_FIELDS.forEach(n => { data[n] = checked(n); });
     data.contributo = Array.from(form.querySelectorAll('input[name="contributo"]:checked')).map(c => c.value);
@@ -118,6 +119,7 @@ function restoreProgress(){
     c.checked = (data.contributo || []).indexOf(c.value) !== -1;
   });
   $('accetto').checked = !!data.accetto;
+  $('ss_plus1').checked = !!data.ss_plus1;
   if(typeof data.startedAt === 'number' && data.startedAt <= Date.now()) formStartedAt = data.startedAt;
 
   const target = Math.max(0, Math.min(data.currentIndex || 0, steps.length - 1));
@@ -234,7 +236,15 @@ async function checkDuplicate(btn){
   return false;
 }
 
+// Il Secret Santa non ha una risposta predefinita: va scelta, perché decide l'estrazione.
+function validateSecretSanta(){
+  const ok = !!checked('secret_santa');
+  $('err-ss').classList.toggle('show', !ok);
+  return ok;
+}
+
 btnNext.addEventListener('click', async () => {
+  if(steps[currentIndex].id === 'ss-step' && !validateSecretSanta()) return;
   if(currentIndex === 0){
     if(!validateFirstStep()) return;
     if(!(await checkDuplicate(btnNext))) return;
@@ -249,13 +259,7 @@ btnBack.addEventListener('click', () => {
 form.addEventListener('change', e => {
   if(RADIO_FIELDS.indexOf(e.target.name) !== -1) refreshFlow();
   if(e.target.id === 'accetto') $('err-accetto').classList.remove('show');
-  // "Non porto nulla" esclude le altre voci, e viceversa.
-  if(e.target.name === 'contributo' && e.target.checked){
-    const none = e.target.value === 'Nessuno';
-    form.querySelectorAll('input[name="contributo"]').forEach(c => {
-      if(c !== e.target && (none || c.value === 'Nessuno')) c.checked = false;
-    });
-  }
+  if(e.target.name === 'secret_santa') $('err-ss').classList.remove('show');
 });
 
 // ---- Invio -------------------------------------------------------------------
@@ -271,6 +275,8 @@ function buildPayload(){
     plus1nome: attending && isPlus1() ? $('plus1nome').value.trim() : "",
     contributo: attending ? contributi.join(", ") : "",
     dettaglio: attending ? $('dettaglio').value.trim() : "",
+    secretSanta: !attending ? "" : (checked('secret_santa') === 'si' ? "Sì" : "No"),
+    secretSantaPlus1: !(attending && isPlus1()) ? "" : ($('ss_plus1').checked ? "Sì" : "No"),
     quota: attending ? formatEuro(quotaFor(isPlus1())) : "—",
     metodoPagamento: !attending ? "—"
       : (checked('metodo_pagamento') === "contanti" ? "Contanti alla serata" : "Online (PayPal/Satispay)"),
@@ -314,7 +320,8 @@ function showResult(payload, opts){
   } else {
     stamp.textContent = "CI SARÒ";
     $('successTitle').textContent = "Ci vediamo il " + CFG_TEXT.dayMonth + "!";
-    $('successText').textContent = "Il tuo posto a tavola è segnato.";
+    $('successText').textContent = "Il tuo posto a tavola è segnato."
+      + (payload.secretSanta === "Sì" ? " Sei anche nell'estrazione del Secret Santa." : "");
     if(payload.metodoPagamento.indexOf("Online") === 0 && quotaFor(isPlus1()) != null){
       sPay.textContent = "Puoi versare la quota di " + payload.quota + " con PayPal o Satispay quando ti fa comodo.";
       sPay.hidden = false;
@@ -330,8 +337,10 @@ function showResult(payload, opts){
   }
 
   Scene.finale(
-    {screen: $('sealScreen'), envelope: $('envelope'), caption: $('sealCaption')},
-    ["Pieghiamo il biglietto...", "...lo chiudiamo nella busta...", attending ? "...ed è consegnato!" : "...e ti teniamo il posto per l'anno prossimo."],
+    {screen: $('giftScreen'), gift: $('gift'), caption: $('giftCaption'), canvas: $('burst')},
+    attending
+      ? ["Mettiamo la tua risposta nel pacco...", "...un bel fiocco...", "...e via sotto l'albero!"]
+      : ["Mettiamo via la tua risposta...", "...un bel fiocco...", "...e ti teniamo il posto per l'anno prossimo."],
     () => {
       form.hidden = true;
       progress.hidden = true;
@@ -339,6 +348,7 @@ function showResult(payload, opts){
       $('success').hidden = false;
       card.scrollIntoView({behavior: 'auto', block: 'nearest'});
       Scene.popIn(stamp);
+      Scene.dropGift();
       $('successTitle').focus({preventScroll: true});
     });
 }
@@ -392,6 +402,10 @@ form.addEventListener('submit', async e => {
     return;
   }
   const attending = isAttending();
+  if(attending && !validateSecretSanta()){
+    goTo(steps.findIndex(s => s.id === 'ss-step'), -1);
+    return;
+  }
   const missingAccept = attending && !$('accetto').checked;
   $('err-accetto').classList.toggle('show', missingAccept);
   if(missingAccept) return;

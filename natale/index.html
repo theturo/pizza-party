@@ -6,31 +6,34 @@
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex">
-<title>Cena di Natale — 19 dicembre 2026</title>
+<title>Cena di Natale 2026 — 19 dicembre</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='26' y='24' width='12' height='34' rx='2' fill='%23f3e6cc'/%3E%3Cpath d='M32 4 C40 14 38 22 32 24 C26 22 24 14 32 4Z' fill='%23ffa733'/%3E%3C/svg%3E">
-<meta property="og:title" content="Cena di Natale — 19 dicembre 2026">
+<meta property="og:title" content="Cena di Natale 2026 — 19 dicembre">
 <meta property="og:description" content="La cena di Natale tra amici: facci sapere se ci sei.">
 <meta property="og:type" content="website">
 <meta name="description" content="La cena di Natale tra amici: facci sapere se ci sei.">
 <meta name="theme-color" content="#1a100b">
 <link rel="preload" href="../fonts/fraunces-italic-latin.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="styles.css?v=1">
+<link rel="stylesheet" href="styles.css?v=2">
 </head>
 <body>
+<div class="lights" id="lights" aria-hidden="true"></div>
 <div class="page">
 
   <!-- ===== LA STANZA: titolo e camino ===== -->
   <header class="room">
     <div class="room-head">
       <p class="eyebrow" data-cfg="weekdayDate">Sabato 19 dicembre 2026</p>
-      <h1 class="title">Cena di Natale</h1>
+      <h1 class="title">Cena di Natale <span class="year">2026</span></h1>
       <p class="tag">tra amici, come ogni anno</p>
     </div>
 
     <div class="scene-crop" aria-hidden="true">
-      <div class="scene-art">
+      <div class="scene-art" id="sceneArt">
         <div class="fire-light"></div>
-        <svg viewBox="0 0 400 560" id="sceneSvg">
+        <!-- La scena è a strati: ognuno sta a una profondità diversa (vedi scene.js). -->
+        <div class="layers" id="layers">
+          <svg class="layer l-back" viewBox="0 0 560 560">
           <defs>
             <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0" stop-color="#0c1830"/><stop offset="1" stop-color="#2a4a72"/>
@@ -52,6 +55,7 @@
             <clipPath id="hearthclip"><path d="M120 542 V380 Q120 320 200 320 Q280 320 280 380 V542 Z"/></clipPath>
           </defs>
 
+
           <!-- finestra sulla notte innevata -->
           <g class="window">
             <rect x="126" y="26" width="148" height="148" rx="4" fill="#5a3a22"/>
@@ -72,7 +76,8 @@
             <rect x="138" y="97" width="124" height="6" fill="#5a3a22"/>
             <rect x="118" y="172" width="164" height="10" rx="2" fill="#6b4529"/>
           </g>
-
+          </svg>
+          <svg class="layer l-hearth" viewBox="0 0 560 560">
           <!-- camino -->
           <rect x="62" y="254" width="276" height="288" fill="url(#brick)"/>
           <path d="M120 542 V380 Q120 320 200 320 Q280 320 280 380 V542 Z" fill="#120806"/>
@@ -88,8 +93,9 @@
             <rect x="150" y="520" width="104" height="17" rx="8.5" fill="#5b3820" transform="rotate(6 200 528)"/>
             <circle cx="252" cy="534" r="7" fill="#7a5132"/><circle cx="252" cy="534" r="3.5" fill="#5b3820"/>
           </g>
-          <rect x="40" y="542" width="320" height="18" fill="#33201a"/>
-
+          <rect x="30" y="542" width="520" height="18" fill="#33201a"/>
+          </svg>
+          <svg class="layer l-mantel" viewBox="0 0 560 560">
           <!-- mensola -->
           <rect x="40" y="232" width="320" height="16" rx="3" fill="#6b4529"/>
           <rect x="52" y="248" width="296" height="7" fill="#4e321d"/>
@@ -107,11 +113,13 @@
             <path class="cf cf-3" d="M104.5 191 C108 196 107.5 201 104.5 203 C101.5 201 101 196 104.5 191Z" fill="#ffb347"/>
           </g>
 
-          <!-- alberello in vaso -->
-          <rect x="300" y="218" width="20" height="14" rx="2" fill="#8a4a2e"/>
-          <path d="M310 168 l14 22 h-7 l11 16 h-36 l11 -16 h-7z" fill="#2f5d3a"/>
-          <path d="M310 160 l2.4 5.2 5.6 .6 -4.2 3.800 1.2 5.6 -5 -2.900 -5 2.900 1.2 -5.6 -4.2 -3.800 5.6 -.6z" fill="#f2c14e"/>
-          <circle cx="305" cy="196" r="2.2" fill="#c0392b"/><circle cx="316" cy="202" r="2.2" fill="#f2c14e"/><circle cx="309" cy="184" r="2" fill="#f3e6cc"/>
+          <!-- palla di neve -->
+          <rect x="297" y="222" width="26" height="10" rx="2" fill="#8a4a2e"/>
+          <circle cx="310" cy="207" r="17" fill="#bcd7f5" fill-opacity=".16" stroke="#e6eef8" stroke-opacity=".7"/>
+          <path d="M310 194 l8 22 h-16z" fill="#2f5d3a"/>
+          <path d="M296 218 Q310 212 324 218 Q318 224 310 224 Q302 224 296 218Z" fill="#f1f5fa"/>
+          <g fill="#fff"><circle cx="302" cy="202" r="1"/><circle cx="318" cy="199" r=".9"/><circle cx="313" cy="192" r=".8"/><circle cx="300" cy="211" r=".8"/><circle cx="320" cy="209" r="1"/></g>
+          <path d="M299 199 Q302 194 307 193" fill="none" stroke="#fff" stroke-opacity=".6" stroke-linecap="round"/>
 
           <!-- ghirlanda con lucine -->
           <path d="M44 250 Q120 285 200 262 Q280 285 356 250" fill="none" stroke="#1f4029" stroke-width="9" stroke-linecap="round"/>
@@ -139,7 +147,42 @@
             <path d="M-8 8 V34 Q-8 46 -20 48 Q-28 50 -27 57 Q-26 63 -14 63 H0 Q8 63 8 52 V8 Z" fill="#2f5d3a"/>
             <rect x="-10" y="0" width="20" height="9" rx="2" fill="#f3e6cc"/>
           </g>
-        </svg>
+          </svg>
+          <svg class="layer l-tree" viewBox="0 0 560 560">
+          <!-- albero di Natale e regali -->
+          <rect x="447" y="498" width="16" height="44" fill="#4a2c18"/>
+          <path d="M455 330 L537 505 Q455 522 373 505 Z" fill="#1c4429"/>
+          <path d="M455 250 L521 420 Q455 436 389 420 Z" fill="#225130"/>
+          <path d="M455 180 L506 330 Q455 344 404 330 Z" fill="#285d37"/>
+          <path d="M455 126 L491 240 Q455 252 419 240 Z" fill="#2e693e"/>
+          <g fill="none" stroke="#f2c14e" stroke-width="3" stroke-linecap="round" stroke-dasharray=".1 6.5" opacity=".9">
+            <path d="M431 214 Q455 232 483 221"/><path d="M417 300 Q455 325 498 304"/>
+            <path d="M402 386 Q455 416 513 391"/><path d="M387 470 Q455 506 527 477"/>
+          </g>
+          <g>
+            <circle cx="446" cy="196" r="5" fill="#c0392b"/><circle cx="470" cy="268" r="5.5" fill="#f2c14e"/>
+            <circle cx="432" cy="282" r="5" fill="#f3e6cc"/><circle cx="484" cy="352" r="6" fill="#c0392b"/>
+            <circle cx="426" cy="366" r="5.5" fill="#f2c14e"/><circle cx="455" cy="440" r="6" fill="#f3e6cc"/>
+            <circle cx="504" cy="452" r="6" fill="#f2c14e"/><circle cx="402" cy="456" r="6" fill="#c0392b"/>
+          </g>
+          <g id="treeLights"></g>
+          <circle class="star-glow" cx="455" cy="112" r="38" fill="url(#halo)"/>
+          <polygon class="star" points="455,96 458.8,106.7 470.2,107.1 461.2,114 464.4,124.9 455,118.5 445.6,124.9 448.8,114 439.8,107.1 451.2,106.7" fill="#f8d568"/>
+          <g>
+            <rect x="372" y="510" width="44" height="32" fill="#a8322a"/><rect x="369" y="503" width="50" height="9" rx="1" fill="#8c261f"/>
+            <rect x="391" y="503" width="6" height="39" fill="#f3e6cc"/>
+            <rect x="494" y="516" width="40" height="26" fill="#2f5d3a"/><rect x="491" y="510" width="46" height="8" rx="1" fill="#244a2e"/>
+            <rect x="511" y="510" width="6" height="32" fill="#f2c14e"/>
+          </g>
+          <!-- il regalo di chi ha appena risposto: compare dopo l'invio -->
+          <g id="myGift" opacity="0">
+            <rect x="428" y="504" width="50" height="38" fill="#d2ad7c"/><rect x="425" y="496" width="56" height="10" rx="1" fill="#c29b68"/>
+            <rect x="449" y="496" width="8" height="46" fill="#9c2f24"/>
+            <path d="M453 496 C443 482 432 486 436 493 C439 498 448 497 453 496Z M453 496 C463 482 474 486 470 493 C467 498 458 497 453 496Z" fill="#b8392c"/>
+          </g>
+          </svg>
+          <svg class="layer l-motes" viewBox="0 0 560 560"><g id="motes" fill="#ffd98c"></g></svg>
+        </div>
       </div>
     </div>
   </header>
@@ -220,14 +263,36 @@
               <legend>Con cosa contribuisci alla cena?</legend>
               <div class="opt-list">
                 <label class="opt"><input type="checkbox" name="contributo" value="Antipasto"><span>Antipasto</span></label>
-                <label class="opt"><input type="checkbox" name="contributo" value="Bevande"><span>Bevande</span></label>
+                <label class="opt"><input type="checkbox" name="contributo" value="Secondo"><span>Secondo</span></label>
+                <label class="opt"><input type="checkbox" name="contributo" value="Contorno"><span>Contorno</span></label>
                 <label class="opt"><input type="checkbox" name="contributo" value="Dolce"><span>Dolce</span></label>
-                <label class="opt"><input type="checkbox" name="contributo" value="Panettone o pandoro"><span>Panettone o pandoro</span></label>
-                <label class="opt"><input type="checkbox" name="contributo" value="Nessuno"><span>Non porto nulla</span></label>
+                <label class="opt"><input type="checkbox" name="contributo" value="Bevande"><span>Bevande</span></label>
               </div>
             </fieldset>
             <label class="lbl" for="dettaglio">Dettagli (facoltativo)</label>
             <input type="text" id="dettaglio" name="dettaglio" placeholder="Es. due bottiglie di rosso, un tiramisù...">
+          </section>
+
+          <section class="step" id="ss-step">
+            <span class="slate">Lo scambio dei regali</span>
+            <h2 tabindex="-1">Secret Santa</h2>
+            <p class="note">Alla cena è abbinato un Secret Santa: chi partecipa viene inserito nell'estrazione dei nomi e fa un regalo alla persona che gli capita.</p>
+            <fieldset>
+              <legend>Vuoi partecipare?</legend>
+              <div class="opt-list">
+                <label class="opt"><input type="radio" name="secret_santa" value="si"><span>Sì, mettimi nell'estrazione</span></label>
+                <label class="opt"><input type="radio" name="secret_santa" value="no"><span>No, quest'anno passo</span></label>
+              </div>
+              <div class="error-msg" id="err-ss" role="alert">Scegli se partecipare o no: serve per l'estrazione.</div>
+            </fieldset>
+            <div class="conditional" id="ss-plus1-wrap" inert>
+              <div class="conditional-inner">
+                <label class="opt opt-solo">
+                  <input type="checkbox" id="ss_plus1" name="ss_plus1">
+                  <span>Partecipa anche il mio +1</span>
+                </label>
+              </div>
+            </div>
           </section>
 
           <section class="step">
@@ -235,9 +300,9 @@
             <h2 tabindex="-1">La quota</h2>
             <div class="quota-line">
               <span>Quota di partecipazione</span>
-              <span class="amount" id="quota-amount">da definire</span>
+              <span class="amount" id="quota-amount">5€</span>
             </div>
-            <p class="note">La quota copre i costi della serata.</p>
+            <p class="note">La quota serve a coprire i costi di preparazione del primo, a base di pasta fresca (ancora da scegliere).</p>
             <fieldset>
               <legend>Come vuoi pagare?</legend>
               <div class="opt-list">
@@ -294,18 +359,46 @@
   </main>
 </div>
 
-<!-- finale: la busta che si chiude con la ceralacca -->
-<div class="seal-screen" id="sealScreen" role="status" hidden>
-  <div class="envelope" id="envelope" aria-hidden="true">
-    <div class="env-letter"></div>
-    <div class="env-front"></div>
-    <div class="env-flap"></div>
-    <div class="env-wax">★</div>
+<!-- finale: la risposta finisce in un pacco regalo -->
+<div class="gift-screen" id="giftScreen" role="status" hidden>
+  <canvas id="burst" aria-hidden="true"></canvas>
+  <div class="gift-stage" aria-hidden="true">
+    <div class="gift" id="gift">
+      <div class="g-letter"></div>
+      <div class="gf front"></div><div class="gf back"></div><div class="gf left"></div><div class="gf right"></div><div class="gf bottom"></div>
+      <div class="g-lid">
+        <div class="lf front"></div><div class="lf back"></div><div class="lf left"></div><div class="lf right"></div><div class="lf top"></div>
+        <div class="g-bow b1"></div><div class="g-bow b2"></div>
+      </div>
+    </div>
   </div>
-  <p class="seal-caption" id="sealCaption">Pieghiamo il biglietto...</p>
+  <p class="gift-caption" id="giftCaption"></p>
 </div>
 
-<script src="scene.js?v=1"></script>
-<script src="app.js?v=1"></script>
+<!-- apertura: dalla notte innevata si entra in casa -->
+<div class="intro" id="intro" hidden>
+  <canvas id="introSnow" aria-hidden="true"></canvas>
+  <div class="intro-zoom" id="introZoom">
+    <p class="intro-text"><span>Sei invitato alla</span><strong>Cena di Natale 2026</strong></p>
+    <svg viewBox="0 0 300 220" aria-hidden="true">
+      <circle cx="244" cy="34" r="15" fill="#f6ecc9"/><circle cx="244" cy="34" r="34" fill="url(#halo)"/>
+      <path d="M-3000 176 H0 Q80 150 150 168 T300 160 H3300 V3000 H-3000Z" fill="#c9d6e6"/>
+      <path d="M38 172 l16 -58 l16 58z M22 180 l13 -44 l13 44z M236 168 l15 -54 l15 54z M262 174 l12 -40 l12 40z" fill="#0f2a1b"/>
+      <path d="M44 132 l10 -18 l10 18z M243 130 l8 -16 l8 16z" fill="#f1f5fa"/>
+      <rect x="188" y="62" width="16" height="34" fill="#241812"/><rect x="185" y="58" width="22" height="6" fill="#f1f5fa"/>
+      <rect x="94" y="110" width="112" height="76" fill="#1d130e"/>
+      <path d="M78 114 L150 54 L222 114 Z" fill="#f1f5fa"/><path d="M94 114 L150 68 L206 114 Z" fill="#2a1a13"/>
+      <circle cx="150" cy="148" r="46" fill="url(#halo)"/>
+      <rect id="introWindow" x="131" y="129" width="38" height="38" rx="2" fill="#ffc66b"/>
+      <path d="M150 129 V167 M131 148 H169" stroke="#5a3a22" stroke-width="3"/>
+      <rect x="128" y="126" width="44" height="44" rx="3" fill="none" stroke="#5a3a22" stroke-width="4"/>
+      <path d="M-3000 190 H0 Q90 172 170 186 T300 178 H3300 V3000 H-3000Z" fill="#f1f5fa"/>
+    </svg>
+  </div>
+  <button type="button" class="intro-skip" id="introSkip">Salta ›</button>
+</div>
+
+<script src="scene.js?v=2"></script>
+<script src="app.js?v=2"></script>
 </body>
 </html>

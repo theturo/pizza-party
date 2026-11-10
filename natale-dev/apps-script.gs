@@ -3,9 +3,9 @@
 
 const SHEET_NAME = 'Risposte';
 const HEADERS = ['Ricevuta il', 'Email', 'Nome', 'Conferma', 'Partecipazione', 'Nome +1',
-                 'Contributo', 'Dettaglio', 'Quota', 'Pagamento', 'Compilata il'];
+                 'Contributo', 'Dettaglio', 'Secret Santa', 'Secret Santa +1', 'Quota', 'Pagamento', 'Compilata il'];
 const FIELDS = ['email', 'nome', 'conferma', 'partecipazione', 'plus1nome',
-                'contributo', 'dettaglio', 'quota', 'metodoPagamento', 'timestamp'];
+                'contributo', 'dettaglio', 'secretSanta', 'secretSantaPlus1', 'quota', 'metodoPagamento', 'timestamp'];
 const MAX_ROWS = 300;   // tetto di sicurezza contro invii automatici
 
 function getSheet_() {
