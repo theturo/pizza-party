@@ -314,58 +314,48 @@ input[aria-invalid="true"]{border-color:var(--red);}
 .privacy a{color:var(--gold);}
 .privacy-body p{margin:8px 4px;}
 
-/* ===== FINALE: il pacco regalo in 3D ===== */
-.gift-screen{
+/* ===== FINALE: la busta ===== */
+.seal-screen{
   position:fixed;inset:0;z-index:50;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:34px;
-  background:radial-gradient(circle at 50% 46%, rgba(74,34,16,.97), rgba(14,8,5,.98) 70%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;
+  background:rgba(20,11,7,.94);
 }
-.gift-screen canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;}
-.gift-stage{width:240px;height:260px;display:grid;place-items:center;perspective:900px;padding-top:70px;}
-.gift{position:relative;width:0;height:0;transform-style:preserve-3d;transform:rotateX(-24deg) rotateY(-34deg);}
-.gift div{position:absolute;}
-.g-lid{transform-style:preserve-3d;}
-.gf,.lf{
-  background-color:var(--kraft);
-  background-image:linear-gradient(90deg, transparent 0 41%, var(--red) 41% 59%, transparent 59%);
-  box-shadow:inset 0 0 0 1px rgba(51,32,15,.25);
+.seal-screen canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;}
+.envelope{position:relative;width:260px;height:170px;perspective:700px;}
+.env-letter{
+  position:absolute;left:18px;right:18px;top:-70px;height:150px;
+  background:var(--paper);border-radius:3px;
+  background-image:repeating-linear-gradient(180deg, transparent 0 17px, rgba(51,32,15,.16) 17px 18px);
+  transition:transform .7s cubic-bezier(.5,0,.3,1);
 }
-.gf{left:-80px;top:-60px;width:160px;height:120px;}
-.gf.front{transform:translateZ(80px);}
-.gf.back{transform:rotateY(180deg) translateZ(80px);filter:brightness(.7);}
-.gf.right{transform:rotateY(90deg) translateZ(80px);filter:brightness(.8);}
-.gf.left{transform:rotateY(-90deg) translateZ(80px);filter:brightness(.88);}
-.gf.bottom{top:-80px;height:160px;transform:rotateX(-90deg) translateZ(60px);filter:brightness(.55);}
-.lf{left:-87px;top:-16px;width:174px;height:32px;background-color:#dcb988;}
-.lf.front{transform:translateZ(87px);}
-.lf.back{transform:rotateY(180deg) translateZ(87px);filter:brightness(.7);}
-.lf.right{transform:rotateY(90deg) translateZ(87px);filter:brightness(.8);}
-.lf.left{transform:rotateY(-90deg) translateZ(87px);filter:brightness(.88);}
-.lf.top{
-  top:-87px;height:174px;transform:rotateX(90deg) translateZ(16px);filter:brightness(1.06);
-  background-image:
-    linear-gradient(90deg, transparent 0 41%, var(--red) 41% 59%, transparent 59%),
-    linear-gradient(0deg, transparent 0 41%, var(--red) 41% 59%, transparent 59%);
+.envelope.tucked .env-letter{transform:translateY(84px);}
+.env-front{
+  position:absolute;inset:0;border-radius:5px;
+  background:
+    linear-gradient(to top right, var(--kraft) 49.6%, transparent 50%) left/50.2% 100% no-repeat,
+    linear-gradient(to top left, var(--kraft) 49.6%, transparent 50%) right/50.2% 100% no-repeat,
+    var(--kraft-dark);
+  box-shadow:0 16px 36px rgba(0,0,0,.6);
 }
-.g-lid{transform:translateY(-330px) rotateZ(-22deg);opacity:0;transition:transform .65s cubic-bezier(.5,0,.35,1.25), opacity .2s;}
-.gift.lidded .g-lid{transform:translateY(-76px);opacity:1;}
-.g-letter{
-  left:-46px;top:-58px;width:92px;height:112px;border-radius:2px;
-  background:var(--paper) repeating-linear-gradient(180deg, transparent 0 13px, rgba(51,32,15,.2) 13px 14px);
-  transform:translateY(-300px) rotateZ(10deg);opacity:0;
-  transition:transform .7s cubic-bezier(.5,0,.4,1), opacity .2s;
+.env-flap{
+  position:absolute;left:0;right:0;top:0;height:96px;
+  background:#c29b68;
+  clip-path:polygon(0 0,100% 0,50% 100%);
+  transform-origin:50% 0;transform:rotateX(180deg);
+  transition:transform .6s cubic-bezier(.5,0,.3,1);
 }
-.gift.filled .g-letter{transform:translateY(0) rotateZ(0deg);opacity:1;}
-.g-bow{
-  left:-24px;top:-50px;width:48px;height:34px;
-  background:#c8473a;border-radius:50%;box-shadow:inset 0 0 0 7px #a8322a;
-  transform:scale(0);transform-origin:50% 100%;
-  transition:transform .4s cubic-bezier(.3,1.7,.5,1);
+.envelope.closed .env-flap{transform:rotateX(0deg);}
+.env-wax{
+  position:absolute;left:50%;top:82px;width:50px;height:50px;margin:-25px 0 0 -25px;
+  display:grid;place-content:center;
+  font-size:22px;color:#e8a79b;
+  background:radial-gradient(circle at 35% 30%, #c8473a, var(--red-dark) 70%);
+  border-radius:47% 53% 50% 50% / 52% 48% 52% 48%;
+  box-shadow:0 3px 6px rgba(0,0,0,.45), inset 0 0 0 4px rgba(0,0,0,.14);
+  transform:scale(2.6);opacity:0;
 }
-/* Il fiocco è girato verso chi guarda (il pacco è ruotato di -34°). */
-.gift.bowed .g-bow.b1{transform:rotateY(34deg) rotateZ(-50deg) scale(1);}
-.gift.bowed .g-bow.b2{transform:rotateY(34deg) rotateZ(50deg) scale(1);}
-.gift-caption{position:relative;margin:0;min-height:1.6em;font-family:var(--hand);font-weight:700;font-size:20px;color:var(--cream);text-align:center;padding:0 20px;}
+.envelope.sealed .env-wax{transform:scale(1);opacity:1;transition:transform .32s cubic-bezier(.5,0,.6,1.5), opacity .15s;}
+.seal-caption{position:relative;margin:0;min-height:1.6em;font-family:var(--hand);font-weight:700;font-size:19px;color:var(--cream);text-align:center;padding:0 20px;}
 
 /* ===== APERTURA ===== */
 .intro{

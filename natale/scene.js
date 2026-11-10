@@ -254,48 +254,35 @@ const Scene = (() => {
     })(t0);
   }
 
-  // Finale: la risposta scende nel pacco, cala il coperchio, il pacco gira e spunta il fiocco.
+  // Finale: il biglietto entra nella busta, la busta si chiude, cala la ceralacca.
   async function finale(els, captions, done){
     if(reduced){ done(); return; }
-    const gift = els.gift;
-    gift.className = 'gift';
     els.caption.textContent = captions[0];
+    els.envelope.className = 'envelope';
     els.screen.hidden = false;
     els.screen.animate([{opacity: 0}, {opacity: 1}], {duration: 250});
     await sleep(350);
-    gift.classList.add('filled');
-    await sleep(800);
-    gift.classList.add('lidded');
-    await sleep(700);
+    els.envelope.classList.add('tucked');
+    await sleep(750);
+    els.envelope.classList.add('closed');
     els.caption.textContent = captions[1];
-    gift.animate(
-      [{transform: 'rotateX(-24deg) rotateY(-34deg)'}, {transform: 'rotateX(-24deg) rotateY(326deg)'}],
-      {duration: 1150, easing: 'cubic-bezier(.5,0,.3,1)'});
     await sleep(700);
-    gift.classList.add('bowed');
-    await sleep(450);
+    els.envelope.classList.add('sealed');
+    await sleep(380);
+    els.envelope.animate(
+      [{transform: 'none'}, {transform: 'translateY(4px) scale(.985)'}, {transform: 'none'}],
+      {duration: 220});
     burst(els.canvas);
-    gift.animate(
-      [{transform: 'rotateX(-24deg) rotateY(-34deg) scale(1)'}, {transform: 'rotateX(-24deg) rotateY(-34deg) scale(1.12)'},
-       {transform: 'rotateX(-24deg) rotateY(-34deg) scale(1)'}],
-      {duration: 420, easing: 'ease-out'});
     els.caption.textContent = captions[2];
-    await sleep(1700);
-    await els.screen.animate([{opacity: 1}, {opacity: 0}], {duration: 350}).finished;
+    await sleep(1600);
+    await els.screen.animate([{opacity: 1}, {opacity: 0}], {duration: 300}).finished;
     els.screen.hidden = true;
     done();
   }
 
-  // Dopo l'invio un pacco in più cade sotto l'albero e la stella si accende.
-  function dropGift(){
-    const g = $('myGift');
-    g.setAttribute('opacity', 1);
+  // Dopo l'invio la stella dell'albero si accende.
+  function starFlash(){
     if(reduced) return;
-    g.animate(
-      [{transform: 'translateY(-420px)', easing: 'cubic-bezier(.5,0,1,.6)'}, {transform: 'translateY(0)', offset: .55},
-       {transform: 'translateY(-26px)', offset: .72, easing: 'ease-in'}, {transform: 'translateY(0)', offset: .86},
-       {transform: 'translateY(-7px)', offset: .93}, {transform: 'translateY(0)'}],
-      {duration: 1100});
     const star = document.querySelector('.star');
     star.classList.add('flash');
     setTimeout(() => star.classList.remove('flash'), 1300);
@@ -315,5 +302,5 @@ const Scene = (() => {
   topLights();
   parallax();
   intro();
-  return {stepSwap, reveal, finale, popIn, dropGift, reduced};
+  return {stepSwap, reveal, finale, popIn, starFlash, reduced};
 })();

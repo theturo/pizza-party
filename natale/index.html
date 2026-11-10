@@ -14,7 +14,7 @@
 <meta name="description" content="La cena di Natale tra amici: facci sapere se ci sei.">
 <meta name="theme-color" content="#1a100b">
 <link rel="preload" href="../fonts/fraunces-italic-latin.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="styles.css?v=2">
+<link rel="stylesheet" href="styles.css?v=3">
 </head>
 <body>
 <div class="lights" id="lights" aria-hidden="true"></div>
@@ -174,12 +174,6 @@
             <rect x="494" y="516" width="40" height="26" fill="#2f5d3a"/><rect x="491" y="510" width="46" height="8" rx="1" fill="#244a2e"/>
             <rect x="511" y="510" width="6" height="32" fill="#f2c14e"/>
           </g>
-          <!-- il regalo di chi ha appena risposto: compare dopo l'invio -->
-          <g id="myGift" opacity="0">
-            <rect x="428" y="504" width="50" height="38" fill="#d2ad7c"/><rect x="425" y="496" width="56" height="10" rx="1" fill="#c29b68"/>
-            <rect x="449" y="496" width="8" height="46" fill="#9c2f24"/>
-            <path d="M453 496 C443 482 432 486 436 493 C439 498 448 497 453 496Z M453 496 C463 482 474 486 470 493 C467 498 458 497 453 496Z" fill="#b8392c"/>
-          </g>
           </svg>
           <svg class="layer l-motes" viewBox="0 0 560 560"><g id="motes" fill="#ffd98c"></g></svg>
         </div>
@@ -291,6 +285,14 @@
                   <input type="checkbox" id="ss_plus1" name="ss_plus1">
                   <span>Partecipa anche il mio +1</span>
                 </label>
+                <div class="conditional" id="ss-plus1nome-wrap" inert>
+                  <div class="conditional-inner">
+                    <label class="lbl" for="ss_plus1nome">Nome e cognome del tuo +1</label>
+                    <span class="hint" id="hint-ss-nome">Serve per inserirlo nell'estrazione.</span>
+                    <input type="text" id="ss_plus1nome" placeholder="Nome dell'accompagnatore" aria-describedby="hint-ss-nome err-ss-nome">
+                    <div class="error-msg" id="err-ss-nome" role="alert">Serve il nome del tuo +1 per l'estrazione.</div>
+                  </div>
+                </div>
               </div>
             </div>
           </section>
@@ -359,20 +361,16 @@
   </main>
 </div>
 
-<!-- finale: la risposta finisce in un pacco regalo -->
-<div class="gift-screen" id="giftScreen" role="status" hidden>
+<!-- finale: la busta che si chiude con la ceralacca -->
+<div class="seal-screen" id="sealScreen" role="status" hidden>
   <canvas id="burst" aria-hidden="true"></canvas>
-  <div class="gift-stage" aria-hidden="true">
-    <div class="gift" id="gift">
-      <div class="g-letter"></div>
-      <div class="gf front"></div><div class="gf back"></div><div class="gf left"></div><div class="gf right"></div><div class="gf bottom"></div>
-      <div class="g-lid">
-        <div class="lf front"></div><div class="lf back"></div><div class="lf left"></div><div class="lf right"></div><div class="lf top"></div>
-        <div class="g-bow b1"></div><div class="g-bow b2"></div>
-      </div>
-    </div>
+  <div class="envelope" id="envelope" aria-hidden="true">
+    <div class="env-letter"></div>
+    <div class="env-front"></div>
+    <div class="env-flap"></div>
+    <div class="env-wax">★</div>
   </div>
-  <p class="gift-caption" id="giftCaption"></p>
+  <p class="seal-caption" id="sealCaption">Pieghiamo il biglietto...</p>
 </div>
 
 <!-- apertura: dalla notte innevata si entra in casa -->
@@ -398,7 +396,7 @@
   <button type="button" class="intro-skip" id="introSkip">Salta ›</button>
 </div>
 
-<script src="scene.js?v=2"></script>
-<script src="app.js?v=2"></script>
+<script src="scene.js?v=3"></script>
+<script src="app.js?v=3"></script>
 </body>
 </html>

@@ -64,6 +64,7 @@ function updateConditionals(){
   Scene.reveal($('plus1-wrap'), isPlus1());
   Scene.reveal($('online-wrap'), checked('metodo_pagamento') === 'online');
   Scene.reveal($('ss-plus1-wrap'), isPlus1());
+  Scene.reveal($('ss-plus1nome-wrap'), isPlus1() && $('ss_plus1').checked);
   $('quota-amount').textContent = formatEuro(quotaFor(isPlus1()));
 }
 
@@ -111,6 +112,7 @@ function restoreProgress(){
   try{ data = JSON.parse(sessionStorage.getItem(PROGRESS_KEY) || 'null'); }catch(e){ data = null; }
   if(!data) return;
   TEXT_FIELDS.forEach(id => { $(id).value = data[id] || ''; });
+  $('ss_plus1nome').value = $('plus1nome').value;
   RADIO_FIELDS.forEach(n => {
     const el = data[n] && form.querySelector('input[name="' + n + '"][value="' + CSS.escape(data[n]) + '"]');
     if(el) el.checked = true;
@@ -134,6 +136,14 @@ function restoreProgress(){
     setTimeout(() => note.classList.remove('show'), 8000);
   }
 }
+// Il nome del +1 si può scrivere al primo passo o in quello del Secret Santa: è lo stesso dato.
+[['plus1nome', 'ss_plus1nome'], ['ss_plus1nome', 'plus1nome']].forEach(([from, to]) => {
+  $(from).addEventListener('input', () => {
+    $(to).value = $(from).value;
+    setInvalid($('ss_plus1nome'), false);
+    $('err-ss-nome').classList.remove('show');
+  });
+});
 form.addEventListener('input', saveProgress);
 form.addEventListener('change', saveProgress);
 
@@ -240,7 +250,12 @@ async function checkDuplicate(btn){
 function validateSecretSanta(){
   const ok = !!checked('secret_santa');
   $('err-ss').classList.toggle('show', !ok);
-  return ok;
+  // Se partecipa anche il +1, per l'estrazione serve il suo nome.
+  const nameMissing = isPlus1() && $('ss_plus1').checked && !$('plus1nome').value.trim();
+  $('err-ss-nome').classList.toggle('show', nameMissing);
+  setInvalid($('ss_plus1nome'), nameMissing);
+  if(ok && nameMissing) $('ss_plus1nome').focus();
+  return ok && !nameMissing;
 }
 
 btnNext.addEventListener('click', async () => {
@@ -260,6 +275,7 @@ form.addEventListener('change', e => {
   if(RADIO_FIELDS.indexOf(e.target.name) !== -1) refreshFlow();
   if(e.target.id === 'accetto') $('err-accetto').classList.remove('show');
   if(e.target.name === 'secret_santa') $('err-ss').classList.remove('show');
+  if(e.target.id === 'ss_plus1') refreshFlow();
 });
 
 // ---- Invio -------------------------------------------------------------------
@@ -337,10 +353,8 @@ function showResult(payload, opts){
   }
 
   Scene.finale(
-    {screen: $('giftScreen'), gift: $('gift'), caption: $('giftCaption'), canvas: $('burst')},
-    attending
-      ? ["Mettiamo la tua risposta nel pacco...", "...un bel fiocco...", "...e via sotto l'albero!"]
-      : ["Mettiamo via la tua risposta...", "...un bel fiocco...", "...e ti teniamo il posto per l'anno prossimo."],
+    {screen: $('sealScreen'), envelope: $('envelope'), caption: $('sealCaption'), canvas: $('burst')},
+    ["Pieghiamo il biglietto...", "...lo chiudiamo nella busta...", attending ? "...ed è consegnato!" : "...e ti teniamo il posto per l'anno prossimo."],
     () => {
       form.hidden = true;
       progress.hidden = true;
@@ -348,7 +362,7 @@ function showResult(payload, opts){
       $('success').hidden = false;
       card.scrollIntoView({behavior: 'auto', block: 'nearest'});
       Scene.popIn(stamp);
-      Scene.dropGift();
+      Scene.starFlash();
       $('successTitle').focus({preventScroll: true});
     });
 }
